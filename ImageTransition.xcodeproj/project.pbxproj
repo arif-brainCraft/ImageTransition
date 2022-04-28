@@ -13,9 +13,23 @@
 		130A86C92817F42300943CCA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 130A86C72817F42300943CCA /* Main.storyboard */; };
 		130A86CB2817F42500943CCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 130A86CA2817F42500943CCA /* Assets.xcassets */; };
 		130A86CE2817F42500943CCA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 130A86CC2817F42500943CCA /* LaunchScreen.storyboard */; };
+		130A86DF2817F7F000943CCA /* 6.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86D62817F7F000943CCA /* 6.jpg */; };
+		130A86E02817F7F000943CCA /* 7.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86D72817F7F000943CCA /* 7.jpg */; };
+		130A86E12817F7F000943CCA /* 8.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86D82817F7F000943CCA /* 8.jpg */; };
+		130A86E22817F7F000943CCA /* 9.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86D92817F7F000943CCA /* 9.jpg */; };
+		130A86E32817F7F000943CCA /* 4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86DA2817F7F000943CCA /* 4.jpg */; };
+		130A86E42817F7F000943CCA /* 5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86DB2817F7F000943CCA /* 5.jpg */; };
+		130A86E52817F7F000943CCA /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86DC2817F7F000943CCA /* 2.jpg */; };
+		130A86E62817F7F000943CCA /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86DD2817F7F000943CCA /* 1.jpg */; };
+		130A86E72817F7F000943CCA /* 3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 130A86DE2817F7F000943CCA /* 3.jpg */; };
+		130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86E82819168800943CCA /* ImgesToVideoViewController.swift */; };
+		130A86EC2819202400943CCA /* audio2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EA2819202400943CCA /* audio2.mp3 */; };
+		130A86ED2819202400943CCA /* audio1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EB2819202400943CCA /* audio1.mp3 */; };
+		848FAF28E948CFD704D7C4DB /* Pods_ImageTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		12BBF925C506ADEF32E4A24F /* Pods-ImageTransition.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.debug.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.debug.xcconfig"; sourceTree = "<group>"; };
 		130A86BE2817F42300943CCA /* ImageTransition.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageTransition.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		130A86C12817F42300943CCA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		130A86C32817F42300943CCA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,6 +38,20 @@
 		130A86CA2817F42500943CCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		130A86CD2817F42500943CCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		130A86CF2817F42500943CCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		130A86D62817F7F000943CCA /* 6.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 6.jpg; sourceTree = "<group>"; };
+		130A86D72817F7F000943CCA /* 7.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 7.jpg; sourceTree = "<group>"; };
+		130A86D82817F7F000943CCA /* 8.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 8.jpg; sourceTree = "<group>"; };
+		130A86D92817F7F000943CCA /* 9.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 9.jpg; sourceTree = "<group>"; };
+		130A86DA2817F7F000943CCA /* 4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 4.jpg; sourceTree = "<group>"; };
+		130A86DB2817F7F000943CCA /* 5.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 5.jpg; sourceTree = "<group>"; };
+		130A86DC2817F7F000943CCA /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
+		130A86DD2817F7F000943CCA /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
+		130A86DE2817F7F000943CCA /* 3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3.jpg; sourceTree = "<group>"; };
+		130A86E82819168800943CCA /* ImgesToVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImgesToVideoViewController.swift; sourceTree = "<group>"; };
+		130A86EA2819202400943CCA /* audio2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio2.mp3; sourceTree = "<group>"; };
+		130A86EB2819202400943CCA /* audio1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio1.mp3; sourceTree = "<group>"; };
+		4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ImageTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.release.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				848FAF28E948CFD704D7C4DB /* Pods_ImageTransition.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,8 +69,11 @@
 		130A86B52817F42300943CCA = {
 			isa = PBXGroup;
 			children = (
+				130A86D52817F7D800943CCA /* Resources */,
 				130A86C02817F42300943CCA /* ImageTransition */,
 				130A86BF2817F42300943CCA /* Products */,
+				F269FBF00145806CF59BE814 /* Pods */,
+				3F322A61A973C1C48C3715BD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -63,8 +95,44 @@
 				130A86CA2817F42500943CCA /* Assets.xcassets */,
 				130A86CC2817F42500943CCA /* LaunchScreen.storyboard */,
 				130A86CF2817F42500943CCA /* Info.plist */,
+				130A86E82819168800943CCA /* ImgesToVideoViewController.swift */,
 			);
 			path = ImageTransition;
+			sourceTree = "<group>";
+		};
+		130A86D52817F7D800943CCA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				130A86EB2819202400943CCA /* audio1.mp3 */,
+				130A86EA2819202400943CCA /* audio2.mp3 */,
+				130A86DD2817F7F000943CCA /* 1.jpg */,
+				130A86DC2817F7F000943CCA /* 2.jpg */,
+				130A86DE2817F7F000943CCA /* 3.jpg */,
+				130A86DA2817F7F000943CCA /* 4.jpg */,
+				130A86DB2817F7F000943CCA /* 5.jpg */,
+				130A86D62817F7F000943CCA /* 6.jpg */,
+				130A86D72817F7F000943CCA /* 7.jpg */,
+				130A86D82817F7F000943CCA /* 8.jpg */,
+				130A86D92817F7F000943CCA /* 9.jpg */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		3F322A61A973C1C48C3715BD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F269FBF00145806CF59BE814 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				12BBF925C506ADEF32E4A24F /* Pods-ImageTransition.debug.xcconfig */,
+				5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,9 +142,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 130A86D22817F42500943CCA /* Build configuration list for PBXNativeTarget "ImageTransition" */;
 			buildPhases = (
+				A44B2576EA046C4372C1E8DC /* [CP] Check Pods Manifest.lock */,
 				130A86BA2817F42300943CCA /* Sources */,
 				130A86BB2817F42300943CCA /* Frameworks */,
 				130A86BC2817F42300943CCA /* Resources */,
+				57DEE13B29E8296E0251B570 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -125,13 +195,66 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				130A86E62817F7F000943CCA /* 1.jpg in Resources */,
+				130A86E32817F7F000943CCA /* 4.jpg in Resources */,
+				130A86E12817F7F000943CCA /* 8.jpg in Resources */,
+				130A86E72817F7F000943CCA /* 3.jpg in Resources */,
+				130A86E52817F7F000943CCA /* 2.jpg in Resources */,
 				130A86CE2817F42500943CCA /* LaunchScreen.storyboard in Resources */,
+				130A86E42817F7F000943CCA /* 5.jpg in Resources */,
+				130A86E22817F7F000943CCA /* 9.jpg in Resources */,
 				130A86CB2817F42500943CCA /* Assets.xcassets in Resources */,
+				130A86E02817F7F000943CCA /* 7.jpg in Resources */,
+				130A86DF2817F7F000943CCA /* 6.jpg in Resources */,
 				130A86C92817F42300943CCA /* Main.storyboard in Resources */,
+				130A86EC2819202400943CCA /* audio2.mp3 in Resources */,
+				130A86ED2819202400943CCA /* audio1.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		57DEE13B29E8296E0251B570 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ImageTransition/Pods-ImageTransition-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ImageTransition/Pods-ImageTransition-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ImageTransition/Pods-ImageTransition-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A44B2576EA046C4372C1E8DC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ImageTransition-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		130A86BA2817F42300943CCA /* Sources */ = {
@@ -140,6 +263,7 @@
 			files = (
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
+				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -282,6 +406,7 @@
 		};
 		130A86D32817F42500943CCA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 12BBF925C506ADEF32E4A24F /* Pods-ImageTransition.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -290,11 +415,13 @@
 				DEVELOPMENT_TEAM = 5NNWRYKRDZ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageTransition/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To export your creation";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -310,6 +437,7 @@
 		};
 		130A86D42817F42500943CCA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -318,11 +446,13 @@
 				DEVELOPMENT_TEAM = 5NNWRYKRDZ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageTransition/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To export your creation";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
