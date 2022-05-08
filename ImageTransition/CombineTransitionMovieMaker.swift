@@ -28,6 +28,7 @@ class CombineTransitionMovieMaker:NSObject {
     
     public func createCombinedTransitionVideo(with images: [UIImage],
                             effects: [MTTransition.Effect],
+                            blendEffects:[Int],
                             frameDuration: TimeInterval = 1,
                             transitionDuration: TimeInterval = 0.8,
                             audioURL: URL? = nil,
@@ -39,6 +40,7 @@ class CombineTransitionMovieMaker:NSObject {
         }
         try createCombinedTransitionVideo(with: inputImages,
                         effects: effects,
+                        blendEffects:blendEffects,
                         frameDuration: frameDuration,
                         transitionDuration: transitionDuration,
                         audioURL: audioURL,
@@ -47,6 +49,7 @@ class CombineTransitionMovieMaker:NSObject {
     
     public func createCombinedTransitionVideo(with images: [MTIImage],
                             effects: [MTTransition.Effect],
+                            blendEffects:[Int],
                             frameDuration: TimeInterval = 1,
                             transitionDuration: TimeInterval = 0.8,
                             audioURL: URL? = nil,
@@ -55,7 +58,10 @@ class CombineTransitionMovieMaker:NSObject {
         guard images.count >= 2 else {
             throw MTMovieMakerError.imagesMustMoreThanTwo
         }
-        guard effects.count == images.count - 1 else {
+        
+        let totalEffect = effects.count - blendEffects.count
+        
+        guard totalEffect == images.count - 1 else {
             throw MTMovieMakerError.imagesAndEffectsDoesNotMatch
         }
         if FileManager.default.fileExists(atPath: outputURL.path) {
@@ -85,16 +91,13 @@ class CombineTransitionMovieMaker:NSObject {
         
         self.writer?.startSession(atSourceTime: .zero)
         writerInput.requestMediaDataWhenReady(on: self.writingQueue) {
-            var index = 0
+            var index = 0,effectIndex = 0
             while index < (images.count - 1) {
                 var presentTime = CMTimeMake(value: Int64(frameDuration * Double(index) * 1000), timescale: 1000)
-                let transition = effects[index].transition
+                let transition = effects[effectIndex].transition
                 transition.inputImage = images[index]
                 transition.destImage = images[index + 1]
                 transition.duration = transitionDuration
-                
-                let transition2 = effects[index + 1].transition
-                
 
                 let frameBeginTime = presentTime
                 let frameCount = 60
@@ -112,10 +115,11 @@ class CombineTransitionMovieMaker:NSObject {
                         presentTime = CMTimeAdd(frameBeginTime, frameTime)
 
                         if  let frame = transition.outputImage {
-                            frameBuffer.append(frame)
-                            if frameBuffer.count == 2 {
-                                transition2.progress = transition.progress * 2;
-                                transition2.inputImage = frameBuffer[0]
+                            if blendEffects.contains(effectIndex + 1) {
+                                
+                                let transition2 = effects[effectIndex + 1].transition
+                                transition2.progress = transition.progress;
+                                transition2.inputImage = frame.oriented(.downMirrored)
                                 transition2.destImage = transition.destImage
                                 transition2.duration = transition.duration
                                 
@@ -126,13 +130,28 @@ class CombineTransitionMovieMaker:NSObject {
                                     try? MTTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
                                 }
-                                frameBuffer.removeAll()
+                                
+                            }else{
+                                var pixelBuffer: CVPixelBuffer?
+                                CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
+                                
+                                if let buffer = pixelBuffer,let frame = transition.outputImage {
+                                    try? MTTransition.context?.render(frame, to: buffer)
+                                    pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
+                                }
                             }
+                            
                             
                         }
                     }
                 }
-                index += 2
+                index += 1
+                
+                if blendEffects.contains(effectIndex + 1) {
+                    effectIndex += 1
+                }
+                effectIndex += 1
+
             }
             writerInput.markAsFinished()
             self.writer?.finishWriting {

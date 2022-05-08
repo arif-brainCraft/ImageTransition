@@ -43,15 +43,19 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
+    @objc func playerDidFinishPlaying(note: NSNotification) {
+        Thread.sleep(forTimeInterval: 2)
+        player.seek(to: .zero)
+    }
+    
     func createVideo() -> Void {
         let allImages = loadImages()
         
-        let effects: [MTTransition.Effect] = [.crossZoom,
-            .crossWarp]
-        
-        let secondEffects: [MTTransition.Effect] = [
-            .angular, .bowTieHorizontal, .burn,
-            .butterflyWaveScrawler, .none]
+        let effects: [MTTransition.Effect] = [.burn,.wipeUp,.wipeLeft,.bowTieHorizontal,.crossHatch]
+        var blendEffects = [Int]()
+        blendEffects.append(2)
+        blendEffects.append(4)
+
         
         let path = NSTemporaryDirectory().appending("CreateVideoFromImages.mp4")
         let url = URL(fileURLWithPath: path)
@@ -59,7 +63,7 @@ class ImgesToVideoViewController: UIViewController {
         movieMaker = CombineTransitionMovieMaker(outputURL: url)
         do {
             
-            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
+            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):
@@ -67,6 +71,16 @@ class ImgesToVideoViewController: UIViewController {
                     let playerItem = AVPlayerItem(url: url)
                     self.player.replaceCurrentItem(with: playerItem)
                     self.player.play()
+                    
+                    NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
+                    
+                    NotificationCenter.default
+                        .addObserver(self,
+                                     selector: #selector(self.playerDidFinishPlaying),
+                        name: .AVPlayerItemDidPlayToEndTime,
+                                     object: self.player.currentItem)
+                                     
+                    
                     break
                     
                 case .failure(let error):
@@ -97,7 +111,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func loadImages() -> [UIImage] {
         var images = [UIImage]()
-        for i in 1...3 {
+        for i in 1...4 {
             if let url = Bundle.main.url(forResource: String(i), withExtension: "jpg") {
                 if let image = UIImage(contentsOfFile: url.path) {
                     images.append(image)
