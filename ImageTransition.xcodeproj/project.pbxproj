@@ -25,6 +25,7 @@
 		130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86E82819168800943CCA /* ImgesToVideoViewController.swift */; };
 		130A86EC2819202400943CCA /* audio2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EA2819202400943CCA /* audio2.mp3 */; };
 		130A86ED2819202400943CCA /* audio1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EB2819202400943CCA /* audio1.mp3 */; };
+		130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */; };
 		848FAF28E948CFD704D7C4DB /* Pods_ImageTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,7 @@
 		130A86E82819168800943CCA /* ImgesToVideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImgesToVideoViewController.swift; sourceTree = "<group>"; };
 		130A86EA2819202400943CCA /* audio2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio2.mp3; sourceTree = "<group>"; };
 		130A86EB2819202400943CCA /* audio1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio1.mp3; sourceTree = "<group>"; };
+		130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTransitionMovieMaker.swift; sourceTree = "<group>"; };
 		4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ImageTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.release.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,6 +98,7 @@
 				130A86CC2817F42500943CCA /* LaunchScreen.storyboard */,
 				130A86CF2817F42500943CCA /* Info.plist */,
 				130A86E82819168800943CCA /* ImgesToVideoViewController.swift */,
+				130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -263,6 +266,7 @@
 			files = (
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
+				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */,
 			);

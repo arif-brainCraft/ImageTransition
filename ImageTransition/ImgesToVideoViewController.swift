@@ -16,7 +16,7 @@ class ImgesToVideoViewController: UIViewController {
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
     private var exportButton : UIBarButtonItem!
-    var movieMaker:MTMovieMaker?
+    var movieMaker:CombineTransitionMovieMaker?
     var fileUrl:URL?
     
     override func viewDidLoad() {
@@ -46,17 +46,20 @@ class ImgesToVideoViewController: UIViewController {
     func createVideo() -> Void {
         let allImages = loadImages()
         
-        let effects: [MTTransition.Effect] = [
-            .circleOpen, .circleCrop, .none,
-            .crossZoom, .dreamy, .rotateScaleFade,
-            .wipeDown, .wipeUp]
+        let effects: [MTTransition.Effect] = [.crossZoom,
+            .crossWarp]
+        
+        let secondEffects: [MTTransition.Effect] = [
+            .angular, .bowTieHorizontal, .burn,
+            .butterflyWaveScrawler, .none]
         
         let path = NSTemporaryDirectory().appending("CreateVideoFromImages.mp4")
         let url = URL(fileURLWithPath: path)
         
-        movieMaker = MTMovieMaker(outputURL: url)
+        movieMaker = CombineTransitionMovieMaker(outputURL: url)
         do {
-            try movieMaker?.createVideo(with: allImages, effects: effects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
+            
+            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):
@@ -94,7 +97,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func loadImages() -> [UIImage] {
         var images = [UIImage]()
-        for i in 1...9 {
+        for i in 1...3 {
             if let url = Bundle.main.url(forResource: String(i), withExtension: "jpg") {
                 if let image = UIImage(contentsOfFile: url.path) {
                     images.append(image)
