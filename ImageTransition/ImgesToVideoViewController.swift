@@ -38,7 +38,7 @@ class ImgesToVideoViewController: UIViewController {
         player = AVPlayer()
         playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspect
-        
+        playerLayer.pixelBufferAttributes = [kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA]
         videoView.layer.addSublayer(playerLayer)
         
     }
@@ -63,23 +63,41 @@ class ImgesToVideoViewController: UIViewController {
         movieMaker = CombineTransitionMovieMaker(outputURL: url)
         do {
             
+            
             try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):
-                    self.fileUrl = url
-                    let playerItem = AVPlayerItem(url: url)
-                    self.player.replaceCurrentItem(with: playerItem)
-                    self.player.play()
-                    
-                    NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
-                    
-                    NotificationCenter.default
-                        .addObserver(self,
-                                     selector: #selector(self.playerDidFinishPlaying),
-                        name: .AVPlayerItemDidPlayToEndTime,
-                                     object: self.player.currentItem)
-                                     
+                    print(url)
+                    let asset = AVURLAsset(url: url)
+                    if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
+                        let overlayAsset = AVURLAsset(url: url)
+                        self.movieMaker?.newoverlay(video: asset, withSecondVideo: overlayAsset, completion: {[weak self] result in
+                            guard let self = self else {return}
+                            switch result {
+                            case .success(let url):
+                                self.playVideo(url: url)
+
+                                break
+
+                            case .failure(let error):
+                                break
+                            }
+                        })
+                    }
+
+//                    self.movieMaker?.exportVideoWithAnimation(asset: asset, completion: {[weak self] result in
+//                        guard let self = self else {return}
+//                        switch result {
+//                        case .success(let url):
+//                            self.playVideo(url: url)
+//
+//                            break
+//
+//                        case .failure(let error):
+//                            break
+//                        }
+//                    })
                     
                     break
                     
@@ -88,35 +106,37 @@ class ImgesToVideoViewController: UIViewController {
                 }
             })
             
-            /*try movieMaker?.createVideo(with: allImages, effects: effects, completion: {[weak self] result in
-                guard let self = self else {return}
-                switch result {
-                case .success(let url):
-                    self.fileUrl = url
-                    let playerItem = AVPlayerItem(url: url)
-                    self.player.replaceCurrentItem(with: playerItem)
-                    self.player.play()
-                    break
-                    
-                case .failure(let error):
-                    break
-                }
-            })*/
         } catch  {
             
         }
         
         
     }
+   
+    func playVideo(url:URL) -> Void {
+        self.fileUrl = url
+        let playerItem = AVPlayerItem(url: url)
+        self.player.replaceCurrentItem(with: playerItem)
+        self.player.play()
+        
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.player.currentItem)
+        
+        NotificationCenter.default
+            .addObserver(self,
+                         selector: #selector(self.playerDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+                         object: self.player.currentItem)
+    }
     
     func loadImages() -> [UIImage] {
         var images = [UIImage]()
-        for i in 1...4 {
+        for i in 5...8 {
             if let url = Bundle.main.url(forResource: String(i), withExtension: "jpg") {
                 if let image = UIImage(contentsOfFile: url.path) {
                     images.append(image)
                 }
             }
+            
         }
         return images
     }

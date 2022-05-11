@@ -101,9 +101,7 @@ class CombineTransitionMovieMaker:NSObject {
 
                 let frameBeginTime = presentTime
                 let frameCount = 60
-                
-                var frameBuffer = [MTIImage]()
-                
+                                
                 for counter in 0 ... frameCount {
                     autoreleasepool {
                         while !writerInput.isReadyForMoreMediaData {
@@ -127,6 +125,7 @@ class CombineTransitionMovieMaker:NSObject {
                                 CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
                                 
                                 if let buffer = pixelBuffer,let frame = transition2.outputImage {
+                                    
                                     try? MTTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
                                 }
@@ -153,6 +152,7 @@ class CombineTransitionMovieMaker:NSObject {
                 effectIndex += 1
 
             }
+            
             writerInput.markAsFinished()
             self.writer?.finishWriting {
                 if let audioURL = audioURL, self.writer?.error == nil {
@@ -246,5 +246,499 @@ class CombineTransitionMovieMaker:NSObject {
                 }
             }
         }
+    }
+    
+        func removeFileAtURLIfExists(url: NSURL) {
+            if let filePath = url.path {
+                let fileManager = FileManager.default
+                if fileManager.fileExists(atPath: filePath) {
+                    do{
+                        try fileManager.removeItem(atPath: filePath)
+                    } catch let error as NSError {
+                        print("Couldn't remove existing destination file: \(error)")
+                    }
+                }
+            }
+        }
+    
+    func exportVideoWithAnimation(asset:AVAsset,audioIsEnabled:Bool = false,completion: MTMovieMakerCompletion? = nil) {
+        let composition = AVMutableComposition()
+        
+        let track =  asset.tracks(withMediaType: AVMediaType.video)
+        let videoTrack:AVAssetTrack = track[0] as AVAssetTrack
+        let timerange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)
+        let outputSize = videoTrack.naturalSize
+        let compositionVideoTrack = composition.addMutableTrack(withMediaType: AVMediaType.video, preferredTrackID: CMPersistentTrackID())
+        
+        do {
+            try compositionVideoTrack?.insertTimeRange(timerange, of: videoTrack, at: CMTime.zero)
+            compositionVideoTrack?.preferredTransform = videoTrack.preferredTransform
+        } catch {
+            print(error)
+        }
+        
+        //if your video has sound, you don’t need to check this
+        if audioIsEnabled {
+            let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: CMPersistentTrackID())
+            
+            for audioTrack in (asset.tracks(withMediaType: AVMediaType.audio)) {
+                do {
+                    try compositionAudioTrack?.insertTimeRange(audioTrack.timeRange, of: audioTrack, at: CMTime.zero)
+                } catch {
+                    print(error)
+                }
+            }
+        }
+        
+        let size = videoTrack.naturalSize
+        
+        let videolayer = CALayer()
+        videolayer.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        
+        let parentlayer = CALayer()
+        parentlayer.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        parentlayer.addSublayer(videolayer)
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //this is the animation part
+        var time = [0.00001, 3, 6, 9, 12] //I used this time array to determine the start time of a frame animation. Each frame will stay for 3 secs, thats why their difference is 3
+        var imgarray = [UIImage]()
+        
+        for image in 0...4 {
+            imgarray.append(UIImage(named: "\(image).jpg")!)
+            
+            let nextPhoto = imgarray[image]
+            
+            let horizontalRatio = CGFloat(outputSize.width) / nextPhoto.size.width
+            let verticalRatio = CGFloat(outputSize.height) / nextPhoto.size.height
+            let aspectRatio = min(horizontalRatio, verticalRatio)
+            let newSize: CGSize = CGSize(width: nextPhoto.size.width * aspectRatio, height: nextPhoto.size.height * aspectRatio)
+            let x = newSize.width < outputSize.width ? (outputSize.width - newSize.width) / 2 : 0
+            let y = newSize.height < outputSize.height ? (outputSize.height - newSize.height) / 2 : 0
+            
+            ///I showed 10 animations here. You can uncomment any of this and export a video to see the result.
+            
+            ///#1. left->right///
+            //                let blackLayer = CALayer()
+            //                blackLayer.frame = CGRect(x: -videoTrack.naturalSize.width, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //                blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //                let imageLayer = CALayer()
+            //                imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //                imageLayer.contents = imgarray[image].cgImage
+            //                blackLayer.addSublayer(imageLayer)
+            //
+            //                let animation = CABasicAnimation()
+            //                animation.keyPath = "position.x"
+            //                animation.fromValue = -videoTrack.naturalSize.width
+            //                animation.toValue = 2 * (videoTrack.naturalSize.width)
+            //                animation.duration = 3
+            //                animation.beginTime = CFTimeInterval(time[image])
+            //                animation.fillMode = CAMediaTimingFillMode.forwards
+            //                animation.isRemovedOnCompletion = false
+            //                blackLayer.add(animation, forKey: "basic")
+            
+            ///#2. right->left///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 2 * videoTrack.naturalSize.width, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.x"
+            //            animation.fromValue = 2 * (videoTrack.naturalSize.width)
+            //            animation.toValue = -videoTrack.naturalSize.width
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            
+            ///#3. top->bottom///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: 2 * videoTrack.naturalSize.height, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.y"
+            //            animation.fromValue = 2 * videoTrack.naturalSize.height
+            //            animation.toValue = -videoTrack.naturalSize.height
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            
+            ///#4. bottom->top///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: -videoTrack.naturalSize.height, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.y"
+            //            animation.fromValue = -videoTrack.naturalSize.height
+            //            animation.toValue = 2 * videoTrack.naturalSize.height
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            
+            ///#5. opacity(1->0)(left->right)///
+            let blackLayer = CALayer()
+            blackLayer.frame = CGRect(x: -videoTrack.naturalSize.width, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            blackLayer.backgroundColor = UIColor.black.cgColor
+            
+            let imageLayer = CALayer()
+            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            imageLayer.contents = imgarray[image].cgImage
+            blackLayer.addSublayer(imageLayer)
+            
+            let animation = CABasicAnimation()
+            animation.keyPath = "position.x"
+            animation.fromValue = -videoTrack.naturalSize.width
+            animation.toValue = 2 * (videoTrack.naturalSize.width)
+            animation.duration = 3
+            animation.beginTime = CFTimeInterval(time[image])
+            animation.fillMode = CAMediaTimingFillMode.forwards
+            animation.isRemovedOnCompletion = false
+            blackLayer.add(animation, forKey: "basic")
+            
+            let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+            fadeOutAnimation.fromValue = 1
+            fadeOutAnimation.toValue = 0
+            fadeOutAnimation.duration = 2.5
+            fadeOutAnimation.beginTime = CFTimeInterval(time[image])
+            fadeOutAnimation.isRemovedOnCompletion = false
+            blackLayer.add(fadeOutAnimation, forKey: "opacity")
+            
+            ///#6. opacity(1->0)(right->left)///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 2 * videoTrack.naturalSize.width, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.x"
+            //            animation.fromValue = 2 * videoTrack.naturalSize.width
+            //            animation.toValue = -videoTrack.naturalSize.width
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            //
+            //            let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+            //            fadeOutAnimation.fromValue = 1
+            //            fadeOutAnimation.toValue = 0
+            //            fadeOutAnimation.duration = 3
+            //            fadeOutAnimation.beginTime = CFTimeInterval(time[image])
+            //            fadeOutAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(fadeOutAnimation, forKey: "opacity")
+            
+            ///#7. opacity(1->0)(top->bottom)///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: 2 * videoTrack.naturalSize.height, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.y"
+            //            animation.fromValue = 2 * videoTrack.naturalSize.height
+            //            animation.toValue = -videoTrack.naturalSize.height
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            //
+            //            let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+            //            fadeOutAnimation.fromValue = 1
+            //            fadeOutAnimation.toValue = 0
+            //            fadeOutAnimation.duration = 3
+            //            fadeOutAnimation.beginTime = CFTimeInterval(time[image])
+            //            fadeOutAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(fadeOutAnimation, forKey: "opacity")
+            
+            ///#8. opacity(1->0)(bottom->top)///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: -videoTrack.naturalSize.height, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let animation = CABasicAnimation()
+            //            animation.keyPath = "position.y"
+            //            animation.fromValue = -videoTrack.naturalSize.height
+            //            animation.toValue = 2 * videoTrack.naturalSize.height
+            //            animation.duration = 3
+            //            animation.beginTime = CFTimeInterval(time[image])
+            //            animation.fillMode = kCAFillModeForwards
+            //            animation.isRemovedOnCompletion = false
+            //            blackLayer.add(animation, forKey: "basic")
+            //
+            //            let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+            //            fadeOutAnimation.fromValue = 1
+            //            fadeOutAnimation.toValue = 0
+            //            fadeOutAnimation.duration = 3
+            //            fadeOutAnimation.beginTime = CFTimeInterval(time[image])
+            //            fadeOutAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(fadeOutAnimation, forKey: "opacity")
+            
+            ///#9. scale(small->big->small)///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //            blackLayer.opacity = 0
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let scaleAnimation = CAKeyframeAnimation(keyPath: "transform.scale")
+            //            scaleAnimation.values = [0, 1.0, 0]
+            //            scaleAnimation.beginTime = CFTimeInterval(time[image])
+            //            scaleAnimation.duration = 3
+            //            scaleAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(scaleAnimation, forKey: "transform.scale")
+            //
+            //            let fadeInOutAnimation = CABasicAnimation(keyPath: "opacity")
+            //            fadeInOutAnimation.fromValue = 1
+            //            fadeInOutAnimation.toValue = 1
+            //            fadeInOutAnimation.duration = 3
+            //            fadeInOutAnimation.beginTime = CFTimeInterval(time[image])
+            //            fadeInOutAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(fadeInOutAnimation, forKey: "opacity")
+            
+            ///#10. scale(big->small->big)///
+            //            let blackLayer = CALayer()
+            //            blackLayer.frame = CGRect(x: 0, y: 0, width: videoTrack.naturalSize.width, height: videoTrack.naturalSize.height)
+            //            blackLayer.backgroundColor = UIColor.black.cgColor
+            //            blackLayer.opacity = 0
+            //
+            //            let imageLayer = CALayer()
+            //            imageLayer.frame = CGRect(x: x, y: y, width: newSize.width, height: newSize.height)
+            //            imageLayer.contents = imgarray[image].cgImage
+            //            blackLayer.addSublayer(imageLayer)
+            //
+            //            let scaleAnimation = CAKeyframeAnimation(keyPath: "transform.scale")
+            //            scaleAnimation.values = [1, 0, 1]
+            //            scaleAnimation.beginTime = CFTimeInterval(time[image])
+            //            scaleAnimation.duration = 3
+            //            scaleAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(scaleAnimation, forKey: "transform.scale")
+            //
+            //            let fadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+            //            fadeOutAnimation.fromValue = 1
+            //            fadeOutAnimation.toValue = 1
+            //            fadeOutAnimation.duration = 3
+            //            fadeOutAnimation.beginTime = CFTimeInterval(time[image])
+            //            fadeOutAnimation.isRemovedOnCompletion = false
+            //            blackLayer.add(fadeOutAnimation, forKey: "opacity")
+            
+            parentlayer.addSublayer(blackLayer)
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        let layercomposition = AVMutableVideoComposition()
+        layercomposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+        layercomposition.renderSize = size
+        layercomposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videolayer, in: parentlayer)
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: composition.duration)
+        let videotrack = composition.tracks(withMediaType: AVMediaType.video)[0] as AVAssetTrack
+        let layerinstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videotrack)
+        instruction.layerInstructions = [layerinstruction]
+        layercomposition.instructions = [instruction]
+        
+        
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("temp.mp4"))
+        try? FileManager.default.removeItem(at: tempURL)
+        guard let assetExport = AVAssetExportSession(asset: composition, presetName:AVAssetExportPresetHighestQuality) else {return}
+        assetExport.videoComposition = layercomposition
+        assetExport.outputFileType = AVFileType.mp4
+        assetExport.outputURL = tempURL
+        assetExport.exportAsynchronously(completionHandler: {
+            switch assetExport.status{
+            case  AVAssetExportSession.Status.failed:
+                print("failed \(String(describing: assetExport.error))")
+            case AVAssetExportSession.Status.cancelled:
+                print("cancelled \(String(describing: assetExport.error))")
+            default:
+                print("Exported")
+                completion?(.success(assetExport.outputURL!))
+            }
+        })
+    }
+    
+    func newoverlay(video firstAsset: AVURLAsset, withSecondVideo secondAsset: AVURLAsset,completion: MTMovieMakerCompletion? = nil) {
+
+
+
+        // 1 - Create AVMutableComposition object. This object will hold your AVMutableCompositionTrack instances.
+        let mixComposition = AVMutableComposition()
+
+        // 2 - Create two video tracks
+        guard let firstTrack = mixComposition.addMutableTrack(withMediaType: .video,
+                                                              preferredTrackID: Int32(kCMPersistentTrackID_Invalid)) else { return }
+        do {
+            try firstTrack.insertTimeRange(CMTimeRangeMake(start: CMTime.zero, duration: firstAsset.duration),
+                                           of: firstAsset.tracks(withMediaType: .video)[0],
+                                           at: CMTime.zero)
+        } catch {
+            print("Failed to load first track")
+            return
+        }
+
+        guard let secondTrack = mixComposition.addMutableTrack(withMediaType: .video,
+                                                               preferredTrackID: Int32(kCMPersistentTrackID_Invalid)) else { return }
+        do {
+            try secondTrack.insertTimeRange(CMTimeRangeMake(start: CMTime.zero, duration: secondAsset.duration),
+                                            of: secondAsset.tracks(withMediaType: .video)[0],
+                                            at: CMTime.zero)
+        } catch {
+            print("Failed to load second track")
+            return
+        }
+
+        // 2.1
+        let mainInstruction = AVMutableVideoCompositionInstruction()
+        mainInstruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: firstAsset.duration)
+
+        // 2.2
+        let firstInstruction = self.videoCompositionInstruction(firstTrack, asset: firstAsset)
+
+        let secondInstruction = self.videoCompositionInstruction(secondTrack, asset: secondAsset)
+        let factorWidth = firstTrack.naturalSize.width / secondTrack.naturalSize.width
+        let factorHeight = firstTrack.naturalSize.height / secondTrack.naturalSize.height
+
+        let scale = CGAffineTransform(scaleX: factorWidth, y: factorHeight)
+        let move = CGAffineTransform(translationX: 0, y: 0)
+        
+        secondInstruction.setTransform(scale.concatenating(move), at: CMTime.zero)
+        secondInstruction.setOpacityRamp(fromStartOpacity: 0.5, toEndOpacity: 0.0, timeRange: CMTimeRangeMake(start: .zero, duration: secondAsset.duration))
+        // 2.3
+        mainInstruction.layerInstructions = [ secondInstruction,firstInstruction]
+        let mainComposition = AVMutableVideoComposition()
+        mainComposition.instructions = [mainInstruction]
+        mainComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+
+//        let width = max(firstTrack.naturalSize.width, secondTrack.naturalSize.width)
+//        let height = max(firstTrack.naturalSize.height, secondTrack.naturalSize.height)
+
+        mainComposition.renderSize = CGSize(width: firstTrack.naturalSize.width, height: firstTrack.naturalSize.height)
+
+        mainInstruction.backgroundColor = UIColor.red.cgColor
+
+
+        // 4 - Get path
+        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .short
+        let date = dateFormatter.string(from: Date())
+        let url = documentDirectory.appendingPathComponent("mergeVideo-\(date).mov")
+
+        // Check exists and remove old file
+        try? FileManager.default.removeItem(at: url)
+
+
+        
+        // 5 - Create Exporter
+        guard let exporter = AVAssetExportSession(asset: mixComposition, presetName: AVAssetExportPresetHighestQuality) else { return }
+        exporter.outputURL = url
+        exporter.outputFileType = AVFileType.mov
+        exporter.shouldOptimizeForNetworkUse = true
+        exporter.videoComposition = mainComposition
+
+
+        // 6 - Perform the Export
+        exporter.exportAsynchronously {
+            switch exporter.status{
+            case  AVAssetExportSession.Status.failed:
+                print("failed \(String(describing: exporter.error))")
+            case AVAssetExportSession.Status.cancelled:
+                print("cancelled \(String(describing: exporter.error))")
+            default:
+                print("Exported")
+                completion?(.success(exporter.outputURL!))
+            }
+        }
+    }
+    
+    func videoCompositionInstruction(_ track: AVCompositionTrack, asset: AVAsset) -> AVMutableVideoCompositionLayerInstruction {
+        let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: track)
+        let assetTrack = asset.tracks(withMediaType: AVMediaType.video)[0]
+
+        let transform = assetTrack.preferredTransform
+        let assetInfo = orientationFromTransform(transform)
+
+        var scaleToFitRatio = UIScreen.main.bounds.width / assetTrack.naturalSize.width
+        if assetInfo.isPortrait {
+            scaleToFitRatio = UIScreen.main.bounds.width / assetTrack.naturalSize.height
+            let scaleFactor = CGAffineTransform(scaleX: scaleToFitRatio, y: scaleToFitRatio)
+            instruction.setTransform(assetTrack.preferredTransform.concatenating(scaleFactor), at: CMTime.zero)
+        } else {
+            let scaleFactor = CGAffineTransform(scaleX: scaleToFitRatio, y: scaleToFitRatio)
+            var concat = assetTrack.preferredTransform.concatenating(scaleFactor)
+                .concatenating(CGAffineTransform(translationX: 0, y: UIScreen.main.bounds.width / 2))
+            if assetInfo.orientation == .down {
+                let fixUpsideDown = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
+                let windowBounds = UIScreen.main.bounds
+                let yFix = assetTrack.naturalSize.height + windowBounds.height
+                let centerFix = CGAffineTransform(translationX: assetTrack.naturalSize.width, y: yFix)
+                concat = fixUpsideDown.concatenating(centerFix).concatenating(scaleFactor)
+            }
+            //instruction.setTransform(concat, at: CMTime.zero)
+        }
+
+        return instruction
+    }
+
+    func orientationFromTransform(_ transform: CGAffineTransform) -> (orientation: UIImage.Orientation, isPortrait: Bool) {
+        var assetOrientation = UIImage.Orientation.up
+        var isPortrait = false
+        if transform.a == 0 && transform.b == 1.0 && transform.c == -1.0 && transform.d == 0 {
+            assetOrientation = .right
+            isPortrait = true
+        } else if transform.a == 0 && transform.b == -1.0 && transform.c == 1.0 && transform.d == 0 {
+            assetOrientation = .left
+            isPortrait = true
+        } else if transform.a == 1.0 && transform.b == 0 && transform.c == 0 && transform.d == 1.0 {
+            assetOrientation = .up
+        } else if transform.a == -1.0 && transform.b == 0 && transform.c == 0 && transform.d == -1.0 {
+            assetOrientation = .down
+        }
+        return (assetOrientation, isPortrait)
+    }
+    
+    func removeBackgroundFromVideo() -> Void {
+        
     }
 }
