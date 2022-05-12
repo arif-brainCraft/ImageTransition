@@ -56,8 +56,9 @@ class ImgesToVideoViewController: UIViewController {
         blendEffects.append(2)
         blendEffects.append(4)
 
+        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
-        let path = NSTemporaryDirectory().appending("CreateVideoFromImages.mp4")
+        let path = documentDirectory.appendingPathComponent("CreateVideoFromImages.mp4").path
         let url = URL(fileURLWithPath: path)
         
         movieMaker = CombineTransitionMovieMaker(outputURL: url)
@@ -70,21 +71,31 @@ class ImgesToVideoViewController: UIViewController {
                 case .success(let url):
                     print(url)
                     let asset = AVURLAsset(url: url)
-                    if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
-                        let overlayAsset = AVURLAsset(url: url)
-                        self.movieMaker?.newoverlay(video: asset, withSecondVideo: overlayAsset, completion: {[weak self] result in
-                            guard let self = self else {return}
-                            switch result {
-                            case .success(let url):
-                                self.playVideo(url: url)
+                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+                        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
+                            var overlayAsset = AVURLAsset(url: url)
+                            overlayAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+                                do {
+                                    try self.movieMaker?.addOverlay(asset: asset, overlayAsset: overlayAsset, completion: {[weak self] result in
+                                        guard let self = self else {return}
+                                        switch result {
+                                        case .success(let outputUrl):
+                                            self.playVideo(url: outputUrl)
 
-                                break
+                                            break
 
-                            case .failure(let error):
-                                break
+                                        case .failure(let error):
+                                            break
+                                        }
+                                    })
+                                } catch {
+                                }
                             }
-                        })
+                            
+                            
+                        }
                     }
+                    
 
 //                    self.movieMaker?.exportVideoWithAnimation(asset: asset, completion: {[weak self] result in
 //                        guard let self = self else {return}

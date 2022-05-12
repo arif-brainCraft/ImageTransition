@@ -18,7 +18,7 @@ class CombineTransitionMovieMaker:NSObject {
     private let writingQueue: DispatchQueue
     
     private var exportSession: AVAssetExportSession?
-    
+    lazy var mtiContext = try? MTIContext(device: MTLCreateSystemDefaultDevice()!)
     public init(outputURL: URL) {
         self.outputURL = outputURL
         self.writingQueue = DispatchQueue(label: "me.shuifeng.MTTransitions.MovieWriter.writingQueue")
@@ -642,7 +642,7 @@ class CombineTransitionMovieMaker:NSObject {
         let move = CGAffineTransform(translationX: 0, y: 0)
         
         secondInstruction.setTransform(scale.concatenating(move), at: CMTime.zero)
-        secondInstruction.setOpacityRamp(fromStartOpacity: 0.5, toEndOpacity: 0.0, timeRange: CMTimeRangeMake(start: .zero, duration: secondAsset.duration))
+        //secondInstruction.setOpacityRamp(fromStartOpacity: 0.5, toEndOpacity: 0.0, timeRange: CMTimeRangeMake(start: .zero, duration: secondAsset.duration))
         // 2.3
         mainInstruction.layerInstructions = [ secondInstruction,firstInstruction]
         let mainComposition = AVMutableVideoComposition()
@@ -738,7 +738,190 @@ class CombineTransitionMovieMaker:NSObject {
         return (assetOrientation, isPortrait)
     }
     
-    func removeBackgroundFromVideo() -> Void {
+    func removeBackgroundFromVideo(asset:AVAsset) -> AVAsset? {
+        guard let context = mtiContext, let videoSize = asset.tracks.first?.naturalSize else {
+            return nil
+        }
+        
+        
+        let chromaKeyBlendFilter = MTIChromaKeyBlendFilter()
+        
+        let color = MTIColor(red: 0.998, green: 0.0, blue: 0.996, alpha: 1)
+        //let backgroundColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        let backgroundColor = MTIColor(red: 0.0, green: 0.0, blue: 0, alpha: 0)
+        chromaKeyBlendFilter.color = color
+        chromaKeyBlendFilter.smoothing = 0.001
+        chromaKeyBlendFilter.thresholdSensitivity = 0.4//0.475
+        chromaKeyBlendFilter.inputBackgroundImage = MTIImage(color: backgroundColor, sRGB: false, size: videoSize)
+        let composition = MTIVideoComposition(asset: asset, context: context, queue: DispatchQueue.main, filter: { request in
+            
+            guard let sourceImage = request.anySourceImage else {
+                return MTIImage(color: backgroundColor, sRGB: false, size: videoSize)
+            }
+            return FilterGraph.makeImage(builder: { output in
+                sourceImage => chromaKeyBlendFilter.inputPorts.inputImage
+                chromaKeyBlendFilter => output
+            })!
+        })
+        return composition.asset
+    }
+    
+    func addOverlay(asset:AVAsset,overlayAsset:AVAsset,                            audioURL: URL? = nil,rewindOverlay:Bool = true,
+completion: @escaping MTMovieMakerCompletion)throws -> Void {
+        
+        let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("temp.mp4"))
+        try? FileManager.default.removeItem(at: tempURL)
+
+        let track =  asset.tracks(withMediaType: AVMediaType.video)
+        let videoTrack:AVAssetTrack = track[0] as AVAssetTrack
+        
+        let outputSize = videoTrack.naturalSize
+        
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+            try FileManager.default.removeItem(at: tempURL)
+        }
+        
+        writer = try? AVAssetWriter(outputURL: tempURL, fileType: .mp4)
+        let videoSettings: [String: Any] = [
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: outputSize.width,
+            AVVideoHeightKey: outputSize.height
+        ]
+        let writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+        let attributes = sourceBufferAttributes(outputSize: outputSize)
+        let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
+                                                                      sourcePixelBufferAttributes: attributes)
+        writer?.add(writerInput)
+        
+        guard let success = writer?.startWriting(), success == true else {
+            fatalError("Can not start writing")
+        }
+        
+        guard let pixelBufferPool = pixelBufferAdaptor.pixelBufferPool else {
+            fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
+        }
+        
+        
+
+        self.writer?.startSession(atSourceTime: .zero)
+        writerInput.requestMediaDataWhenReady(on: self.writingQueue) {
+            
+            var reader:AVAssetReader!
+            do {
+                reader = try AVAssetReader(asset: asset)
+            } catch  {
+                print(error.localizedDescription)
+            }
+
+
+            let videoTrack = asset.tracks(withMediaType: AVMediaType.video)[0]
+
+            // read video frames as BGRA
+            let trackReaderOutput = AVAssetReaderTrackOutput(track: videoTrack, outputSettings:[String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: kCVPixelFormatType_32BGRA)])
+
+            reader.add(trackReaderOutput)
+            
+            let reader2 = try! AVAssetReader(asset: overlayAsset)
+
+            let videoTrack2 = overlayAsset.tracks(withMediaType: AVMediaType.video)[0]
+
+            // read video frames as BGRA
+            let trackReaderOutput2 = AVAssetReaderTrackOutput(track: videoTrack2, outputSettings:[String(kCVPixelBufferPixelFormatTypeKey): NSNumber(value: kCVPixelFormatType_32BGRA)])
+            trackReaderOutput2.supportsRandomAccess = true;
+
+            reader2.add(trackReaderOutput2)
+            
+
+
+            let chromaKeyBlendFilter = MTIChromaKeyBlendFilter()
+            let overlayBlendFilter = MTIBlendFilter(blendMode: .overlay)
+            
+            var sampleOverlayMtiImages = [MTIImage]()
+            var overlayImageIndex = 0
+            
+            reader2.startReading()
+            
+            while let sampleBuffer2 = trackReaderOutput2.copyNextSampleBuffer(){
+                if let imageBuffer2:CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer2) {
+                    let overlayMtiImage = MTIImage(cvPixelBuffer: imageBuffer2, alphaType: .alphaIsOne)
+                    sampleOverlayMtiImages.append(overlayMtiImage)
+
+                }
+                    
+            }
+            reader2.cancelReading()
+
+            reader.startReading()
+            
+            while let sampleBuffer = trackReaderOutput.copyNextSampleBuffer() {
+                
+                let presentationTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+                
+                print("sample at time BG \(presentationTime) sec \(CMTimeGetSeconds(presentationTime)) duration \(CMTimeGetSeconds(presentationTime))")
+                
+                if let imageBuffer:CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+                    
+                    let bgMtiImage = MTIImage(cvPixelBuffer: imageBuffer, alphaType: .alphaIsOne)
+                    
+                    let overlayMtiImage = sampleOverlayMtiImages[overlayImageIndex]
+                    let backgroundColor = MTIColor(red: 0.0, green: 0.0, blue: 0, alpha: 0)
+                    chromaKeyBlendFilter.color = MTIColor(red: 1.0, green: 0.0, blue: 0, alpha: 0.3)
+                    chromaKeyBlendFilter.inputImage = overlayMtiImage
+                    chromaKeyBlendFilter.smoothing = 0.001
+                    chromaKeyBlendFilter.thresholdSensitivity = 0.4//0.475
+                    chromaKeyBlendFilter.inputBackgroundImage = MTIImage(color: backgroundColor, sRGB: false, size: overlayMtiImage.size)
+                     
+                    overlayBlendFilter.inputImage = chromaKeyBlendFilter.outputImage?.resized(to: bgMtiImage.size)
+                    overlayBlendFilter.inputBackgroundImage = bgMtiImage
+                    
+
+                    
+                    
+                    var pixelBuffer: CVPixelBuffer?
+                    CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
+                    
+                    if let buffer = pixelBuffer,let frame = overlayBlendFilter.outputImage {
+                        try? MTTransition.context?.render(frame, to: buffer)
+                        
+                        while pixelBufferAdaptor.assetWriterInput.isReadyForMoreMediaData == false {
+                            print("Thread sleeping to get ready to append pixel buffer")
+                            Thread.sleep(forTimeInterval: 0.1)
+                        }
+                        pixelBufferAdaptor.append(buffer, withPresentationTime: presentationTime)
+                        
+                        
+                    }
+                    
+                    overlayImageIndex += 1
+                    
+                    if overlayImageIndex == sampleOverlayMtiImages.count, rewindOverlay {
+                        overlayImageIndex = 0
+                    }
+                    
+                }
+            }
+            
+            writerInput.markAsFinished()
+            self.writer?.finishWriting {
+                if let audioURL = audioURL, self.writer?.error == nil {
+                    do {
+                        let audioAsset = AVAsset(url: audioURL)
+                        let videoAsset = AVAsset(url: tempURL)
+                        try self.mixAudio(audioAsset, video: videoAsset, completion: completion)
+                    } catch {
+                        completion(.failure(error))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        if let error = self.writer?.error {
+                            completion(.failure(error))
+                        } else {
+                            completion(.success(tempURL))
+                        }
+                    }
+                }
+            }
+        }
         
     }
 }
