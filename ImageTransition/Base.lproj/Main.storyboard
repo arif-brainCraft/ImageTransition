@@ -73,13 +73,24 @@
                                     <action selector="restartButtonPressed:" destination="iSy-Lw-rcU" eventType="touchUpInside" id="cGf-7a-vou"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DzB-tX-TdF">
+                                <rect key="frame" x="168" y="138" width="78" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Recreate"/>
+                                <connections>
+                                    <action selector="reCreateVideo:" destination="iSy-Lw-rcU" eventType="touchUpInside" id="41T-X0-j3z"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="rYy-yD-dvN"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="yri-EF-jx1" firstAttribute="top" secondItem="6Jh-zT-Tj0" secondAttribute="bottom" constant="94" id="4UQ-Pc-6rN"/>
+                            <constraint firstItem="DzB-tX-TdF" firstAttribute="top" secondItem="rYy-yD-dvN" secondAttribute="top" constant="50" id="DHE-Ih-3xd"/>
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="leading" secondItem="rYy-yD-dvN" secondAttribute="leading" constant="50" id="Vd0-fc-80v"/>
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="centerY" secondItem="rYy-yD-dvN" secondAttribute="centerY" id="Xde-FK-hWQ"/>
+                            <constraint firstItem="DzB-tX-TdF" firstAttribute="centerX" secondItem="rYy-yD-dvN" secondAttribute="centerX" id="ijx-hI-8HG"/>
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="centerX" secondItem="rYy-yD-dvN" secondAttribute="centerX" id="omT-5Q-3f6"/>
                             <constraint firstItem="yri-EF-jx1" firstAttribute="centerX" secondItem="6Jh-zT-Tj0" secondAttribute="centerX" id="wbT-r4-Y9y"/>
                         </constraints>

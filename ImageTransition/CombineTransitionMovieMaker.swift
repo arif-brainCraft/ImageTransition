@@ -6,8 +6,16 @@
 //
 
 import UIKit
-import MTTransitions
 import MetalPetal
+
+public enum MTMovieMakerError: Error {
+    case imagesMustMoreThanTwo
+    case imagesAndEffectsDoesNotMatch
+}
+
+public typealias MTMovieMakerProgressHandler = (Float) -> Void
+
+public typealias MTMovieMakerCompletion = (Result<URL, Error>) -> Void
 
 class CombineTransitionMovieMaker:NSObject {
     
@@ -27,7 +35,7 @@ class CombineTransitionMovieMaker:NSObject {
     
     
     public func createCombinedTransitionVideo(with images: [UIImage],
-                            effects: [MTTransition.Effect],
+                            effects: [BCLTransition.Effect],
                             blendEffects:[Int],
                             frameDuration: TimeInterval = 1,
                             transitionDuration: TimeInterval = 0.8,
@@ -48,7 +56,7 @@ class CombineTransitionMovieMaker:NSObject {
     }
     
     public func createCombinedTransitionVideo(with images: [MTIImage],
-                            effects: [MTTransition.Effect],
+                            effects: [BCLTransition.Effect],
                             blendEffects:[Int],
                             frameDuration: TimeInterval = 1,
                             transitionDuration: TimeInterval = 0.8,
@@ -56,12 +64,15 @@ class CombineTransitionMovieMaker:NSObject {
                             completion: MTMovieMakerCompletion? = nil) throws {
         
         guard images.count >= 2 else {
+            print("ERROR:: imagesMustMoreThanTwo")
+
             throw MTMovieMakerError.imagesMustMoreThanTwo
         }
         
         let totalEffect = effects.count - blendEffects.count
         
         guard totalEffect == images.count - 1 else {
+            print("ERROR:: imagesAndEffectsDoesNotMatch")
             throw MTMovieMakerError.imagesAndEffectsDoesNotMatch
         }
         if FileManager.default.fileExists(atPath: outputURL.path) {
@@ -126,7 +137,7 @@ class CombineTransitionMovieMaker:NSObject {
                                 
                                 if let buffer = pixelBuffer,let frame = transition2.outputImage {
                                     
-                                    try? MTTransition.context?.render(frame, to: buffer)
+                                    try? BCLTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
                                 }
                                 
@@ -135,7 +146,7 @@ class CombineTransitionMovieMaker:NSObject {
                                 CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
                                 
                                 if let buffer = pixelBuffer,let frame = transition.outputImage {
-                                    try? MTTransition.context?.render(frame, to: buffer)
+                                    try? BCLTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
                                 }
                             }
@@ -166,8 +177,10 @@ class CombineTransitionMovieMaker:NSObject {
                 } else {
                     DispatchQueue.main.async {
                         if let error = self.writer?.error {
+                            print("video written failed")
                             completion?(.failure(error))
                         } else {
+                            print("video written succesfully")
                             completion?(.success(self.outputURL))
                         }
                     }
@@ -881,7 +894,7 @@ completion: @escaping MTMovieMakerCompletion)throws -> Void {
                     CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
                     
                     if let buffer = pixelBuffer,let frame = overlayBlendFilter.outputImage {
-                        try? MTTransition.context?.render(frame, to: buffer)
+                        try? BCLTransition.context?.render(frame, to: buffer)
                         
                         while pixelBufferAdaptor.assetWriterInput.isReadyForMoreMediaData == false {
                             print("Thread sleeping to get ready to append pixel buffer")

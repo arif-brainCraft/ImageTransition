@@ -27,6 +27,12 @@
 		130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */; };
 		13DC7137282A6D5200E2811C /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7136282A6D5200E2811C /* 0.jpg */; };
 		13DC7139282A8DA400E2811C /* Abstract.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7138282A8BD500E2811C /* Abstract.mp4 */; };
+		13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66332283A7C050059802E /* CustomTransitionEffect.swift */; };
+		13E66335283A7CE60059802E /* WaterDropTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66334283A7CE60059802E /* WaterDropTransition.swift */; };
+		13E66337283B58E00059802E /* BCLTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66336283B58E00059802E /* BCLTransition.swift */; };
+		13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E66339283B5AAF0059802E /* WaterDropTransition.metal */; };
+		13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E6633D283B83410059802E /* DreamyWindowSlice.metal */; };
+		13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E6633F283B83D80059802E /* DreamyWindowSlice.swift */; };
 		848FAF28E948CFD704D7C4DB /* Pods_ImageTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +60,13 @@
 		130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTransitionMovieMaker.swift; sourceTree = "<group>"; };
 		13DC7136282A6D5200E2811C /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		13DC7138282A8BD500E2811C /* Abstract.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Abstract.mp4; sourceTree = "<group>"; };
+		13E66332283A7C050059802E /* CustomTransitionEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTransitionEffect.swift; sourceTree = "<group>"; };
+		13E66334283A7CE60059802E /* WaterDropTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterDropTransition.swift; sourceTree = "<group>"; };
+		13E66336283B58E00059802E /* BCLTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCLTransition.swift; sourceTree = "<group>"; };
+		13E66339283B5AAF0059802E /* WaterDropTransition.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WaterDropTransition.metal; sourceTree = "<group>"; };
+		13E6633C283B81720059802E /* BCLTransitionLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BCLTransitionLib.h; sourceTree = "<group>"; };
+		13E6633D283B83410059802E /* DreamyWindowSlice.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DreamyWindowSlice.metal; sourceTree = "<group>"; };
+		13E6633F283B83D80059802E /* DreamyWindowSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamyWindowSlice.swift; sourceTree = "<group>"; };
 		4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ImageTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.release.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,6 +105,7 @@
 		130A86C02817F42300943CCA /* ImageTransition */ = {
 			isa = PBXGroup;
 			children = (
+				13E66338283B5A900059802E /* BCLShaders */,
 				130A86C12817F42300943CCA /* AppDelegate.swift */,
 				130A86C32817F42300943CCA /* SceneDelegate.swift */,
 				130A86C52817F42300943CCA /* ViewController.swift */,
@@ -101,6 +115,8 @@
 				130A86CF2817F42500943CCA /* Info.plist */,
 				130A86E82819168800943CCA /* ImgesToVideoViewController.swift */,
 				130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */,
+				13E66332283A7C050059802E /* CustomTransitionEffect.swift */,
+				13E66336283B58E00059802E /* BCLTransition.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -122,6 +138,18 @@
 				13DC7138282A8BD500E2811C /* Abstract.mp4 */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		13E66338283B5A900059802E /* BCLShaders */ = {
+			isa = PBXGroup;
+			children = (
+				13E66339283B5AAF0059802E /* WaterDropTransition.metal */,
+				13E66334283A7CE60059802E /* WaterDropTransition.swift */,
+				13E6633D283B83410059802E /* DreamyWindowSlice.metal */,
+				13E6633C283B81720059802E /* BCLTransitionLib.h */,
+				13E6633F283B83D80059802E /* DreamyWindowSlice.swift */,
+			);
+			path = BCLShaders;
 			sourceTree = "<group>";
 		};
 		3F322A61A973C1C48C3715BD /* Frameworks */ = {
@@ -268,11 +296,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */,
+				13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */,
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
+				13E66337283B58E00059802E /* BCLTransition.swift in Sources */,
+				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */,
+				13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */,
+				13E66335283A7CE60059802E /* WaterDropTransition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

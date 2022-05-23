@@ -49,12 +49,12 @@ class ImgesToVideoViewController: UIViewController {
     }
     
     func createVideo() -> Void {
-        let allImages = loadImages()
         
-        let effects: [MTTransition.Effect] = [.burn,.wipeUp,.wipeLeft,.bowTieHorizontal,.crossHatch]
+        let effects: [BCLTransition.Effect] = [.dreamyWindowSlice]
+        let allImages = loadImages(count: effects.count + 1)
+
         var blendEffects = [Int]()
-        blendEffects.append(2)
-        blendEffects.append(4)
+
 
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
@@ -65,36 +65,38 @@ class ImgesToVideoViewController: UIViewController {
         do {
             
             
-            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: 2.5, transitionDuration: 1, audioURL: nil, completion: {[weak self] result in
+            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: 1, transitionDuration: 5, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):
                     print(url)
-                    let asset = AVURLAsset(url: url)
-                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
-                        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
-                            var overlayAsset = AVURLAsset(url: url)
-                            overlayAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
-                                do {
-                                    try self.movieMaker?.addOverlay(asset: asset, overlayAsset: overlayAsset, completion: {[weak self] result in
-                                        guard let self = self else {return}
-                                        switch result {
-                                        case .success(let outputUrl):
-                                            self.playVideo(url: outputUrl)
+                    self.playVideo(url: url)
 
-                                            break
-
-                                        case .failure(let error):
-                                            break
-                                        }
-                                    })
-                                } catch {
-                                }
-                            }
-                            
-                            
-                        }
-                    }
+//                    let asset = AVURLAsset(url: url)
+//                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+//                        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
+//                            var overlayAsset = AVURLAsset(url: url)
+//                            overlayAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+//                                do {
+//                                    try self.movieMaker?.addOverlay(asset: asset, overlayAsset: overlayAsset, completion: {[weak self] result in
+//                                        guard let self = self else {return}
+//                                        switch result {
+//                                        case .success(let outputUrl):
+//                                            self.playVideo(url: outputUrl)
+//
+//                                            break
+//
+//                                        case .failure(let error):
+//                                            break
+//                                        }
+//                                    })
+//                                } catch {
+//                                }
+//                            }
+//
+//
+//                        }
+//                    }
                     
 
 //                    self.movieMaker?.exportVideoWithAnimation(asset: asset, completion: {[weak self] result in
@@ -139,9 +141,10 @@ class ImgesToVideoViewController: UIViewController {
                          object: self.player.currentItem)
     }
     
-    func loadImages() -> [UIImage] {
+    func loadImages(count:Int) -> [UIImage] {
         var images = [UIImage]()
-        for i in 5...8 {
+        for _ in 0..<count {
+            let i = Int.random(in: 0..<9)
             if let url = Bundle.main.url(forResource: String(i), withExtension: "jpg") {
                 if let image = UIImage(contentsOfFile: url.path) {
                     images.append(image)
@@ -190,6 +193,10 @@ class ImgesToVideoViewController: UIViewController {
     @IBAction func restartButtonPressed(_ sender: Any) {
         self.player.seek(to: .zero)
         self.player.play()
+    }
+    
+    @IBAction func reCreateVideo(_ sender: Any) {
+        self.createVideo()
     }
     
 
