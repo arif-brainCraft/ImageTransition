@@ -25,6 +25,10 @@
 		130A86EC2819202400943CCA /* audio2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EA2819202400943CCA /* audio2.mp3 */; };
 		130A86ED2819202400943CCA /* audio1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 130A86EB2819202400943CCA /* audio1.mp3 */; };
 		130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */; };
+		130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E6634F283BC7490059802E /* RandomAngularDreamy.metal */; };
+		130F1FB1283E3BED0063F8BC /* RandomWindowBlind.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E66355283CEDF40059802E /* RandomWindowBlind.metal */; };
+		130F1FB4283E54A20063F8BC /* RandomDownSwipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */; };
+		130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */; };
 		13DC7137282A6D5200E2811C /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7136282A6D5200E2811C /* 0.jpg */; };
 		13DC7139282A8DA400E2811C /* Abstract.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7138282A8BD500E2811C /* Abstract.mp4 */; };
 		13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66332283A7C050059802E /* CustomTransitionEffect.swift */; };
@@ -33,6 +37,13 @@
 		13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E66339283B5AAF0059802E /* WaterDropTransition.metal */; };
 		13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E6633D283B83410059802E /* DreamyWindowSlice.metal */; };
 		13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E6633F283B83D80059802E /* DreamyWindowSlice.swift */; };
+		13E66348283BBA110059802E /* AngularTransition.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E66347283BBA110059802E /* AngularTransition.metal */; };
+		13E6634A283BBA570059802E /* AngularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66349283BBA570059802E /* AngularTransition.swift */; };
+		13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E6634B283BBAE90059802E /* BurnTransition.metal */; };
+		13E6634E283BBAE90059802E /* BurnTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E6634C283BBAE90059802E /* BurnTransition.swift */; };
+		13E66354283BCFE90059802E /* RandomAngularDreamy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66351283BC9A60059802E /* RandomAngularDreamy.swift */; };
+		13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66357283CEF2F0059802E /* RandomWindowBlind.swift */; };
+		13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66359283D13920059802E /* AspectRatioCollectionCell.swift */; };
 		848FAF28E948CFD704D7C4DB /* Pods_ImageTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +69,8 @@
 		130A86EA2819202400943CCA /* audio2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio2.mp3; sourceTree = "<group>"; };
 		130A86EB2819202400943CCA /* audio1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio1.mp3; sourceTree = "<group>"; };
 		130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTransitionMovieMaker.swift; sourceTree = "<group>"; };
+		130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomDownSwipe.swift; sourceTree = "<group>"; };
+		130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = RandomDownSwipe.metal; sourceTree = "<group>"; };
 		13DC7136282A6D5200E2811C /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		13DC7138282A8BD500E2811C /* Abstract.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Abstract.mp4; sourceTree = "<group>"; };
 		13E66332283A7C050059802E /* CustomTransitionEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTransitionEffect.swift; sourceTree = "<group>"; };
@@ -67,6 +80,15 @@
 		13E6633C283B81720059802E /* BCLTransitionLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BCLTransitionLib.h; sourceTree = "<group>"; };
 		13E6633D283B83410059802E /* DreamyWindowSlice.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DreamyWindowSlice.metal; sourceTree = "<group>"; };
 		13E6633F283B83D80059802E /* DreamyWindowSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamyWindowSlice.swift; sourceTree = "<group>"; };
+		13E66347283BBA110059802E /* AngularTransition.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AngularTransition.metal; sourceTree = "<group>"; };
+		13E66349283BBA570059802E /* AngularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AngularTransition.swift; sourceTree = "<group>"; };
+		13E6634B283BBAE90059802E /* BurnTransition.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = BurnTransition.metal; sourceTree = "<group>"; };
+		13E6634C283BBAE90059802E /* BurnTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BurnTransition.swift; sourceTree = "<group>"; };
+		13E6634F283BC7490059802E /* RandomAngularDreamy.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = RandomAngularDreamy.metal; sourceTree = "<group>"; };
+		13E66351283BC9A60059802E /* RandomAngularDreamy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomAngularDreamy.swift; sourceTree = "<group>"; };
+		13E66355283CEDF40059802E /* RandomWindowBlind.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = RandomWindowBlind.metal; sourceTree = "<group>"; };
+		13E66357283CEF2F0059802E /* RandomWindowBlind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomWindowBlind.swift; sourceTree = "<group>"; };
+		13E66359283D13920059802E /* AspectRatioCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectRatioCollectionCell.swift; sourceTree = "<group>"; };
 		4F228756799F480B51FCE1B7 /* Pods_ImageTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ImageTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5CCB3BFBBBA5B3E60697EEA6 /* Pods-ImageTransition.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.release.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -115,8 +137,8 @@
 				130A86CF2817F42500943CCA /* Info.plist */,
 				130A86E82819168800943CCA /* ImgesToVideoViewController.swift */,
 				130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */,
-				13E66332283A7C050059802E /* CustomTransitionEffect.swift */,
 				13E66336283B58E00059802E /* BCLTransition.swift */,
+				13E66359283D13920059802E /* AspectRatioCollectionCell.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -143,11 +165,22 @@
 		13E66338283B5A900059802E /* BCLShaders */ = {
 			isa = PBXGroup;
 			children = (
+				13E66332283A7C050059802E /* CustomTransitionEffect.swift */,
+				130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */,
+				130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */,
+				13E6634F283BC7490059802E /* RandomAngularDreamy.metal */,
+				13E66351283BC9A60059802E /* RandomAngularDreamy.swift */,
+				13E6634B283BBAE90059802E /* BurnTransition.metal */,
+				13E6634C283BBAE90059802E /* BurnTransition.swift */,
+				13E66347283BBA110059802E /* AngularTransition.metal */,
+				13E66349283BBA570059802E /* AngularTransition.swift */,
 				13E66339283B5AAF0059802E /* WaterDropTransition.metal */,
 				13E66334283A7CE60059802E /* WaterDropTransition.swift */,
 				13E6633D283B83410059802E /* DreamyWindowSlice.metal */,
 				13E6633C283B81720059802E /* BCLTransitionLib.h */,
 				13E6633F283B83D80059802E /* DreamyWindowSlice.swift */,
+				13E66355283CEDF40059802E /* RandomWindowBlind.metal */,
+				13E66357283CEF2F0059802E /* RandomWindowBlind.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -297,16 +330,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */,
+				13E66354283BCFE90059802E /* RandomAngularDreamy.swift in Sources */,
 				13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */,
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
+				13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */,
+				130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */,
+				13E6634A283BBA570059802E /* AngularTransition.swift in Sources */,
 				13E66337283B58E00059802E /* BCLTransition.swift in Sources */,
+				13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */,
 				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,
+				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */,
+				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
+				13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */,
+				13E6634E283BBAE90059802E /* BurnTransition.swift in Sources */,
 				13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */,
+				130F1FB1283E3BED0063F8BC /* RandomWindowBlind.metal in Sources */,
 				13E66335283A7CE60059802E /* WaterDropTransition.swift in Sources */,
+				130F1FB4283E54A20063F8BC /* RandomDownSwipe.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,7 +498,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5NNWRYKRDZ;
+				DEVELOPMENT_TEAM = U8DK4S4CV4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageTransition/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To export your creation";
@@ -485,7 +529,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5NNWRYKRDZ;
+				DEVELOPMENT_TEAM = U8DK4S4CV4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ImageTransition/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To export your creation";

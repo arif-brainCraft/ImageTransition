@@ -6,6 +6,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -57,24 +58,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Jh-zT-Tj0">
-                                <rect key="frame" x="50" y="318" width="314" height="314"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="6Jh-zT-Tj0" secondAttribute="height" multiplier="1:1" id="FLP-g6-KaS"/>
-                                </constraints>
-                            </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yri-EF-jx1">
-                                <rect key="frame" x="169.5" y="726" width="75" height="41"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" title="Restart"/>
-                                <connections>
-                                    <action selector="restartButtonPressed:" destination="iSy-Lw-rcU" eventType="touchUpInside" id="cGf-7a-vou"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DzB-tX-TdF">
-                                <rect key="frame" x="168" y="138" width="78" height="36"/>
+                                <rect key="frame" x="168" y="108" width="78" height="36"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Recreate"/>
@@ -82,21 +67,99 @@
                                     <action selector="reCreateVideo:" destination="iSy-Lw-rcU" eventType="touchUpInside" id="41T-X0-j3z"/>
                                 </connections>
                             </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Jh-zT-Tj0">
+                                <rect key="frame" x="10" y="164" width="394" height="394"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="6Jh-zT-Tj0" secondAttribute="height" multiplier="1:1" id="FLP-g6-KaS"/>
+                                </constraints>
+                            </view>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="KYa-Zn-KVP">
+                                <rect key="frame" x="10" y="568" width="394" height="60"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="vZb-2u-Ylv"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="2G4-az-61F">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="AspectRatioCollectionCell" reuseIdentifier="AspectRatioCollectionCell" id="GcG-pf-FQc" customClass="AspectRatioCollectionCell" customModule="ImageTransition" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="-34" width="128" height="128"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="yKL-Iu-myK">
+                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5:4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nUw-Ws-FDy">
+                                                    <rect key="frame" x="43" y="53.5" width="25.5" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cfR-8L-rI8">
+                                                    <rect key="frame" x="30" y="48" width="67" height="31"/>
+                                                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                                </button>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="cfR-8L-rI8" firstAttribute="width" secondItem="yKL-Iu-myK" secondAttribute="width" id="Lu7-YO-CAc"/>
+                                                <constraint firstItem="nUw-Ws-FDy" firstAttribute="leading" secondItem="yKL-Iu-myK" secondAttribute="leading" constant="43" id="TOd-di-kn0"/>
+                                                <constraint firstItem="cfR-8L-rI8" firstAttribute="height" secondItem="yKL-Iu-myK" secondAttribute="height" id="ZoE-74-OIS"/>
+                                                <constraint firstItem="nUw-Ws-FDy" firstAttribute="centerX" secondItem="yKL-Iu-myK" secondAttribute="centerX" id="fwz-0n-wfe"/>
+                                                <constraint firstItem="nUw-Ws-FDy" firstAttribute="centerY" secondItem="yKL-Iu-myK" secondAttribute="centerY" id="kR0-7d-fXa"/>
+                                                <constraint firstItem="cfR-8L-rI8" firstAttribute="centerX" secondItem="yKL-Iu-myK" secondAttribute="centerX" id="y7c-Gw-8W9"/>
+                                                <constraint firstItem="cfR-8L-rI8" firstAttribute="centerY" secondItem="yKL-Iu-myK" secondAttribute="centerY" id="zb8-oc-iIr"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="subviews">
+                                                    <exclude reference="cfR-8L-rI8"/>
+                                                </mask>
+                                            </variation>
+                                        </collectionViewCellContentView>
+                                        <connections>
+                                            <outlet property="aspectButton" destination="cfR-8L-rI8" id="UP1-cm-x9F"/>
+                                            <outlet property="aspectLabel" destination="nUw-Ws-FDy" id="Qft-UI-9rj"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <connections>
+                                    <outlet property="dataSource" destination="iSy-Lw-rcU" id="yFv-4h-oXg"/>
+                                    <outlet property="delegate" destination="iSy-Lw-rcU" id="NCh-dz-dhN"/>
+                                </connections>
+                            </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yri-EF-jx1">
+                                <rect key="frame" x="169.5" y="652" width="75" height="41"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Restart"/>
+                                <connections>
+                                    <action selector="restartButtonPressed:" destination="iSy-Lw-rcU" eventType="touchUpInside" id="cGf-7a-vou"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="rYy-yD-dvN"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="yri-EF-jx1" firstAttribute="top" secondItem="6Jh-zT-Tj0" secondAttribute="bottom" constant="94" id="4UQ-Pc-6rN"/>
-                            <constraint firstItem="DzB-tX-TdF" firstAttribute="top" secondItem="rYy-yD-dvN" secondAttribute="top" constant="50" id="DHE-Ih-3xd"/>
-                            <constraint firstItem="6Jh-zT-Tj0" firstAttribute="leading" secondItem="rYy-yD-dvN" secondAttribute="leading" constant="50" id="Vd0-fc-80v"/>
-                            <constraint firstItem="6Jh-zT-Tj0" firstAttribute="centerY" secondItem="rYy-yD-dvN" secondAttribute="centerY" id="Xde-FK-hWQ"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="centerX" secondItem="6Jh-zT-Tj0" secondAttribute="centerX" id="6GV-9b-qfb"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="top" secondItem="6Jh-zT-Tj0" secondAttribute="bottom" constant="10" id="6fP-b9-boQ"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="leading" secondItem="6Jh-zT-Tj0" secondAttribute="leading" id="7hq-NC-rcd"/>
+                            <constraint firstItem="DzB-tX-TdF" firstAttribute="top" secondItem="rYy-yD-dvN" secondAttribute="top" constant="20" id="DHE-Ih-3xd"/>
+                            <constraint firstItem="6Jh-zT-Tj0" firstAttribute="top" secondItem="DzB-tX-TdF" secondAttribute="bottom" constant="20" id="K7N-H4-R98"/>
+                            <constraint firstItem="6Jh-zT-Tj0" firstAttribute="leading" secondItem="rYy-yD-dvN" secondAttribute="leading" constant="10" id="Vd0-fc-80v"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="trailing" secondItem="6Jh-zT-Tj0" secondAttribute="trailing" id="fjS-vm-oMZ"/>
                             <constraint firstItem="DzB-tX-TdF" firstAttribute="centerX" secondItem="rYy-yD-dvN" secondAttribute="centerX" id="ijx-hI-8HG"/>
+                            <constraint firstItem="yri-EF-jx1" firstAttribute="top" secondItem="KYa-Zn-KVP" secondAttribute="bottom" constant="24" id="m3s-m9-tVV"/>
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="centerX" secondItem="rYy-yD-dvN" secondAttribute="centerX" id="omT-5Q-3f6"/>
                             <constraint firstItem="yri-EF-jx1" firstAttribute="centerX" secondItem="6Jh-zT-Tj0" secondAttribute="centerX" id="wbT-r4-Y9y"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="9Yb-OJ-Fa3"/>
                     <connections>
+                        <outlet property="ratioCollectionView" destination="KYa-Zn-KVP" id="AeV-YQ-0NE"/>
                         <outlet property="videoView" destination="6Jh-zT-Tj0" id="5TD-JG-xZm"/>
                     </connections>
                 </viewController>

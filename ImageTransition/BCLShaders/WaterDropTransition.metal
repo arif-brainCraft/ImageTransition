@@ -8,7 +8,7 @@
 #include <metal_stdlib>
 #include "BCLTransitionLib.h"
 
-using namespace metal;
+using namespace metalpetal;
 
 constant float downAmplitude = 20;
 constant float upAmplitude   = 30;

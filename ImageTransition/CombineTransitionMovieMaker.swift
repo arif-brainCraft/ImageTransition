@@ -7,6 +7,7 @@
 
 import UIKit
 import MetalPetal
+import MTTransitions
 
 public enum MTMovieMakerError: Error {
     case imagesMustMoreThanTwo
@@ -101,7 +102,11 @@ class CombineTransitionMovieMaker:NSObject {
         }
         
         self.writer?.startSession(atSourceTime: .zero)
+        
+        
         writerInput.requestMediaDataWhenReady(on: self.writingQueue) {
+            print("video buffer adding to buffer pool")
+
             var index = 0,effectIndex = 0
             while index < (images.count - 1) {
                 var presentTime = CMTimeMake(value: Int64(frameDuration * Double(index) * 1000), timescale: 1000)
@@ -139,6 +144,8 @@ class CombineTransitionMovieMaker:NSObject {
                                     
                                     try? BCLTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
+                                    print(".", separator: " ", terminator: " ")
+
                                 }
                                 
                             }else{
@@ -148,6 +155,7 @@ class CombineTransitionMovieMaker:NSObject {
                                 if let buffer = pixelBuffer,let frame = transition.outputImage {
                                     try? BCLTransition.context?.render(frame, to: buffer)
                                     pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
+                                    print(".", separator: "", terminator: "|\(CMTimeGetSeconds(presentTime))|")
                                 }
                             }
                             
@@ -161,7 +169,7 @@ class CombineTransitionMovieMaker:NSObject {
                     effectIndex += 1
                 }
                 effectIndex += 1
-
+                print("\n\(transition.description) transition added")
             }
             
             writerInput.markAsFinished()
@@ -177,7 +185,7 @@ class CombineTransitionMovieMaker:NSObject {
                 } else {
                     DispatchQueue.main.async {
                         if let error = self.writer?.error {
-                            print("video written failed")
+                            print("video written failed \(error.localizedDescription)")
                             completion?(.failure(error))
                         } else {
                             print("video written succesfully")

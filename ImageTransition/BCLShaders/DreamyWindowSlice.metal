@@ -8,10 +8,10 @@
 #include <metal_stdlib>
 #include "BCLTransitionLib.h"
 
-using namespace metal;
+using namespace metalpetal;
 
 
-constant float count          = 5.0;
+constant float count          = 50.0;
 constant float smoothness     = 2;
 constant float speed          = 1.5;
 constant float zoom_quickness = 0.1;
@@ -21,6 +21,7 @@ constant float nQuick = clamp(zoom_quickness,0.1,0.3);
 float2 zoom(float2 uv, float amount,float2 center) {
     return center.x + ((uv - center) * (1.0-amount));
 }
+
 float2 offset(float progress, float x, float theta) {
     float phase = progress*progress + progress + theta;
     float shifty = 0.03*progress*cos(10.0*(progress+x));

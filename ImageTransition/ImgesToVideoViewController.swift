@@ -13,11 +13,13 @@ import MTTransitions
 class ImgesToVideoViewController: UIViewController {
 
     @IBOutlet var videoView: UIView!
+    @IBOutlet var ratioCollectionView:UICollectionView!
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
     private var exportButton : UIBarButtonItem!
     var movieMaker:CombineTransitionMovieMaker?
     var fileUrl:URL?
+    let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 1, height: 2),CGSize(width: 2, height: 1),CGSize(width: 2, height: 3),CGSize(width: 3, height: 4),CGSize(width: 4, height: 3)]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +52,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.dreamyWindowSlice]
+        let effects: [BCLTransition.Effect] = [.waterDrop,.randomAngularDreamy,.dreamyWindowSlice,.randomDownSwipe]
         let allImages = loadImages(count: effects.count + 1)
 
         var blendEffects = [Int]()
@@ -64,8 +66,9 @@ class ImgesToVideoViewController: UIViewController {
         movieMaker = CombineTransitionMovieMaker(outputURL: url)
         do {
             
+            let duration = Float(effects.count) * 2
             
-            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: 1, transitionDuration: 5, audioURL: nil, completion: {[weak self] result in
+            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: TimeInterval(duration + Float(1)), transitionDuration: 4, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):
@@ -186,10 +189,17 @@ class ImgesToVideoViewController: UIViewController {
                 break;
             }
         }
+    }
+    
+    func getAspectRatio(asset:AVAsset)->CGSize{
         
-        
+        let videoTrack = asset.tracks(withMediaType: .video).first!
+        let naturalSize = videoTrack.naturalSize
+        let transform = videoTrack.preferredTransform
+        return naturalSize.applying(transform)
         
     }
+    
     @IBAction func restartButtonPressed(_ sender: Any) {
         self.player.seek(to: .zero)
         self.player.play()
@@ -198,6 +208,107 @@ class ImgesToVideoViewController: UIViewController {
     @IBAction func reCreateVideo(_ sender: Any) {
         self.createVideo()
     }
+    
+
+}
+
+
+extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let space = 5
+        let collectionSize = collectionView.frame.size
+        return CGSize(width: collectionSize.width / CGFloat(aspectRatioes.count) - CGFloat(space * (aspectRatioes.count - 1) ), height: collectionSize.height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return aspectRatioes.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AspectRatioCollectionCell", for: indexPath) as! AspectRatioCollectionCell
+        
+        let width = String(format: "%d", Int(aspectRatioes[indexPath.item].width))
+        let height = String(format: "%d", Int(aspectRatioes[indexPath.item].height))
+
+        cell.aspectLabel.text = "\(width):\(height)"
+        
+        cell.contentView.layer.cornerRadius = 5
+        cell.contentView.layer.borderColor = UIColor.blue.cgColor
+        cell.contentView.layer.borderWidth = 1
+        cell.contentView.layer.masksToBounds = true
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+//        if let cell = collectionView.cellForItem(at: indexPath) {
+//            UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
+//                cell.backgroundColor = UIColor.lightGray
+//            }, completion: { _ in
+//                cell.backgroundColor = UIColor.white
+//            })
+//        }
+        
+        
+        if let asset = player.currentItem?.asset{
+            let maxBounds = videoView.bounds
+            let minSize = CGSize(width: maxBounds.width - 100, height: maxBounds.height - 100)
+
+            let aspect = aspectRatioes[indexPath.item]
+            
+            var width = maxBounds.width * aspect.width
+            var height = maxBounds.height * aspect.height
+            var diffPercent:CGFloat = 0.0
+            
+            if width > height {
+                if width > maxBounds.width {
+                    let diff = width - maxBounds.width
+                    
+                    diffPercent =  diff * 100.0 / width
+                    width = width - diff
+
+                    height = height - (height * diffPercent / 100)
+                    
+                    if height < minSize.height {
+                        let diff = minSize.height - height
+                        
+                        diffPercent =  diff * 100.0 / height
+                        height = height + diff
+
+                        width = width + (width * diffPercent / 100)
+                    }
+                }
+            }else if height > width{
+                if height > maxBounds.height {
+                    let diff = height - maxBounds.height
+        
+                    diffPercent =  diff * 100.0 / height
+                    height = height - diff
+                    width = width - (width * diffPercent / 100)
+                    
+                    if width < minSize.width {
+                        let diff = minSize.width - width
+                        
+                        diffPercent =  diff * 100.0 / width
+                        width = width + diff
+
+                        height = height + (height * diffPercent / 100)
+                    }
+                    
+                }
+            }
+            let tempOrigin = CGPoint(x: maxBounds.midX - width/2, y: maxBounds.midY - height/2)
+            
+            let rect = CGRect(x: tempOrigin.x, y: tempOrigin.y, width:width , height: height)
+            
+            playerLayer.frame = AVMakeRect(aspectRatio: self.getAspectRatio(asset: asset), insideRect: rect)
+            videoView.layoutSubviews()
+        }
+        
+    }
+    
     
 
 }

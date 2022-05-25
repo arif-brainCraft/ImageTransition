@@ -1,0 +1,26 @@
+PODS:
+  - MetalPetal (1.24.1):
+    - MetalPetal/Core (= 1.24.1)
+  - MetalPetal/Core (1.24.1)
+  - MetalPetal/Swift (1.24.1):
+    - MetalPetal/Core
+  - MTTransitions (1.6.5):
+    - MetalPetal
+    - MetalPetal/Swift
+
+DEPENDENCIES:
+  - MetalPetal/Swift
+  - MTTransitions
+
+SPEC REPOS:
+  trunk:
+    - MetalPetal
+    - MTTransitions
+
+SPEC CHECKSUMS:
+  MetalPetal: 5801c52cb1ce686743f2d1955456bfcaba112832
+  MTTransitions: f4818ba485abc477545af4ee483c00b717dfd76e
+
+PODFILE CHECKSUM: 75d82b85253fd7400a29c92770e924fe93fd5e1c
+
+COCOAPODS: 1.11.2
