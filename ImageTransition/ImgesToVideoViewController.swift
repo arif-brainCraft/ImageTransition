@@ -20,13 +20,15 @@ class ImgesToVideoViewController: UIViewController {
     var movieMaker:CombineTransitionMovieMaker?
     var fileUrl:URL?
     let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16)]
+    var selectedRatio:CGSize!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Image To Video"
-        
+        selectedRatio = aspectRatioes.first!
         exportButton = UIBarButtonItem(title: "Export", style: .plain, target: self, action: #selector(exportButtonPressed))
         self.navigationItem.rightBarButtonItem = exportButton
+        resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio))
         setUpSubviews()
         createVideo()
     }
@@ -200,6 +202,97 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
+    func resizeVideView(rect:CGRect) -> Void {
+        
+        var rectangle = rect
+        var size = rect.size
+        
+        if size.width > size.height {
+            size.width = videoView.superview!.bounds.width
+        }else{
+            size.height = videoView.superview!.bounds.height
+        }
+        rectangle.size = size
+        videoView.frame = rectangle
+        
+    }
+    
+    func resizePlayerLayer(rect:CGRect) -> Void {
+        let maxBounds = videoView.bounds
+
+        let tempOrigin = CGPoint(x: maxBounds.midX - rect.width/2, y: maxBounds.midY - rect.height/2)
+        
+        let rectangle = CGRect(x: tempOrigin.x, y: tempOrigin.y, width:rect.width , height: rect.height)
+        if let asset = player.currentItem?.asset{
+
+            playerLayer.frame = AVMakeRect(aspectRatio: self.getAspectRatio(asset: asset), insideRect: rectangle)
+            playerLayer.removeAllAnimations()
+
+            
+        }
+        
+
+    }
+    
+    func getResizedRectAsRatio(aspectRatio:CGSize) -> CGRect {
+        
+        let maxBounds = videoView.superview!.bounds
+        let maxSize = CGSize(width: maxBounds.width, height: maxBounds.width)
+        let minSize = CGSize(width: maxSize.width/2, height: maxSize.height/2)
+
+        
+        var width = maxSize.width * aspectRatio.width
+        var height = maxSize.height * aspectRatio.height
+        var diffPercent:CGFloat = 0.0
+        
+        
+        if width > height {
+            if width > maxBounds.width {
+                let diff = width - maxBounds.width
+                
+                diffPercent =  diff * 100.0 / width
+                width = width - diff
+
+                height = height - (height * diffPercent / 100)
+                
+                if height < minSize.height {
+                    let diff = minSize.height - height
+                    
+                    diffPercent =  diff * 100.0 / height
+                    height = height + diff
+
+                    width = width + (width * diffPercent / 100)
+                }
+            }
+        }else if height > width{
+            if height > maxBounds.height {
+                let diff = height - maxBounds.height
+    
+                diffPercent =  diff * 100.0 / height
+                height = height - diff
+                width = width - (width * diffPercent / 100)
+                
+                if width < minSize.width {
+                    let diff = minSize.width - width
+                    
+                    diffPercent =  diff * 100.0 / width
+                    width = width + diff
+
+                    height = height + (height * diffPercent / 100)
+                }
+                
+            }
+        }
+
+        
+        let tempOrigin = CGPoint(x: maxBounds.midX - width/2, y: maxBounds.midY - height/2)
+        
+        let rect = CGRect(x: tempOrigin.x, y: tempOrigin.y, width:width , height: height)
+        print("origin: \(tempOrigin) width: \(width) height \(height) ratio: \(width/height)")
+        
+        return rect
+    }
+    
     @IBAction func restartButtonPressed(_ sender: Any) {
         self.player.seek(to: .zero)
         self.player.play()
@@ -209,6 +302,27 @@ class ImgesToVideoViewController: UIViewController {
         self.createVideo()
     }
     
+    @IBAction func aspectFitButtonPressed(_ sender: Any) {
+        playerLayer.videoGravity = .resizeAspect
+        
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+
+        self.resizeVideView(rect: rect)
+        self.resizePlayerLayer(rect: rect)
+        self.videoView.superview?.layoutIfNeeded()
+
+
+    }
+    
+    @IBAction func aspectFillButtonPressed(_ sender: Any) {
+        playerLayer.videoGravity = .resizeAspectFill
+        
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+
+        self.resizeVideView(rect: rect)
+        self.resizePlayerLayer(rect: rect)
+        self.videoView.superview?.layoutIfNeeded()
+    }
 
 }
 
@@ -250,63 +364,15 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
 //                cell.backgroundColor = UIColor.white
 //            })
 //        }
-        
-        
-        if let asset = player.currentItem?.asset{
-            let maxBounds = videoView.bounds
-            let minSize = CGSize(width: maxBounds.width - 100, height: maxBounds.height - 100)
+        selectedRatio = aspectRatioes[indexPath.item]
+        playerLayer.videoGravity = .resizeAspect
 
-            let aspect = aspectRatioes[indexPath.item]
-            
-            var width = maxBounds.width * aspect.width
-            var height = maxBounds.height * aspect.height
-            var diffPercent:CGFloat = 0.0
-            
-            if width > height {
-                if width > maxBounds.width {
-                    let diff = width - maxBounds.width
-                    
-                    diffPercent =  diff * 100.0 / width
-                    width = width - diff
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
 
-                    height = height - (height * diffPercent / 100)
-                    
-                    if height < minSize.height {
-                        let diff = minSize.height - height
-                        
-                        diffPercent =  diff * 100.0 / height
-                        height = height + diff
+        self.resizeVideView(rect: rect)
+        self.resizePlayerLayer(rect: rect)
+        self.videoView.superview?.layoutIfNeeded()
 
-                        width = width + (width * diffPercent / 100)
-                    }
-                }
-            }else if height > width{
-                if height > maxBounds.height {
-                    let diff = height - maxBounds.height
-        
-                    diffPercent =  diff * 100.0 / height
-                    height = height - diff
-                    width = width - (width * diffPercent / 100)
-                    
-                    if width < minSize.width {
-                        let diff = minSize.width - width
-                        
-                        diffPercent =  diff * 100.0 / width
-                        width = width + diff
-
-                        height = height + (height * diffPercent / 100)
-                    }
-                    
-                }
-            }
-            let tempOrigin = CGPoint(x: maxBounds.midX - width/2, y: maxBounds.midY - height/2)
-            
-            let rect = CGRect(x: tempOrigin.x, y: tempOrigin.y, width:width , height: height)
-            
-            playerLayer.frame = AVMakeRect(aspectRatio: self.getAspectRatio(asset: asset), insideRect: rect)
-            videoView.layoutSubviews()
-        }
-        
     }
     
     
