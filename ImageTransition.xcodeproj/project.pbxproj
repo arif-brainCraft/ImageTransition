@@ -29,6 +29,8 @@
 		130F1FB1283E3BED0063F8BC /* RandomWindowBlind.metal in Sources */ = {isa = PBXBuildFile; fileRef = 13E66355283CEDF40059802E /* RandomWindowBlind.metal */; };
 		130F1FB4283E54A20063F8BC /* RandomDownSwipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */; };
 		130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */; };
+		130F1FB9283F5E6E0063F8BC /* DoomScreenTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB8283F5E6E0063F8BC /* DoomScreenTransition.swift */; };
+		130F1FBC283F9FE70063F8BC /* DoomScreenTransition.metal in Sources */ = {isa = PBXBuildFile; fileRef = 130F1FB6283F5D310063F8BC /* DoomScreenTransition.metal */; };
 		13DC7137282A6D5200E2811C /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7136282A6D5200E2811C /* 0.jpg */; };
 		13DC7139282A8DA400E2811C /* Abstract.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7138282A8BD500E2811C /* Abstract.mp4 */; };
 		13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66332283A7C050059802E /* CustomTransitionEffect.swift */; };
@@ -71,6 +73,8 @@
 		130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineTransitionMovieMaker.swift; sourceTree = "<group>"; };
 		130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomDownSwipe.swift; sourceTree = "<group>"; };
 		130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = RandomDownSwipe.metal; sourceTree = "<group>"; };
+		130F1FB6283F5D310063F8BC /* DoomScreenTransition.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DoomScreenTransition.metal; sourceTree = "<group>"; };
+		130F1FB8283F5E6E0063F8BC /* DoomScreenTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoomScreenTransition.swift; sourceTree = "<group>"; };
 		13DC7136282A6D5200E2811C /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		13DC7138282A8BD500E2811C /* Abstract.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Abstract.mp4; sourceTree = "<group>"; };
 		13E66332283A7C050059802E /* CustomTransitionEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTransitionEffect.swift; sourceTree = "<group>"; };
@@ -181,6 +185,8 @@
 				13E6633F283B83D80059802E /* DreamyWindowSlice.swift */,
 				13E66355283CEDF40059802E /* RandomWindowBlind.metal */,
 				13E66357283CEF2F0059802E /* RandomWindowBlind.swift */,
+				130F1FB6283F5D310063F8BC /* DoomScreenTransition.metal */,
+				130F1FB8283F5E6E0063F8BC /* DoomScreenTransition.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -334,8 +340,10 @@
 				13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */,
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
 				13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */,
+				130F1FBC283F9FE70063F8BC /* DoomScreenTransition.metal in Sources */,
 				130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */,
 				13E6634A283BBA570059802E /* AngularTransition.swift in Sources */,
+				130F1FB9283F5E6E0063F8BC /* DoomScreenTransition.swift in Sources */,
 				13E66337283B58E00059802E /* BCLTransition.swift in Sources */,
 				13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */,
 				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,

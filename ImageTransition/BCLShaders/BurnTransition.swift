@@ -8,7 +8,10 @@
 import MetalPetal
 
 public class BurnTransition: BCLTransition {
-    
+    public override init() {
+        super.init()
+        self.duration = 3.0;
+    }
     public var color: MTIColor = MTIColor(red: 0.9, green: 0.4, blue: 0.2, alpha: 1.0)
 
     override var fragmentName: String {

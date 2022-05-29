@@ -9,7 +9,10 @@ import Foundation
 import MTTransitions
 
 public class AngularTransition: BCLTransition {
-    
+    public override init() {
+        super.init()
+        self.duration = 3.0;
+    }
     public var startingAngle: Float = 90
 
     override var fragmentName: String {

@@ -40,7 +40,7 @@ constant float randomness = 0.1;
    return min(rectangleSize.x, rectangleSize.y) * dividerWidth;
  }
 
- float4 randomWindowBlindFragment(VertexOut vertexIn [[ stage_in ]],
+ fragment float4 randomWindowBlindFragment(VertexOut vertexIn [[ stage_in ]],
                    texture2d<float, access::sample> fromTexture [[ texture(0) ]],
                    texture2d<float, access::sample> toTexture [[ texture(1) ]],
                    constant float & startingAngle [[ buffer(0) ]],

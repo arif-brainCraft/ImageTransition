@@ -7,7 +7,7 @@
 
 import MetalPetal
 
-public class RandomDownSwipe: BCLTransition {
+public class DoomScreenTransition: BCLTransition {
     public override init() {
         super.init()
         self.duration = 4.0;
@@ -15,12 +15,10 @@ public class RandomDownSwipe: BCLTransition {
     public var startingAngle: Float = 90
 
     override var fragmentName: String {
-        return "randomDownSwipeFragment"
+        return "doomScreenTransitionFragment"
     }
 
     override var parameters: [String: Any] {
-        return [
-            "startingAngle": startingAngle
-        ]
+        return [:]
     }
 }

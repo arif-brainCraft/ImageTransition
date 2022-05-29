@@ -19,7 +19,7 @@ class ImgesToVideoViewController: UIViewController {
     private var exportButton : UIBarButtonItem!
     var movieMaker:CombineTransitionMovieMaker?
     var fileUrl:URL?
-    let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 1, height: 2),CGSize(width: 2, height: 1),CGSize(width: 2, height: 3),CGSize(width: 3, height: 4),CGSize(width: 4, height: 3)]
+    let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16)]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,12 +52,12 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.waterDrop,.randomAngularDreamy,.dreamyWindowSlice,.randomDownSwipe]
+        let effects: [BCLTransition.Effect] = [.burn,.doomScreenTransition]
         let allImages = loadImages(count: effects.count + 1)
 
         var blendEffects = [Int]()
 
-
+        
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
         let path = documentDirectory.appendingPathComponent("CreateVideoFromImages.mp4").path
@@ -68,7 +68,7 @@ class ImgesToVideoViewController: UIViewController {
             
             let duration = Float(effects.count) * 2
             
-            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: TimeInterval(duration + Float(1)), transitionDuration: 4, audioURL: nil, completion: {[weak self] result in
+            try movieMaker?.createCombinedTransitionVideo(with: allImages, effects: effects, blendEffects: blendEffects, frameDuration: TimeInterval(Float(allImages.count) * 2.5), transitionDuration: 4, audioURL: nil, completion: {[weak self] result in
                 guard let self = self else {return}
                 switch result {
                 case .success(let url):

@@ -113,7 +113,7 @@ class CombineTransitionMovieMaker:NSObject {
                 let transition = effects[effectIndex].transition
                 transition.inputImage = images[index]
                 transition.destImage = images[index + 1]
-                transition.duration = transitionDuration
+                //transition.duration = transitionDuration
 
                 let frameBeginTime = presentTime
                 let frameCount = 60

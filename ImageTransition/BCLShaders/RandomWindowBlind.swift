@@ -10,7 +10,10 @@ import MetalPetal
 import simd
 
 public class RandomWindowBlind: BCLTransition {
-    
+    public override init() {
+        super.init()
+        self.duration = 4.0;
+    }
     public var startingAngle: Float = 90
 
     override var fragmentName: String {

@@ -23,6 +23,7 @@ extension BCLTransition{
         case randomAngularDreamy
         case randomWindowBlind
         case randomDownSwipe
+        case doomScreenTransition
         public var transition: BCLTransition {
             switch self {
             case .waterDrop: return WaterDropTransition()
@@ -32,6 +33,7 @@ extension BCLTransition{
             case . randomAngularDreamy: return RandomAngularDreamy()
             case .randomWindowBlind: return RandomWindowBlind()
             case .randomDownSwipe: return RandomDownSwipe()
+            case .doomScreenTransition: return DoomScreenTransition()
             }
         }
         
@@ -44,6 +46,7 @@ extension BCLTransition{
             case .randomAngularDreamy: return "randomAngularDreamy"
             case .randomWindowBlind: return "RandomWindowBlind"
             case .randomDownSwipe: return "RandomDownSwipe"
+            case .doomScreenTransition: return "DoomScreenTransition"
             }
         }
     }
