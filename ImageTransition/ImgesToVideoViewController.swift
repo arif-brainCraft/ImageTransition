@@ -54,11 +54,13 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.doomScreenTransition]
-        let allImages = loadImages(count: effects.count + 1)
+        let effects: [BCLTransition.Effect] = [.dreamyWindowSlice,.doomScreenTransition]
         
         var blendEffects = [Int]()
         
+        let allImages = loadImages(count: effects.count + 1 - blendEffects.count )
+        
+
         
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
@@ -239,7 +241,7 @@ class ImgesToVideoViewController: UIViewController {
             case .authorized:
                 PHPhotoLibrary.shared().performChanges {
                     let options = PHAssetResourceCreationOptions()
-                    options.shouldMoveFile = false
+                    options.shouldMoveFile = true
                     let request = PHAssetCreationRequest.forAsset()
                     request.addResource(with: .video, fileURL: url, options: options)
                 } completionHandler: { success, error in
