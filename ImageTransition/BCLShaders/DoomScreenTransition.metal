@@ -34,7 +34,7 @@ float rand_dst(int num) {
 
 float wave_dst(int num) {
     float fn = float(num) * frequency_dst * 0.1 * float(bars_dst);
-    return cos(fn * 0.5) * cos(fn * 0.13) * sin((fn+10.0) * 0.31) / 2.0 + 0.5;
+    return cos(fn * 0.5) * sin(fn * 0.5) * sin((fn+10.0) * 0.31) / 2.0 + 0.5;
 }
 
 float drip_dst(int num) {

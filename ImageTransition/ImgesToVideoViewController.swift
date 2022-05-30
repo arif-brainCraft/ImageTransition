@@ -11,7 +11,7 @@ import Photos
 import MTTransitions
 
 class ImgesToVideoViewController: UIViewController {
-
+    
     @IBOutlet var videoView: UIView!
     @IBOutlet var ratioCollectionView:UICollectionView!
     private var player: AVPlayer!
@@ -54,11 +54,11 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.burn,.doomScreenTransition]
+        let effects: [BCLTransition.Effect] = [.doomScreenTransition]
         let allImages = loadImages(count: effects.count + 1)
-
+        
         var blendEffects = [Int]()
-
+        
         
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
@@ -76,46 +76,46 @@ class ImgesToVideoViewController: UIViewController {
                 case .success(let url):
                     print(url)
                     self.playVideo(url: url)
-
-//                    let asset = AVURLAsset(url: url)
-//                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
-//                        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
-//                            var overlayAsset = AVURLAsset(url: url)
-//                            overlayAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
-//                                do {
-//                                    try self.movieMaker?.addOverlay(asset: asset, overlayAsset: overlayAsset, completion: {[weak self] result in
-//                                        guard let self = self else {return}
-//                                        switch result {
-//                                        case .success(let outputUrl):
-//                                            self.playVideo(url: outputUrl)
-//
-//                                            break
-//
-//                                        case .failure(let error):
-//                                            break
-//                                        }
-//                                    })
-//                                } catch {
-//                                }
-//                            }
-//
-//
-//                        }
-//                    }
                     
-
-//                    self.movieMaker?.exportVideoWithAnimation(asset: asset, completion: {[weak self] result in
-//                        guard let self = self else {return}
-//                        switch result {
-//                        case .success(let url):
-//                            self.playVideo(url: url)
-//
-//                            break
-//
-//                        case .failure(let error):
-//                            break
-//                        }
-//                    })
+                    //                    let asset = AVURLAsset(url: url)
+                    //                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+                    //                        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4") {
+                    //                            var overlayAsset = AVURLAsset(url: url)
+                    //                            overlayAsset.loadValuesAsynchronously(forKeys: ["tracks"]) {
+                    //                                do {
+                    //                                    try self.movieMaker?.addOverlay(asset: asset, overlayAsset: overlayAsset, completion: {[weak self] result in
+                    //                                        guard let self = self else {return}
+                    //                                        switch result {
+                    //                                        case .success(let outputUrl):
+                    //                                            self.playVideo(url: outputUrl)
+                    //
+                    //                                            break
+                    //
+                    //                                        case .failure(let error):
+                    //                                            break
+                    //                                        }
+                    //                                    })
+                    //                                } catch {
+                    //                                }
+                    //                            }
+                    //
+                    //
+                    //                        }
+                    //                    }
+                    
+                    
+                    //                    self.movieMaker?.exportVideoWithAnimation(asset: asset, completion: {[weak self] result in
+                    //                        guard let self = self else {return}
+                    //                        switch result {
+                    //                        case .success(let url):
+                    //                            self.playVideo(url: url)
+                    //
+                    //                            break
+                    //
+                    //                        case .failure(let error):
+                    //                            break
+                    //                        }
+                    //                    })
                     
                     break
                     
@@ -130,7 +130,7 @@ class ImgesToVideoViewController: UIViewController {
         
         
     }
-   
+    
     func playVideo(url:URL) -> Void {
         self.fileUrl = url
         let playerItem = AVPlayerItem(url: url)
@@ -142,7 +142,7 @@ class ImgesToVideoViewController: UIViewController {
         NotificationCenter.default
             .addObserver(self,
                          selector: #selector(self.playerDidFinishPlaying),
-            name: .AVPlayerItemDidPlayToEndTime,
+                         name: .AVPlayerItemDidPlayToEndTime,
                          object: self.player.currentItem)
     }
     
@@ -164,17 +164,87 @@ class ImgesToVideoViewController: UIViewController {
         guard let fileUrl = fileUrl else {
             return
         }
-        PHPhotoLibrary.requestAuthorization{ auth in
+        let asset = AVAsset(url: fileUrl)
+        let tracksKey = #keyPath(AVAsset.tracks)
+        asset.loadValuesAsynchronously(forKeys: [tracksKey]){
+            let videoTrack = asset.tracks(withMediaType: .video).first!
+            DispatchQueue.main.async {
+                print(asset) // <-- amazing trick
+                assert(videoTrack.asset != nil) // passes!
+                
+                let composition = AVMutableVideoComposition(propertiesOf: asset)
+                composition.renderSize = self.videoView.frame.size
+                //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
+                
+                let instruction = AVMutableVideoCompositionInstruction()
+                instruction.timeRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
+                
+                let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+                let layerFrame = self.playerLayer.frame
+                
+                var transform =  videoTrack.preferredTransform.scaledBy(x: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
+                
+                var size = __CGSizeApplyAffineTransform(videoTrack.naturalSize, transform)
+                
+                if layerFrame.width == composition.renderSize.width {
+                    let Y = (composition.renderSize.height - size.height)
+                    transform = transform.translatedBy(x: 0, y: Y)
+                }else if layerFrame.height == composition.renderSize.height{
+                    let X = (composition.renderSize.width - layerFrame.width)
+                    transform = transform.translatedBy(x: X, y: 0)
+                }
+                
+                layerInstruction.setTransform(transform, at: .zero)
+
+
+                instruction.layerInstructions = [layerInstruction]
+                composition.instructions = [instruction]
+                
+                let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                
+                let path = documentDirectory.appendingPathComponent("exported.mp4").path
+                let url = URL(fileURLWithPath: path)
+                try? FileManager.default.removeItem(at: url)
+                
+                if let exporter = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality){
+                    
+                    exporter.outputFileType = .mp4
+                    exporter.timeRange = CMTimeRange(start: .zero, duration: asset.duration)
+                    exporter.videoComposition = composition
+                    exporter.outputURL = url
+                    
+                    exporter.exportAsynchronously {
+                        switch exporter.status {
+                        case .completed:
+                            self.exportToPhotoLibrary(url: exporter.outputURL!)
+                            break
+                        case .failed:
+                            print(exporter.error?.localizedDescription)
+                            break
+                        default:
+                            break
+                        }
+                        
+                    }
+                }
+            }
+        }
+        
+        
+    }
+    
+    func exportToPhotoLibrary(url:URL) -> Void {
+        PHPhotoLibrary.requestAuthorization { auth in
             switch auth {
             case .authorized:
                 PHPhotoLibrary.shared().performChanges {
                     let options = PHAssetResourceCreationOptions()
-                    options.shouldMoveFile = true
+                    options.shouldMoveFile = false
                     let request = PHAssetCreationRequest.forAsset()
-                    request.addResource(with: .video, fileURL: fileUrl, options: options)
+                    request.addResource(with: .video, fileURL: url, options: options)
                 } completionHandler: { success, error in
                     DispatchQueue.main.async {
-                        if success {
+                        if success && error == nil {
                             let alert = UIAlertController(title: "Video Saved To Camera Roll", message: nil, preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { _ in
                                 
@@ -183,16 +253,17 @@ class ImgesToVideoViewController: UIViewController {
                         }
                     }
                 }
-
+                
                 break;
             default:
                 print("PhotoLibrary not authorized")
-
+                
                 break;
             }
         }
     }
     
+
     func getAspectRatio(asset:AVAsset)->CGSize{
         
         let videoTrack = asset.tracks(withMediaType: .video).first!
@@ -219,19 +290,19 @@ class ImgesToVideoViewController: UIViewController {
     
     func resizePlayerLayer(rect:CGRect) -> Void {
         let maxBounds = videoView.bounds
-
+        
         let tempOrigin = CGPoint(x: maxBounds.midX - rect.width/2, y: maxBounds.midY - rect.height/2)
         
         let rectangle = CGRect(x: tempOrigin.x, y: tempOrigin.y, width:rect.width , height: rect.height)
         if let asset = player.currentItem?.asset{
-
+            
             playerLayer.frame = AVMakeRect(aspectRatio: self.getAspectRatio(asset: asset), insideRect: rectangle)
             playerLayer.removeAllAnimations()
-
+            
             
         }
         
-
+        
     }
     
     func getResizedRectAsRatio(aspectRatio:CGSize) -> CGRect {
@@ -239,7 +310,7 @@ class ImgesToVideoViewController: UIViewController {
         let maxBounds = videoView.superview!.bounds
         let maxSize = CGSize(width: maxBounds.width, height: maxBounds.width)
         let minSize = CGSize(width: maxSize.width/2, height: maxSize.height/2)
-
+        
         
         var width = maxSize.width * aspectRatio.width
         var height = maxSize.height * aspectRatio.height
@@ -252,7 +323,7 @@ class ImgesToVideoViewController: UIViewController {
                 
                 diffPercent =  diff * 100.0 / width
                 width = width - diff
-
+                
                 height = height - (height * diffPercent / 100)
                 
                 if height < minSize.height {
@@ -260,14 +331,14 @@ class ImgesToVideoViewController: UIViewController {
                     
                     diffPercent =  diff * 100.0 / height
                     height = height + diff
-
+                    
                     width = width + (width * diffPercent / 100)
                 }
             }
         }else if height > width{
             if height > maxBounds.height {
                 let diff = height - maxBounds.height
-    
+                
                 diffPercent =  diff * 100.0 / height
                 height = height - diff
                 width = width - (width * diffPercent / 100)
@@ -277,13 +348,13 @@ class ImgesToVideoViewController: UIViewController {
                     
                     diffPercent =  diff * 100.0 / width
                     width = width + diff
-
+                    
                     height = height + (height * diffPercent / 100)
                 }
                 
             }
         }
-
+        
         
         let tempOrigin = CGPoint(x: maxBounds.midX - width/2, y: maxBounds.midY - height/2)
         
@@ -306,24 +377,24 @@ class ImgesToVideoViewController: UIViewController {
         playerLayer.videoGravity = .resizeAspect
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
-
+        
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
         self.videoView.superview?.layoutIfNeeded()
-
-
+        
+        
     }
     
     @IBAction func aspectFillButtonPressed(_ sender: Any) {
         playerLayer.videoGravity = .resizeAspectFill
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
-
+        
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
         self.videoView.superview?.layoutIfNeeded()
     }
-
+    
 }
 
 
@@ -344,7 +415,7 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
         
         let width = String(format: "%d", Int(aspectRatioes[indexPath.item].width))
         let height = String(format: "%d", Int(aspectRatioes[indexPath.item].height))
-
+        
         cell.aspectLabel.text = "\(width):\(height)"
         
         cell.contentView.layer.cornerRadius = 5
@@ -357,24 +428,24 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-//        if let cell = collectionView.cellForItem(at: indexPath) {
-//            UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
-//                cell.backgroundColor = UIColor.lightGray
-//            }, completion: { _ in
-//                cell.backgroundColor = UIColor.white
-//            })
-//        }
+        //        if let cell = collectionView.cellForItem(at: indexPath) {
+        //            UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
+        //                cell.backgroundColor = UIColor.lightGray
+        //            }, completion: { _ in
+        //                cell.backgroundColor = UIColor.white
+        //            })
+        //        }
         selectedRatio = aspectRatioes[indexPath.item]
         playerLayer.videoGravity = .resizeAspect
-
+        
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
-
+        
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
         self.videoView.superview?.layoutIfNeeded()
-
+        
     }
     
     
-
+    
 }
