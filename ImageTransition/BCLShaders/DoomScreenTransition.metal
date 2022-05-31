@@ -31,7 +31,7 @@ constant float dripScale_dst = 0.5;
 constant float zoom_quickness = 0.8;
 
 float nQuick(float zoom_quickness){
-    return clamp(zoom_quickness,0.2,1.0);
+    return clamp(zoom_quickness,0.2,1.0) + 0.3;
 }
 
 float2 zoom(float2 uv, float amount) {
