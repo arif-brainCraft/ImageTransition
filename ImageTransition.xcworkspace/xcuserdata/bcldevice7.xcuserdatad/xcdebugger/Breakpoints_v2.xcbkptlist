@@ -19,16 +19,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8FBE9047-FFE2-4A49-8BA7-B57351A384DA"
-            shouldBeEnabled = "No"
+            uuid = "09BBC6EF-6F01-4BF6-A1FB-AEA5E5DF3B6E"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ImageTransition/ImgesToVideoViewController.swift"
+            filePath = "ImageTransition/CombineTransitionMovieMaker.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "219"
-            endingLineNumber = "219"
-            landmarkName = "exportButtonPressed()"
+            startingLineNumber = "659"
+            endingLineNumber = "659"
+            landmarkName = "newoverlay(video:withSecondVideo:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

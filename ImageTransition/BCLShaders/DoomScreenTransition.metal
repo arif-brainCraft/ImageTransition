@@ -28,6 +28,16 @@ constant float dripScale_dst = 0.5;
 
 // The code proper --------
 
+constant float zoom_quickness = 0.8;
+
+float nQuick(float zoom_quickness){
+    return clamp(zoom_quickness,0.2,1.0);
+}
+
+float2 zoom(float2 uv, float amount) {
+  return 0.5 + ((uv - 0.5) * (1.0-amount));
+}
+
 float rand_dst(int num) {
     return fract(mod(float(num) * 67123.313, 12.0) * sin(float(num) * 10.3) * cos(float(num)));
 }
@@ -62,17 +72,14 @@ fragment float4 doomScreenTransitionFragment(VertexOut vertexIn [[ stage_in ]],
     float scale = 1.0 + pos_dst(bar) * amplitude_dst;
     float phase = progress * scale;
     float posY = uv.y / float2(1.0).y;
-    float2 p;
     float4 c;
     
     if (phase + posY < 1.0) {
         
-        p = float2(uv.x , uv.y + mix(0., float2(1.).y, progress)) * float2(1.).xy * ( smoothstep(0.,1.,phase));
-        c = getFromColor(p,fromTexture,ratio,_fromR)  ;
+        c = getFromColor(zoom(uv, smoothstep(0., nQuick(zoom_quickness), phase)),fromTexture,ratio,_fromR)  ;
     } else {
         
-        p = uv.xy  * float2(1).xy * ( smoothstep(0.0,1.,phase));
-        c = getToColor(p,toTexture,ratio,_toR);
+        c = getToColor(zoom(uv, smoothstep(0.0, nQuick(zoom_quickness),1.- phase)),toTexture,ratio,_toR);
     }
     
     return c;

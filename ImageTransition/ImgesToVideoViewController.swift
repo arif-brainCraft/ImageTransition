@@ -54,7 +54,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.dreamyWindowSlice,.doomScreenTransition]
+        let effects: [BCLTransition.Effect] = [.doomScreenTransition]
         
         var blendEffects = [Int]()
         
@@ -169,39 +169,7 @@ class ImgesToVideoViewController: UIViewController {
         let asset = AVAsset(url: fileUrl)
         let tracksKey = #keyPath(AVAsset.tracks)
         asset.loadValuesAsynchronously(forKeys: [tracksKey]){
-            let videoTrack = asset.tracks(withMediaType: .video).first!
             DispatchQueue.main.async {
-                print(asset) // <-- amazing trick
-                assert(videoTrack.asset != nil) // passes!
-                
-                let composition = AVMutableVideoComposition(propertiesOf: asset)
-                composition.renderSize = self.videoView.frame.size
-                //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
-                
-                let instruction = AVMutableVideoCompositionInstruction()
-                instruction.timeRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
-                
-                let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-                let layerFrame = self.playerLayer.frame
-                
-                var transform =  videoTrack.preferredTransform.scaledBy(x: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
-                
-                var size = __CGSizeApplyAffineTransform(videoTrack.naturalSize, transform)
-                
-                if layerFrame.width == composition.renderSize.width {
-                    let Y = (composition.renderSize.height - size.height)
-                    transform = transform.translatedBy(x: 0, y: Y)
-                }else if layerFrame.height == composition.renderSize.height{
-                    let X = (composition.renderSize.width - layerFrame.width)
-                    transform = transform.translatedBy(x: X, y: 0)
-                }
-                
-                layerInstruction.setTransform(transform, at: .zero)
-
-
-                instruction.layerInstructions = [layerInstruction]
-                composition.instructions = [instruction]
-                
                 let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
                 
                 let path = documentDirectory.appendingPathComponent("exported.mp4").path
@@ -212,7 +180,7 @@ class ImgesToVideoViewController: UIViewController {
                     
                     exporter.outputFileType = .mp4
                     exporter.timeRange = CMTimeRange(start: .zero, duration: asset.duration)
-                    exporter.videoComposition = composition
+                    exporter.videoComposition = self.getScaledVideoComposition(aspectRatio: self.selectedRatio, asset: asset)
                     exporter.outputURL = url
                     
                     exporter.exportAsynchronously {
@@ -233,6 +201,41 @@ class ImgesToVideoViewController: UIViewController {
         }
         
         
+    }
+    
+    func getScaledVideoComposition(aspectRatio:CGSize,asset:AVAsset) -> AVMutableVideoComposition? {
+        
+        guard let videoTrack = asset.tracks(withMediaType: .video).first else{return nil}
+
+        
+        let canvasSize = self.videoView.frame.size
+        let composition = AVMutableVideoComposition(propertiesOf: asset)
+        composition.renderSize = canvasSize
+        //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
+        
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
+        
+        let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+        let layerFrame = self.playerLayer.frame
+        
+        var transform =  videoTrack.preferredTransform.scaledBy(x: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
+        
+        let size = __CGSizeApplyAffineTransform(videoTrack.naturalSize, transform)
+        
+        let Y = (canvasSize.height - size.height)/2
+        let X = (composition.renderSize.width - layerFrame.width)/2
+        
+        transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
+
+        
+        layerInstruction.setTransform(transform, at: .zero)
+
+
+        instruction.layerInstructions = [layerInstruction]
+        composition.instructions = [instruction]
+        
+        return composition
     }
     
     func exportToPhotoLibrary(url:URL) -> Void {
