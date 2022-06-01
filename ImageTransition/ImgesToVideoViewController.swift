@@ -19,7 +19,7 @@ class ImgesToVideoViewController: UIViewController {
     private var exportButton : UIBarButtonItem!
     var movieMaker:CombineTransitionMovieMaker?
     var fileUrl:URL?
-    let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16)]
+    let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16),CGSize(width: 16, height: 9)]
     var selectedRatio:CGSize!
     
     override func viewDidLoad() {
@@ -228,14 +228,43 @@ class ImgesToVideoViewController: UIViewController {
         
         transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
 
+        let point = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), transform)
         
         layerInstruction.setTransform(transform, at: .zero)
+        
+        addBackground(image: UIImage(color: .red)!, composition: composition, origin: point, bgSize: size)
 
 
         instruction.layerInstructions = [layerInstruction]
         composition.instructions = [instruction]
         
         return composition
+    }
+    
+    func addBackground(image:UIImage,composition:AVMutableVideoComposition,origin:CGPoint,bgSize:CGSize) -> Void {
+                
+        let parentSize = videoView.frame.size
+        let overlayLayer = CALayer()
+
+        overlayLayer.contents = image.cgImage
+        overlayLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
+        overlayLayer.masksToBounds = false
+
+        // 2 - set up the parent layer
+        let parentLayer = CALayer()
+        let videoLayer = CALayer()
+        
+        parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
+        videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: bgSize.width, height: bgSize.height)
+        videoLayer.backgroundColor = UIColor.blue.cgColor
+        parentLayer.addSublayer(overlayLayer)
+        parentLayer.addSublayer(videoLayer)
+        
+        // 3 - apply magic
+        composition.animationTool = AVVideoCompositionCoreAnimationTool(
+            postProcessingAsVideoLayer: videoLayer,
+            in: parentLayer)
+        
     }
     
     func exportToPhotoLibrary(url:URL) -> Void {
@@ -280,6 +309,8 @@ class ImgesToVideoViewController: UIViewController {
     
     func resizeVideView(rect:CGRect) -> Void {
         
+        let maxBounds = self.videoView.superview!.bounds
+        
         var rectangle = rect
         var size = rect.size
         
@@ -288,7 +319,11 @@ class ImgesToVideoViewController: UIViewController {
         }else{
             size.height = videoView.superview!.bounds.height
         }
+        
+        let tempOrigin = CGPoint(x: maxBounds.midX - size.width/2, y: maxBounds.midY - size.height/2)
+
         rectangle.size = size
+        rectangle.origin = tempOrigin
         videoView.frame = rectangle
         
     }
