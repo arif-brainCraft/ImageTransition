@@ -211,6 +211,7 @@ class ImgesToVideoViewController: UIViewController {
         let canvasSize = self.videoView.frame.size
         let composition = AVMutableVideoComposition(propertiesOf: asset)
         composition.renderSize = canvasSize
+
         //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
         
         let instruction = AVMutableVideoCompositionInstruction()
@@ -222,22 +223,20 @@ class ImgesToVideoViewController: UIViewController {
         var transform =  videoTrack.preferredTransform.scaledBy(x: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
         
         let size = __CGSizeApplyAffineTransform(videoTrack.naturalSize, transform)
-        
+
         let Y = (canvasSize.height - size.height)/2
-        let X = (composition.renderSize.width - layerFrame.width)/2
-        
-        transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
+        let X = (canvasSize.width - size.width)/2
+
+        //transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
 
         let point = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), transform)
-        
         layerInstruction.setTransform(transform, at: .zero)
         
-        addBackground(image: UIImage(color: .red)!, composition: composition, origin: point, bgSize: size)
+        addBackground(image: UIImage(color: .red)!, composition: composition, origin: CGPoint(x: X, y: Y), bgSize: size)
 
 
         instruction.layerInstructions = [layerInstruction]
         composition.instructions = [instruction]
-        
         return composition
     }
     
@@ -249,16 +248,25 @@ class ImgesToVideoViewController: UIViewController {
         overlayLayer.contents = image.cgImage
         overlayLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
         overlayLayer.masksToBounds = false
+        
+//        let overlayLayer2 = CALayer()
+//
+//        overlayLayer2.contents = image.cgImage
+//        overlayLayer2.frame = CGRect(x: 0, y: origin.y - bgSize.height, width: parentSize.width, height: parentSize.height)
+//        overlayLayer2.masksToBounds = false
 
         // 2 - set up the parent layer
         let parentLayer = CALayer()
-        let videoLayer = CALayer()
-        
+        let videoLayer = AVPlayerLayer()
+        parentLayer.backgroundColor = UIColor.red.cgColor
         parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
         videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: bgSize.width, height: bgSize.height)
+        videoLayer.videoGravity = .resizeAspect
         videoLayer.backgroundColor = UIColor.blue.cgColor
-        parentLayer.addSublayer(overlayLayer)
+        //parentLayer.addSublayer(overlayLayer)
         parentLayer.addSublayer(videoLayer)
+        //parentLayer.isGeometryFlipped = true
+        //parentLayer.addSublayer(overlayLayer2)
         
         // 3 - apply magic
         composition.animationTool = AVVideoCompositionCoreAnimationTool(
