@@ -208,7 +208,7 @@ class ImgesToVideoViewController: UIViewController {
         guard let videoTrack = asset.tracks(withMediaType: .video).first else{return nil}
 
         
-        let canvasSize = self.videoView.frame.size
+        let canvasSize = CGSize(width: 512, height: 910)
         let composition = AVMutableVideoComposition(propertiesOf: asset)
         composition.renderSize = canvasSize
 
@@ -218,21 +218,21 @@ class ImgesToVideoViewController: UIViewController {
         instruction.timeRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
         
         let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-        let layerFrame = self.playerLayer.frame
-        
-        var transform =  videoTrack.preferredTransform.scaledBy(x: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
+        let layerFrame = CGRect(x: 0, y: 0, width: canvasSize.width, height: canvasSize.height)
+        let bSize = videoTrack.naturalSize
+        let transform =  CGAffineTransform(scaleX: layerFrame.width/videoTrack.naturalSize.width , y: layerFrame.height/videoTrack.naturalSize.height)
         
         let size = __CGSizeApplyAffineTransform(videoTrack.naturalSize, transform)
 
-        let Y = (canvasSize.height - size.height)/2
-        let X = (canvasSize.width - size.width)/2
+        let Y = (canvasSize.height - bSize.height)/2
+        let X = (canvasSize.width - bSize.width)/2
 
         //transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
 
         let point = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), transform)
         layerInstruction.setTransform(transform, at: .zero)
         
-        addBackground(image: UIImage(color: .red)!, composition: composition, origin: CGPoint(x: X, y: Y), bgSize: size)
+        addBackground(image: UIImage(color: .red)!, composition: composition, origin: CGPoint(x: X, y: Y), layerSize: bSize, parentLayerSize: canvasSize)
 
 
         instruction.layerInstructions = [layerInstruction]
@@ -240,32 +240,24 @@ class ImgesToVideoViewController: UIViewController {
         return composition
     }
     
-    func addBackground(image:UIImage,composition:AVMutableVideoComposition,origin:CGPoint,bgSize:CGSize) -> Void {
+    func addBackground(image:UIImage,composition:AVMutableVideoComposition,origin:CGPoint,layerSize:CGSize,parentLayerSize:CGSize) -> Void {
                 
-        let parentSize = videoView.frame.size
-        let overlayLayer = CALayer()
-
-        overlayLayer.contents = image.cgImage
-        overlayLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
-        overlayLayer.masksToBounds = false
-        
-//        let overlayLayer2 = CALayer()
-//
-//        overlayLayer2.contents = image.cgImage
-//        overlayLayer2.frame = CGRect(x: 0, y: origin.y - bgSize.height, width: parentSize.width, height: parentSize.height)
-//        overlayLayer2.masksToBounds = false
+        let parentSize = parentLayerSize
 
         // 2 - set up the parent layer
         let parentLayer = CALayer()
         let videoLayer = AVPlayerLayer()
         parentLayer.backgroundColor = UIColor.red.cgColor
         parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
-        videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: bgSize.width, height: bgSize.height)
-        videoLayer.videoGravity = .resizeAspect
+        
+        videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: layerSize.width, height: layerSize.height)
+//        videoLayer.videoGravity = .resizeAspect
         videoLayer.backgroundColor = UIColor.blue.cgColor
+        
+        
         //parentLayer.addSublayer(overlayLayer)
         parentLayer.addSublayer(videoLayer)
-        //parentLayer.isGeometryFlipped = true
+        parentLayer.isGeometryFlipped = true
         //parentLayer.addSublayer(overlayLayer2)
         
         // 3 - apply magic
