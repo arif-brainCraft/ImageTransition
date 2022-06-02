@@ -238,7 +238,7 @@ class ImgesToVideoViewController: UIViewController {
 
         layerInstruction.setTransform(transform, at: .zero)
         
-        addBackground(image: UIImage(color: .red)!, composition: composition, origin: CGPoint(x: X, y: Y), layerSize: naturalSize, parentLayerSize: canvasSize)
+        addBackground(image: UIImage(color: .white)!, composition: composition, origin: CGPoint(x: X, y: Y), layerSize: naturalSize, parentLayerSize: canvasSize)
 
 
         instruction.layerInstructions = [layerInstruction]
@@ -251,8 +251,8 @@ class ImgesToVideoViewController: UIViewController {
         let parentSize = parentLayerSize
 
         let parentLayer = CALayer()
-        let videoLayer = AVPlayerLayer()
-        parentLayer.backgroundColor = UIColor.white.cgColor
+        let videoLayer = CALayer()
+        parentLayer.contents = image.cgImage
         parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
         
         videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: layerSize.width, height: layerSize.height)
