@@ -135,7 +135,33 @@ class ImgesToVideoViewController: UIViewController {
     
     func playVideo(url:URL) -> Void {
         self.fileUrl = url
-        let playerItem = AVPlayerItem(url: url)
+        let composition = AVMutableComposition()
+
+        let asset = AVAsset(url: fileUrl!)
+        guard let videoTrack = asset.tracks(withMediaType: .video).first else{return}
+
+        
+        let naturalSize = videoTrack.naturalSize
+        var canvasSize = naturalSize
+        
+        if self.selectedRatio.width > self.selectedRatio.height {
+            canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
+        }else{
+            canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
+        }
+        
+        var assets = [asset]
+        
+        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4"){
+            let secondAsset = AVAsset(url: url)
+            assets.append(secondAsset)
+        }
+        guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: self.videoView.frame.size, assets: assets) else {return}
+
+        
+        
+        let playerItem = AVPlayerItem(asset: composition)
+        playerItem.videoComposition = videoComposition
         self.player.replaceCurrentItem(with: playerItem)
         self.player.play()
         
@@ -166,6 +192,8 @@ class ImgesToVideoViewController: UIViewController {
         guard let fileUrl = fileUrl else {
             return
         }
+        let composition = AVMutableComposition()
+
         let asset = AVAsset(url: fileUrl)
         let tracksKey = #keyPath(AVAsset.tracks)
         asset.loadValuesAsynchronously(forKeys: [tracksKey]){
@@ -176,11 +204,40 @@ class ImgesToVideoViewController: UIViewController {
                 let url = URL(fileURLWithPath: path)
                 try? FileManager.default.removeItem(at: url)
                 
-                if let exporter = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality){
+                
+                guard let videoTrack = asset.tracks(withMediaType: .video).first else{return}
+
+                
+                let naturalSize = videoTrack.naturalSize
+                var canvasSize = naturalSize
+                
+                if self.selectedRatio.width > self.selectedRatio.height {
+                    canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
+                }else{
+                    canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
+                }
+                
+                var assets = [asset]
+                
+                if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4"){
+                    let secondAsset = AVAsset(url: url)
+                    assets.append(secondAsset)
+                }
+                guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
+                
+                let Y = (canvasSize.height - naturalSize.height)/2
+                let X = (canvasSize.width - naturalSize.width)/2
+                let videoLayerOrigin = CGPoint(x: X, y: Y)
+                
+                self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: videoLayerOrigin, layerSize: naturalSize, parentLayerSize: canvasSize)
+
+                
+                if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
+
                     
                     exporter.outputFileType = .mp4
-                    exporter.timeRange = CMTimeRange(start: .zero, duration: asset.duration)
-                    exporter.videoComposition = self.getScaledVideoComposition(aspectRatio: self.selectedRatio, asset: asset)
+                    exporter.timeRange = videoComposition.instructions.first!.timeRange
+                    exporter.videoComposition = videoComposition
                     exporter.outputURL = url
                     
                     exporter.exportAsynchronously {
@@ -203,47 +260,86 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
-    func getScaledVideoComposition(aspectRatio:CGSize,asset:AVAsset) -> AVMutableVideoComposition? {
+    func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset]) -> AVMutableVideoComposition? {
         
-        guard let videoTrack = asset.tracks(withMediaType: .video).first else{return nil}
-
-        
-        let naturalSize = videoTrack.naturalSize
-        var canvasSize = naturalSize
-        
-        if aspectRatio.width > aspectRatio.height {
-            canvasSize.width = naturalSize.height * (aspectRatio.width / aspectRatio.height)
-        }else{
-            canvasSize.height = naturalSize.width * (aspectRatio.height / aspectRatio.width)
-        }
-        
-        let composition = AVMutableVideoComposition(propertiesOf: asset)
-        composition.renderSize = canvasSize
 
         //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
         
+        var instructions = [AVMutableVideoCompositionLayerInstruction]()
+        var duration:CMTime = .zero
+        var position:CGPoint?
+        var layerSize:CGSize?
+        var highestFrameRate = 0
+        
+        
+        let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        
+        for asset in assets {
+            
+            if let videoTrack = asset.tracks(withMediaType: .video).first{
+                
+                let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+
+                
+                let naturalSize = videoTrack.naturalSize
+                let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
+                
+        //        let size = __CGSizeApplyAffineTransform(naturalSize, transform)
+                
+
+                let Y = (canvasSize.height - naturalSize.height)/2
+                let X = (canvasSize.width - naturalSize.width)/2
+                
+                if position != nil{
+                    let positionTransform = CGAffineTransform(translationX: 0 , y: 100)
+                    layerInstruction.setTransform(positionTransform, at: .zero)
+                }else{
+
+                    position = CGPoint(x: X, y: Y)
+                }
+                
+                if layerSize == nil {
+                    layerSize = videoTrack.naturalSize
+                }
+                
+
+                let currentFrameRate = Int(roundf((videoTrack.nominalFrameRate)))
+                highestFrameRate = (currentFrameRate > highestFrameRate) ? currentFrameRate : highestFrameRate
+                
+                let timeRange = CMTimeRange(start: .zero, duration: asset.duration)
+                try? parentVideoTrack?.insertTimeRange(timeRange, of: videoTrack, at: duration)
+                
+                //layerInstruction.setOpacity(0.3, at: duration)
+
+                layerInstruction.setTransform(transform, at: duration)
+                instructions.append(layerInstruction)
+            
+                duration = CMTimeAdd(duration, asset.duration)
+
+            }
+        }
+        
+
+        
+
+        
         let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRangeMake(start: .zero, duration: asset.duration)
+        instruction.timeRange = CMTimeRangeMake(start: .zero, duration: duration)
         
-        let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
+
+
+        instruction.layerInstructions = instructions
         
-        let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
         
-//        let size = __CGSizeApplyAffineTransform(naturalSize, transform)
-
-        let Y = (canvasSize.height - naturalSize.height)/2
-        let X = (canvasSize.width - naturalSize.width)/2
-
-        //transform = transform.concatenating(CGAffineTransform(translationX: X, y: Y))
-
-        layerInstruction.setTransform(transform, at: .zero)
+        let videoComposition = AVMutableVideoComposition()
         
-        addBackground(image: UIImage(color: .white)!, composition: composition, origin: CGPoint(x: X, y: Y), layerSize: naturalSize, parentLayerSize: canvasSize)
-
-
-        instruction.layerInstructions = [layerInstruction]
-        composition.instructions = [instruction]
-        return composition
+        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(highestFrameRate))
+        videoComposition.renderSize = canvasSize
+        videoComposition.instructions = [instruction]
+        
+        
+        return videoComposition
     }
     
     func addBackground(image:UIImage,composition:AVMutableVideoComposition,origin:CGPoint,layerSize:CGSize,parentLayerSize:CGSize) -> Void {
@@ -251,12 +347,12 @@ class ImgesToVideoViewController: UIViewController {
         let parentSize = parentLayerSize
 
         let parentLayer = CALayer()
-        let videoLayer = CALayer()
+        let videoLayer = AVPlayerLayer()
         parentLayer.contents = image.cgImage
         parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
         
         videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: layerSize.width, height: layerSize.height)
-//        videoLayer.videoGravity = .resizeAspect
+        videoLayer.videoGravity = .resizeAspect
         videoLayer.backgroundColor = UIColor.blue.cgColor
         
         
