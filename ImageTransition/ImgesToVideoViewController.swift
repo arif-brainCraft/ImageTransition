@@ -41,7 +41,7 @@ class ImgesToVideoViewController: UIViewController {
     func setUpSubviews() -> Void {
         player = AVPlayer()
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspect
+        //playerLayer.videoGravity = .resizeAspect
         playerLayer.pixelBufferAttributes = [kCVPixelBufferPixelFormatTypeKey as String:kCVPixelFormatType_32BGRA]
         videoView.layer.addSublayer(playerLayer)
         
@@ -142,13 +142,13 @@ class ImgesToVideoViewController: UIViewController {
 
         
         let naturalSize = videoTrack.naturalSize
-        var canvasSize = naturalSize
+        var canvasSize = self.videoView.frame.size
         
-        if self.selectedRatio.width > self.selectedRatio.height {
-            canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
-        }else{
-            canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
-        }
+//        if self.selectedRatio.width > self.selectedRatio.height {
+//            canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
+//        }else{
+//            canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
+//        }
         
         var assets = [asset]
         
@@ -156,7 +156,7 @@ class ImgesToVideoViewController: UIViewController {
             let secondAsset = AVAsset(url: url)
             assets.append(secondAsset)
         }
-        guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: self.videoView.frame.size, assets: assets) else {return}
+        guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
 
         
         
@@ -265,7 +265,7 @@ class ImgesToVideoViewController: UIViewController {
 
         //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
         
-        var instructions = [AVMutableVideoCompositionLayerInstruction]()
+        var instructions = [AVMutableVideoCompositionInstruction]()
         var duration:CMTime = .zero
         var position:CGPoint?
         var layerSize:CGSize?
@@ -274,7 +274,7 @@ class ImgesToVideoViewController: UIViewController {
         
         let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         
-        
+        var assetNumber = 0
         for asset in assets {
             
             if let videoTrack = asset.tracks(withMediaType: .video).first{
@@ -285,7 +285,7 @@ class ImgesToVideoViewController: UIViewController {
                 let naturalSize = videoTrack.naturalSize
                 let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
                 
-        //        let size = __CGSizeApplyAffineTransform(naturalSize, transform)
+                let size = __CGSizeApplyAffineTransform(naturalSize, transform)
                 
 
                 let Y = (canvasSize.height - naturalSize.height)/2
@@ -293,7 +293,7 @@ class ImgesToVideoViewController: UIViewController {
                 
                 if position != nil{
                     let positionTransform = CGAffineTransform(translationX: 0 , y: 100)
-                    layerInstruction.setTransform(positionTransform, at: .zero)
+                    //layerInstruction.setTransform(positionTransform, at: .zero)
                 }else{
 
                     position = CGPoint(x: X, y: Y)
@@ -310,13 +310,17 @@ class ImgesToVideoViewController: UIViewController {
                 let timeRange = CMTimeRange(start: .zero, duration: asset.duration)
                 try? parentVideoTrack?.insertTimeRange(timeRange, of: videoTrack, at: duration)
                 
-                //layerInstruction.setOpacity(0.3, at: duration)
 
-                layerInstruction.setTransform(transform, at: duration)
-                instructions.append(layerInstruction)
-            
+                layerInstruction.setTransform(transform, at: .zero)
+
+                
+                let instruction = AVMutableVideoCompositionInstruction()
+                instruction.timeRange = CMTimeRangeMake(start: duration, duration: asset.duration)
+                instruction.layerInstructions = [layerInstruction]
+                instructions.append(instruction)
+                
                 duration = CMTimeAdd(duration, asset.duration)
-
+                assetNumber += 1
             }
         }
         
@@ -324,19 +328,17 @@ class ImgesToVideoViewController: UIViewController {
         
 
         
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRangeMake(start: .zero, duration: duration)
+
+        
         
 
-
-        instruction.layerInstructions = instructions
         
         
         let videoComposition = AVMutableVideoComposition()
         
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(highestFrameRate))
         videoComposition.renderSize = canvasSize
-        videoComposition.instructions = [instruction]
+        videoComposition.instructions = instructions
         
         
         return videoComposition
@@ -511,7 +513,7 @@ class ImgesToVideoViewController: UIViewController {
         self.createVideo()
     }
     
-    @IBAction func aspectFitButtonPressed(_ sender: Any) {
+    @IBAction func aspectFitButtonPressed(_ sender: Any?) {
         playerLayer.videoGravity = .resizeAspect
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
@@ -523,7 +525,7 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
-    @IBAction func aspectFillButtonPressed(_ sender: Any) {
+    @IBAction func aspectFillButtonPressed(_ sender: Any?) {
         playerLayer.videoGravity = .resizeAspectFill
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
