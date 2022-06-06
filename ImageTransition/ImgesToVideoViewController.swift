@@ -13,6 +13,8 @@ import MTTransitions
 class ImgesToVideoViewController: UIViewController {
     
     @IBOutlet var videoView: UIView!
+    @IBOutlet var playButton: UIButton!
+
     @IBOutlet var ratioCollectionView:UICollectionView!
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
@@ -52,6 +54,33 @@ class ImgesToVideoViewController: UIViewController {
         player.seek(to: .zero)
     }
     
+    @IBAction func playButtonPressed(_ sender: UIButton) {
+        if sender.tag == 0 {
+            self.player.pause()
+            sender.setTitle("Play", for: .normal)
+            sender.tag = 1
+        }else{
+            self.player.play()
+            sender.tag = 0
+            sender.setTitle("Pause", for: .normal)
+        }
+    }
+
+    @IBAction func sliderValueChanged(_ sender: UISlider) {
+        guard let currentItem = self.player.currentItem else {
+            return
+        }
+        if self.player.timeControlStatus == .playing {
+            self.player.pause()
+            playButton.setTitle("Play", for: .normal)
+            playButton.tag = 1
+        }
+        
+        let totalDuration = CMTimeGetSeconds(currentItem.duration)
+        let second = totalDuration * Float64(sender.value)
+        self.player.seek(to: CMTime(seconds: second, preferredTimescale: currentItem.duration.timescale))
+    }
+    
     func createVideo() -> Void {
         
         let effects: [BCLTransition.Effect] = [.doomScreenTransition]
@@ -77,6 +106,7 @@ class ImgesToVideoViewController: UIViewController {
                 switch result {
                 case .success(let url):
                     print(url)
+                    self.fileUrl = url
                     self.playVideo(url: url)
                     
                     //                    let asset = AVURLAsset(url: url)
@@ -134,31 +164,14 @@ class ImgesToVideoViewController: UIViewController {
     }
     
     func playVideo(url:URL) -> Void {
-        self.fileUrl = url
         let composition = AVMutableComposition()
 
-        let asset = AVAsset(url: fileUrl!)
-        guard let videoTrack = asset.tracks(withMediaType: .video).first else{return}
-
+        let assets = loadAssetsToMerge()
         
-        let naturalSize = videoTrack.naturalSize
-        var canvasSize = self.videoView.frame.size
+        let canvasSize = self.videoView.frame.size
         
-//        if self.selectedRatio.width > self.selectedRatio.height {
-//            canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
-//        }else{
-//            canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
-//        }
-        
-        var assets = [asset]
-        
-        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
-            let secondAsset = AVAsset(url: url)
-            assets.append(secondAsset)
-        }
         guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
 
-        
         
         let playerItem = AVPlayerItem(asset: composition)
         playerItem.videoComposition = videoComposition
@@ -188,13 +201,36 @@ class ImgesToVideoViewController: UIViewController {
         return images
     }
     
-    @objc func exportButtonPressed() -> Void {
+    func loadAssetsToMerge() -> [AVAsset] {
+        
         guard let fileUrl = fileUrl else {
-            return
+            return [AVAsset]()
         }
-        let composition = AVMutableComposition()
 
         let asset = AVAsset(url: fileUrl)
+        
+        var assets = [asset]
+        
+        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
+            let secondAsset = AVAsset(url: url)
+            assets.append(secondAsset)
+        }
+        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
+            let secondAsset = AVAsset(url: url)
+            assets.append(secondAsset)
+        }
+        
+        return assets
+
+    }
+    
+    @objc func exportButtonPressed() -> Void {
+
+        let composition = AVMutableComposition()
+        let assets = loadAssetsToMerge()
+        
+        guard let asset = assets.first else{return}
+        
         let tracksKey = #keyPath(AVAsset.tracks)
         asset.loadValuesAsynchronously(forKeys: [tracksKey]){
             DispatchQueue.main.async {
@@ -216,13 +252,7 @@ class ImgesToVideoViewController: UIViewController {
                 }else{
                     canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
                 }
-                
-                var assets = [asset]
-                
-                if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
-                    let secondAsset = AVAsset(url: url)
-                    assets.append(secondAsset)
-                }
+
                 guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
                 
                 let Y = (canvasSize.height - naturalSize.height)/2
@@ -231,14 +261,9 @@ class ImgesToVideoViewController: UIViewController {
                 
                 self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: videoLayerOrigin, layerSize: naturalSize, parentLayerSize: canvasSize)
                 
-                
                 if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
-
-                    var duration = CMTime.zero
                     
-                    for asset in assets {
-                        duration = CMTimeAdd(duration, asset.duration)
-                    }
+                    let duration = assets.reduce(CMTime.zero, {CMTimeAdd($0, $1.duration)})
                     
                     exporter.outputFileType = .mp4
                     exporter.timeRange = CMTimeRange(start: .zero, duration: duration)
@@ -251,7 +276,7 @@ class ImgesToVideoViewController: UIViewController {
                             self.exportToPhotoLibrary(url: exporter.outputURL!)
                             break
                         case .failed:
-                            print(exporter.error?.localizedDescription)
+                            print(exporter.error?.localizedDescription ?? "Failed to video export")
                             break
                         default:
                             break
@@ -272,8 +297,6 @@ class ImgesToVideoViewController: UIViewController {
         
         var instructions = [AVMutableVideoCompositionInstruction]()
         var duration:CMTime = .zero
-        var position:CGPoint?
-        var layerSize:CGSize?
         var highestFrameRate = 0
         
         
@@ -289,8 +312,8 @@ class ImgesToVideoViewController: UIViewController {
                 let naturalSize = videoTrack.naturalSize
                 let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
                 
-                //let size = __CGSizeApplyAffineTransform(naturalSize, transform)
-                
+                let size = __CGSizeApplyAffineTransform(naturalSize, transform)
+                print("scaled size of merging asset \(size)")
 
                 let currentFrameRate = Int(roundf((videoTrack.nominalFrameRate)))
                 highestFrameRate = (currentFrameRate > highestFrameRate) ? currentFrameRate : highestFrameRate
@@ -299,7 +322,7 @@ class ImgesToVideoViewController: UIViewController {
                 try? parentVideoTrack?.insertTimeRange(timeRange, of: videoTrack, at: duration)
                 
 
-                layerInstruction.setTransform(transform, at: .zero)
+                layerInstruction.setTransform(transform, at: duration)
 
                 
                 let instruction = AVMutableVideoCompositionInstruction()
