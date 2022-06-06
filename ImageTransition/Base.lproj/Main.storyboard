@@ -210,6 +210,8 @@
                     </view>
                     <navigationItem key="navigationItem" id="9Yb-OJ-Fa3"/>
                     <connections>
+                        <outlet property="fillButton" destination="2dj-p1-Rkl" id="ew8-3H-m0w"/>
+                        <outlet property="fitButton" destination="lQw-yY-0cd" id="Fsw-Jl-nxr"/>
                         <outlet property="playButton" destination="cpN-w6-27W" id="t6J-Ec-ZY5"/>
                         <outlet property="ratioCollectionView" destination="KYa-Zn-KVP" id="AeV-YQ-0NE"/>
                         <outlet property="videoView" destination="OGH-qj-nam" id="l0m-Pn-cbW"/>

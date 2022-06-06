@@ -14,6 +14,8 @@ class ImgesToVideoViewController: UIViewController {
     
     @IBOutlet var videoView: UIView!
     @IBOutlet var playButton: UIButton!
+    @IBOutlet var fillButton: UIButton!
+    @IBOutlet var fitButton: UIButton!
 
     @IBOutlet var ratioCollectionView:UICollectionView!
     private var player: AVPlayer!
@@ -30,6 +32,8 @@ class ImgesToVideoViewController: UIViewController {
         selectedRatio = aspectRatioes.first!
         exportButton = UIBarButtonItem(title: "Export", style: .plain, target: self, action: #selector(exportButtonPressed))
         self.navigationItem.rightBarButtonItem = exportButton
+        
+        self.fitButton.backgroundColor = .lightGray
         resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio))
         setUpSubviews()
         createVideo()
@@ -211,13 +215,13 @@ class ImgesToVideoViewController: UIViewController {
         
         var assets = [asset]
         
-        if let url = Bundle.main.url(forResource: "fifthClip", withExtension: "MOV"){
+        if let url = Bundle.main.url(forResource: "sixthClip", withExtension: "MOV"){
             let secondAsset = AVAsset(url: url)
-            //assets.append(secondAsset)
+            assets.append(secondAsset)
         }
         if let url = Bundle.main.url(forResource: "secondClip", withExtension: "MP4"){
             let secondAsset = AVAsset(url: url)
-            assets.append(secondAsset)
+            //assets.append(secondAsset)
         }
         
         return assets
@@ -244,8 +248,9 @@ class ImgesToVideoViewController: UIViewController {
                 guard let videoTrack = asset.tracks(withMediaType: .video).first else{return}
 
                 
-                let naturalSize = videoTrack.naturalSize
-                var canvasSize = naturalSize
+                
+                var canvasSize = self.videoView.frame.size
+                let naturalSize = canvasSize
                 
                 if self.selectedRatio.width > self.selectedRatio.height {
                     canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
@@ -290,6 +295,44 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
+    func getNaturalSize(asset:AVAsset) -> CGSize {
+        
+        let orientation = getOrientation(asset: asset)
+        if let naturalSize = asset.tracks(withMediaType: .video).first?.naturalSize {
+            if orientation.isPortrait {
+                return CGSize(width:naturalSize.height , height: naturalSize.width)
+            }else{
+                return naturalSize
+            }
+        }
+        return CGSize(width: 0, height: 0)
+    }
+    
+    func getOrientation (asset:AVAsset) -> (isPortrait:Bool,orientation:UIImage.Orientation) {
+        
+        var isPortrait = false
+        var orientation:UIImage.Orientation = .up
+        
+        let transform = asset.preferredTransform
+        
+        if(transform.a == 0 && transform.b == 1.0 && transform.c == -1.0 && transform.d == 0) {
+            orientation = .right
+            isPortrait = true
+        }
+        
+        if(transform.a == 0 && transform.b == -1.0 && transform.c == 1.0 && transform.d == 0)  {
+            orientation =  .left
+            isPortrait = true
+        }
+        if(transform.a == 1.0 && transform.b == 0 && transform.c == 0 && transform.d == 1.0)   {
+            orientation =  .up
+        }
+        if(transform.a == -1.0 && transform.b == 0 && transform.c == 0 && transform.d == -1.0) {
+            orientation = .down
+        }
+        return (isPortrait:isPortrait,orientation:orientation)
+    }
+    
     func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset]) -> AVMutableVideoComposition? {
         
 
@@ -311,7 +354,19 @@ class ImgesToVideoViewController: UIViewController {
 
                 
                 let naturalSize = videoTrack.naturalSize
-                let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
+                
+                let orientation = getOrientation(asset: asset)
+                
+                var transform:CGAffineTransform!
+                
+                if orientation.isPortrait == false{
+                    transform = CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
+                    layerInstruction.setTransform(CGAffineTransform(rotationAngle: CGFloat.pi / 3), at: duration)
+                }else{
+                    transform = CGAffineTransform(scaleX: canvasSize.width/naturalSize.height , y: canvasSize.height/naturalSize.width)
+                    transform.concatenating(CGAffineTransform(rotationAngle: 270.0))
+                }
+                
                 
                 layerInstruction.setTransform(transform, at: duration)
 
@@ -515,10 +570,23 @@ class ImgesToVideoViewController: UIViewController {
     }
     
     @IBAction func reCreateVideo(_ sender: Any) {
+        
+        if selectedRatio != aspectRatioes.first {
+            selectedRatio = aspectRatioes.first
+            let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+            resizeVideView(rect: rect)
+            resizePlayerLayer(rect: rect)
+            self.videoView.superview?.layoutIfNeeded()
+        }
+        self.ratioCollectionView.reloadData()
+        
         self.createVideo()
     }
     
     @IBAction func aspectFitButtonPressed(_ sender: Any?) {
+        self.fitButton.backgroundColor = .lightGray
+        self.fillButton.backgroundColor = .white
+        
         playerLayer.videoGravity = .resizeAspect
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
@@ -531,6 +599,10 @@ class ImgesToVideoViewController: UIViewController {
     }
     
     @IBAction func aspectFillButtonPressed(_ sender: Any?) {
+        
+        self.fitButton.backgroundColor = .white
+        self.fillButton.backgroundColor = .lightGray
+        
         playerLayer.videoGravity = .resizeAspectFill
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
@@ -568,6 +640,12 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
         cell.contentView.layer.borderWidth = 1
         cell.contentView.layer.masksToBounds = true
         
+        if selectedRatio == aspectRatioes[indexPath.row] {
+            cell.backgroundColor = .lightGray
+        }else{
+            cell.backgroundColor = .white
+        }
+        
         return cell
     }
     
@@ -580,6 +658,18 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
         //                cell.backgroundColor = UIColor.white
         //            })
         //        }
+        
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            
+            for cell in collectionView.visibleCells{
+                cell.backgroundColor = .white
+            }
+            
+            cell.backgroundColor = .lightGray
+            
+            
+        }
+        
         selectedRatio = aspectRatioes[indexPath.item]
         playerLayer.videoGravity = .resizeAspect
         
