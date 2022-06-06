@@ -59,7 +59,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DzB-tX-TdF">
-                                <rect key="frame" x="59" y="604" width="78" height="36"/>
+                                <rect key="frame" x="59" y="594" width="78" height="36"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Recreate"/>
@@ -84,7 +84,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cpN-w6-27W">
                                 <rect key="frame" x="10" y="499" width="50" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="50" id="qZ0-EP-y8S"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="qZ0-EP-y8S"/>
                                 </constraints>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Play"/>
@@ -101,10 +101,10 @@
                                 </connections>
                             </slider>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="KYa-Zn-KVP">
-                                <rect key="frame" x="0.0" y="534" width="414" height="60"/>
+                                <rect key="frame" x="10" y="534" width="394" height="50"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="vZb-2u-Ylv"/>
+                                    <constraint firstAttribute="height" constant="50" id="vZb-2u-Ylv"/>
                                 </constraints>
                                 <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="2G4-az-61F">
                                     <size key="itemSize" width="128" height="128"/>
@@ -114,7 +114,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" restorationIdentifier="AspectRatioCollectionCell" reuseIdentifier="AspectRatioCollectionCell" id="GcG-pf-FQc" customClass="AspectRatioCollectionCell" customModule="ImageTransition" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="-34" width="128" height="128"/>
+                                        <rect key="frame" x="0.0" y="-39" width="128" height="128"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="yKL-Iu-myK">
                                             <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
@@ -158,7 +158,7 @@
                                 </connections>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yri-EF-jx1">
-                                <rect key="frame" x="288.66666666666669" y="604" width="75" height="36"/>
+                                <rect key="frame" x="288.66666666666669" y="594" width="75" height="36"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Restart"/>
@@ -167,7 +167,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lQw-yY-0cd">
-                                <rect key="frame" x="78" y="660" width="40.333333333333343" height="31"/>
+                                <rect key="frame" x="78" y="650" width="40.333333333333343" height="31"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Fit"/>
                                 <connections>
@@ -175,7 +175,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2dj-p1-Rkl">
-                                <rect key="frame" x="305" y="660" width="42" height="31"/>
+                                <rect key="frame" x="305" y="650" width="42" height="31"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Fill"/>
                                 <connections>
@@ -186,8 +186,7 @@
                         <viewLayoutGuide key="safeArea" id="rYy-yD-dvN"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="centerX" secondItem="6Jh-zT-Tj0" secondAttribute="centerX" id="6GV-9b-qfb"/>
-                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="leading" secondItem="6Jh-zT-Tj0" secondAttribute="leading" id="7hq-NC-rcd"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="leading" secondItem="6Jh-zT-Tj0" secondAttribute="leading" constant="10" id="7hq-NC-rcd"/>
                             <constraint firstItem="lQw-yY-0cd" firstAttribute="centerX" secondItem="DzB-tX-TdF" secondAttribute="centerX" id="8Ue-Bu-emO"/>
                             <constraint firstItem="yri-EF-jx1" firstAttribute="width" secondItem="DzB-tX-TdF" secondAttribute="width" multiplier="0.961538" id="AAw-3w-NxO"/>
                             <constraint firstItem="2dj-p1-Rkl" firstAttribute="centerX" secondItem="yri-EF-jx1" secondAttribute="centerX" id="APg-u6-G9d"/>
@@ -199,7 +198,7 @@
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="leading" secondItem="rYy-yD-dvN" secondAttribute="leading" id="Vd0-fc-80v"/>
                             <constraint firstItem="rYy-yD-dvN" firstAttribute="trailing" secondItem="yri-EF-jx1" secondAttribute="trailing" constant="50.5" id="bDU-LT-2Ve"/>
                             <constraint firstItem="AVK-5b-V1X" firstAttribute="leading" secondItem="cpN-w6-27W" secondAttribute="trailing" constant="20" id="ffw-Fs-krY"/>
-                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="trailing" secondItem="6Jh-zT-Tj0" secondAttribute="trailing" id="fjS-vm-oMZ"/>
+                            <constraint firstItem="KYa-Zn-KVP" firstAttribute="trailing" secondItem="6Jh-zT-Tj0" secondAttribute="trailing" constant="-10" id="fjS-vm-oMZ"/>
                             <constraint firstItem="AVK-5b-V1X" firstAttribute="top" secondItem="6Jh-zT-Tj0" secondAttribute="bottom" constant="5" id="jQz-F2-CH0"/>
                             <constraint firstItem="cpN-w6-27W" firstAttribute="centerY" secondItem="AVK-5b-V1X" secondAttribute="centerY" id="kI2-cM-4WQ"/>
                             <constraint firstItem="6Jh-zT-Tj0" firstAttribute="top" secondItem="rYy-yD-dvN" secondAttribute="top" id="mIh-rM-PUw"/>

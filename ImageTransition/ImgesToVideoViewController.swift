@@ -211,11 +211,11 @@ class ImgesToVideoViewController: UIViewController {
         
         var assets = [asset]
         
-        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
+        if let url = Bundle.main.url(forResource: "fifthClip", withExtension: "MOV"){
             let secondAsset = AVAsset(url: url)
-            assets.append(secondAsset)
+            //assets.append(secondAsset)
         }
-        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
+        if let url = Bundle.main.url(forResource: "secondClip", withExtension: "MP4"){
             let secondAsset = AVAsset(url: url)
             assets.append(secondAsset)
         }
@@ -301,7 +301,8 @@ class ImgesToVideoViewController: UIViewController {
         
         
         let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
-        
+        let parentAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+
         for asset in assets {
             
             if let videoTrack = asset.tracks(withMediaType: .video).first{
@@ -312,6 +313,8 @@ class ImgesToVideoViewController: UIViewController {
                 let naturalSize = videoTrack.naturalSize
                 let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
                 
+                layerInstruction.setTransform(transform, at: duration)
+
                 let size = __CGSizeApplyAffineTransform(naturalSize, transform)
                 print("scaled size of merging asset \(size)")
 
@@ -321,8 +324,11 @@ class ImgesToVideoViewController: UIViewController {
                 let timeRange = CMTimeRange(start: .zero, duration: asset.duration)
                 try? parentVideoTrack?.insertTimeRange(timeRange, of: videoTrack, at: duration)
                 
+                if let audioTrack = asset.tracks(withMediaType: .audio).first {
+                    try? parentAudioTrack?.insertTimeRange(timeRange, of: audioTrack, at: duration)
+                }
+                
 
-                layerInstruction.setTransform(transform, at: duration)
 
                 
                 let instruction = AVMutableVideoCompositionInstruction()
