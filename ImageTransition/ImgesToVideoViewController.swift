@@ -152,7 +152,7 @@ class ImgesToVideoViewController: UIViewController {
         
         var assets = [asset]
         
-        if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4"){
+        if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
             let secondAsset = AVAsset(url: url)
             assets.append(secondAsset)
         }
@@ -219,7 +219,7 @@ class ImgesToVideoViewController: UIViewController {
                 
                 var assets = [asset]
                 
-                if let url = Bundle.main.url(forResource: "Abstract", withExtension: "mp4"){
+                if let url = Bundle.main.url(forResource: "fourthClip", withExtension: "mp4"){
                     let secondAsset = AVAsset(url: url)
                     assets.append(secondAsset)
                 }
@@ -230,13 +230,18 @@ class ImgesToVideoViewController: UIViewController {
                 let videoLayerOrigin = CGPoint(x: X, y: Y)
                 
                 self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: videoLayerOrigin, layerSize: naturalSize, parentLayerSize: canvasSize)
-
+                
                 
                 if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
 
+                    var duration = CMTime.zero
+                    
+                    for asset in assets {
+                        duration = CMTimeAdd(duration, asset.duration)
+                    }
                     
                     exporter.outputFileType = .mp4
-                    exporter.timeRange = videoComposition.instructions.first!.timeRange
+                    exporter.timeRange = CMTimeRange(start: .zero, duration: duration)
                     exporter.videoComposition = videoComposition
                     exporter.outputURL = url
                     
@@ -274,7 +279,6 @@ class ImgesToVideoViewController: UIViewController {
         
         let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         
-        var assetNumber = 0
         for asset in assets {
             
             if let videoTrack = asset.tracks(withMediaType: .video).first{
@@ -285,23 +289,7 @@ class ImgesToVideoViewController: UIViewController {
                 let naturalSize = videoTrack.naturalSize
                 let transform =  CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
                 
-                let size = __CGSizeApplyAffineTransform(naturalSize, transform)
-                
-
-                let Y = (canvasSize.height - naturalSize.height)/2
-                let X = (canvasSize.width - naturalSize.width)/2
-                
-                if position != nil{
-                    let positionTransform = CGAffineTransform(translationX: 0 , y: 100)
-                    //layerInstruction.setTransform(positionTransform, at: .zero)
-                }else{
-
-                    position = CGPoint(x: X, y: Y)
-                }
-                
-                if layerSize == nil {
-                    layerSize = videoTrack.naturalSize
-                }
+                //let size = __CGSizeApplyAffineTransform(naturalSize, transform)
                 
 
                 let currentFrameRate = Int(roundf((videoTrack.nominalFrameRate)))
@@ -320,26 +308,14 @@ class ImgesToVideoViewController: UIViewController {
                 instructions.append(instruction)
                 
                 duration = CMTimeAdd(duration, asset.duration)
-                assetNumber += 1
             }
         }
-        
-
-        
-
-        
-
-        
-        
-
-        
         
         let videoComposition = AVMutableVideoComposition()
         
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: Int32(highestFrameRate))
         videoComposition.renderSize = canvasSize
         videoComposition.instructions = instructions
-        
         
         return videoComposition
     }
