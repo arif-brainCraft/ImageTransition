@@ -248,26 +248,23 @@ class ImgesToVideoViewController: UIViewController {
                 try? FileManager.default.removeItem(at: url)
                 
                 
-                guard let videoTrack = asset.tracks(withMediaType: .video).first else{return}
-
+                let canvasSize = self.videoView.frame.size
+                var layerSize = self.playerLayer.frame.size
                 
-                
-                var canvasSize = self.videoView.frame.size
-                let naturalSize = canvasSize
-                
-                if self.selectedRatio.width > self.selectedRatio.height {
-                    canvasSize.width = naturalSize.height * (self.selectedRatio.width / self.selectedRatio.height)
-                }else{
-                    canvasSize.height = naturalSize.width * (self.selectedRatio.height / self.selectedRatio.width)
-                }
-
+//                if self.selectedRatio.width > self.selectedRatio.height {
+//                    layerSize.width = canvasSize.height * (self.selectedRatio.width / self.selectedRatio.height)
+//                }else{
+//
+//                    layerSize.height = canvasSize.width * (self.selectedRatio.height / self.selectedRatio.width)
+//                }
+                print("canvas \(canvasSize) layer \(layerSize)")
                 guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
                 
-                let Y = (canvasSize.height - naturalSize.height)/2
-                let X = (canvasSize.width - naturalSize.width)/2
-                let videoLayerOrigin = CGPoint(x: X, y: Y)
+                let Y = (canvasSize.height - layerSize.height)/2
+                let X = (canvasSize.width - layerSize.width)/2
+                let layerOrigin = CGPoint(x: X, y: Y)
                 
-                self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: videoLayerOrigin, layerSize: naturalSize, parentLayerSize: canvasSize)
+                self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: layerOrigin, layerSize: layerSize, parentLayerSize: canvasSize)
                 
                 if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
                     
