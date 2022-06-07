@@ -82,6 +82,9 @@ class ImgesToVideoViewController: UIViewController {
         
         let totalDuration = CMTimeGetSeconds(currentItem.duration)
         let second = totalDuration * Float64(sender.value)
+        let seektime = CMTime(seconds: second, preferredTimescale: currentItem.duration.timescale)
+        print("slider value changing \(seektime)")
+
         self.player.seek(to: CMTime(seconds: second, preferredTimescale: currentItem.duration.timescale))
     }
     
@@ -334,10 +337,7 @@ class ImgesToVideoViewController: UIViewController {
     }
     
     func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset]) -> AVMutableVideoComposition? {
-        
-
-        //composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(NSEC_PER_SEC))
-        
+                
         var instructions = [AVMutableVideoCompositionInstruction]()
         var duration:CMTime = .zero
         var highestFrameRate = 0
@@ -355,23 +355,24 @@ class ImgesToVideoViewController: UIViewController {
                 
                 let naturalSize = videoTrack.naturalSize
                 
-                let orientation = getOrientation(asset: asset)
+
+                var finalTransform = videoTrack.preferredTransform.scaledBy(x:canvasSize.width/naturalSize.width, y: canvasSize.height/naturalSize.height)
+
+                //let size = __CGSizeApplyAffineTransform(naturalSize, transform)
+                var size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
+                let point = __CGPointApplyAffineTransform(.zero, videoTrack.preferredTransform)
                 
-                var transform:CGAffineTransform!
-                
-                if orientation.isPortrait == false{
-                    transform = CGAffineTransform(scaleX: canvasSize.width/naturalSize.width , y: canvasSize.height/naturalSize.height)
-                    layerInstruction.setTransform(CGAffineTransform(rotationAngle: CGFloat.pi / 3), at: duration)
-                }else{
-                    transform = CGAffineTransform(scaleX: canvasSize.width/naturalSize.height , y: canvasSize.height/naturalSize.width)
-                    transform.concatenating(CGAffineTransform(rotationAngle: 270.0))
+                if size2.width < 0 {
+                    finalTransform = videoTrack.preferredTransform.scaledBy(x:canvasSize.height/naturalSize.width, y: canvasSize.width/naturalSize.height)
+                    finalTransform = finalTransform.scaledBy(x: 1, y: -1)
+                    finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x, y: 0))
                 }
                 
+                size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
+                let point2 = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), finalTransform)
+                print("scaled size of merging asset \(size2) \(point2)")
                 
-                layerInstruction.setTransform(transform, at: duration)
-
-                let size = __CGSizeApplyAffineTransform(naturalSize, transform)
-                print("scaled size of merging asset \(size)")
+                layerInstruction.setTransform(finalTransform, at: duration)
 
                 let currentFrameRate = Int(roundf((videoTrack.nominalFrameRate)))
                 highestFrameRate = (currentFrameRate > highestFrameRate) ? currentFrameRate : highestFrameRate
