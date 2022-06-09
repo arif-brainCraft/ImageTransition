@@ -34,7 +34,7 @@ class ImgesToVideoViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = exportButton
         
         self.fitButton.backgroundColor = .lightGray
-        resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio))
+        resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds))
         setUpSubviews()
         createVideo()
     }
@@ -247,16 +247,20 @@ class ImgesToVideoViewController: UIViewController {
                 let url = URL(fileURLWithPath: path)
                 try? FileManager.default.removeItem(at: url)
                 
+                guard let videoTrack = asset.tracks(withMediaType: .video).first else {return}
                 
-                let canvasSize = self.videoView.frame.size
-                var layerSize = self.playerLayer.frame.size
+                var canvasSize = videoTrack.naturalSize
                 
-//                if self.selectedRatio.width > self.selectedRatio.height {
-//                    layerSize.width = canvasSize.height * (self.selectedRatio.width / self.selectedRatio.height)
-//                }else{
-//
-//                    layerSize.height = canvasSize.width * (self.selectedRatio.height / self.selectedRatio.width)
-//                }
+                if self.selectedRatio.width > self.selectedRatio.height {
+                    canvasSize.width = canvasSize.height * (self.selectedRatio.width / self.selectedRatio.height)
+
+                }else{
+
+                    canvasSize.height = canvasSize.width * (self.selectedRatio.height / self.selectedRatio.width)
+                }
+                
+                var layerSize = CGSize(width: canvasSize.width - 20, height: canvasSize.height - 20)
+
                 print("canvas \(canvasSize) layer \(layerSize)")
                 guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
                 
@@ -350,22 +354,32 @@ class ImgesToVideoViewController: UIViewController {
                 let layerInstruction : AVMutableVideoCompositionLayerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
 
                 
-                let naturalSize = videoTrack.naturalSize
                 
-
-                var finalTransform = videoTrack.preferredTransform.scaledBy(x:canvasSize.width/naturalSize.width, y: canvasSize.height/naturalSize.height)
+                
+                let naturalSize = videoTrack.naturalSize
+                let newsize = AVMakeRect(aspectRatio: naturalSize, insideRect: CGRect(x: 0, y: 0, width: canvasSize.width, height: canvasSize.height))
+                
+                
+                
+                var finalTransform = videoTrack.preferredTransform.scaledBy(x:newsize.width/naturalSize.width, y: newsize.height/naturalSize.height)
 
                 //let size = __CGSizeApplyAffineTransform(naturalSize, transform)
-                var size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
+                let size1 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
                 let point = __CGPointApplyAffineTransform(.zero, videoTrack.preferredTransform)
                 
-                if size2.width < 0 {
-                    finalTransform = videoTrack.preferredTransform.scaledBy(x:canvasSize.height/naturalSize.width, y: canvasSize.width/naturalSize.height)
+                if size1.width < 0 {
+                    finalTransform = videoTrack.preferredTransform.scaledBy(x:newsize.width/naturalSize.width, y: newsize.height/naturalSize.height)
                     finalTransform = finalTransform.scaledBy(x: 1, y: -1)
-                    finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x, y: 0))
+                    let size = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
+                    let point = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), finalTransform)
+
+                    finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x + (canvasSize.width/2 - size.width/2), y: (canvasSize.height/2 - size.height/2)))
+                }else{
+                    finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x + (canvasSize.width/2 - size1.width/2), y: (canvasSize.height/2 - size1.height/2)))
+
                 }
                 
-                size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
+                let size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
                 let point2 = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), finalTransform)
                 print("scaled size of merging asset \(size2) \(point2)")
                 
@@ -503,9 +517,9 @@ class ImgesToVideoViewController: UIViewController {
         
     }
     
-    func getResizedRectAsRatio(aspectRatio:CGSize) -> CGRect {
+    func getResizedRectAsRatio(aspectRatio:CGSize,rect:CGRect) -> CGRect {
         
-        let maxBounds = videoView.superview!.bounds
+        let maxBounds = rect
         let maxSize = CGSize(width: maxBounds.width, height: maxBounds.width)
         let minSize = CGSize(width: maxSize.width/2, height: maxSize.height/2)
         
@@ -571,7 +585,7 @@ class ImgesToVideoViewController: UIViewController {
         
         if selectedRatio != aspectRatioes.first {
             selectedRatio = aspectRatioes.first
-            let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+            let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
             resizeVideView(rect: rect)
             resizePlayerLayer(rect: rect)
             self.videoView.superview?.layoutIfNeeded()
@@ -587,7 +601,7 @@ class ImgesToVideoViewController: UIViewController {
         
         playerLayer.videoGravity = .resizeAspect
         
-        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
         
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
@@ -603,7 +617,7 @@ class ImgesToVideoViewController: UIViewController {
         
         playerLayer.videoGravity = .resizeAspectFill
         
-        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
         
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
@@ -649,14 +663,6 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        //        if let cell = collectionView.cellForItem(at: indexPath) {
-        //            UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseInOut, animations: {
-        //                cell.backgroundColor = UIColor.lightGray
-        //            }, completion: { _ in
-        //                cell.backgroundColor = UIColor.white
-        //            })
-        //        }
-        
         if let cell = collectionView.cellForItem(at: indexPath) {
             
             for cell in collectionView.visibleCells{
@@ -671,7 +677,7 @@ extension ImgesToVideoViewController:UICollectionViewDelegate,UICollectionViewDa
         selectedRatio = aspectRatioes[indexPath.item]
         playerLayer.videoGravity = .resizeAspect
         
-        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio)
+        let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
         
         self.resizeVideView(rect: rect)
         self.resizePlayerLayer(rect: rect)
