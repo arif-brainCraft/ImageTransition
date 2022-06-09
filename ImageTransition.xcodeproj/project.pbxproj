@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		130A86C22817F42300943CCA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86C12817F42300943CCA /* AppDelegate.swift */; };
-		130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86C32817F42300943CCA /* SceneDelegate.swift */; };
 		130A86C62817F42300943CCA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130A86C52817F42300943CCA /* ViewController.swift */; };
 		130A86C92817F42300943CCA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 130A86C72817F42300943CCA /* Main.storyboard */; };
 		130A86CB2817F42500943CCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 130A86CA2817F42500943CCA /* Assets.xcassets */; };
@@ -61,7 +60,6 @@
 		12BBF925C506ADEF32E4A24F /* Pods-ImageTransition.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageTransition.debug.xcconfig"; path = "Target Support Files/Pods-ImageTransition/Pods-ImageTransition.debug.xcconfig"; sourceTree = "<group>"; };
 		130A86BE2817F42300943CCA /* ImageTransition.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageTransition.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		130A86C12817F42300943CCA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		130A86C32817F42300943CCA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		130A86C52817F42300943CCA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		130A86C82817F42300943CCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		130A86CA2817F42500943CCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -150,7 +148,6 @@
 				130F1FBD284634CF0063F8BC /* Extensions */,
 				13E66338283B5A900059802E /* BCLShaders */,
 				130A86C12817F42300943CCA /* AppDelegate.swift */,
-				130A86C32817F42300943CCA /* SceneDelegate.swift */,
 				130A86C52817F42300943CCA /* ViewController.swift */,
 				130A86C72817F42300943CCA /* Main.storyboard */,
 				130A86CA2817F42500943CCA /* Assets.xcassets */,
@@ -390,7 +387,6 @@
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
-				130A86C42817F42300943CCA /* SceneDelegate.swift in Sources */,
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
 				130F1FBF284634E50063F8BC /* UIImageExtension.swift in Sources */,
 				13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */,
@@ -555,7 +551,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -586,7 +582,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

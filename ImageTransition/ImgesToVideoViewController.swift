@@ -262,13 +262,12 @@ class ImgesToVideoViewController: UIViewController {
                 var layerSize = CGSize(width: canvasSize.width - 20, height: canvasSize.height - 20)
 
                 print("canvas \(canvasSize) layer \(layerSize)")
-                guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets) else {return}
+                guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets,addBackground: true) else {return}
                 
                 let Y = (canvasSize.height - layerSize.height)/2
                 let X = (canvasSize.width - layerSize.width)/2
                 let layerOrigin = CGPoint(x: X, y: Y)
                 
-                self.addBackground(image: UIImage(color: .red)!, composition: videoComposition, origin: layerOrigin, layerSize: layerSize, parentLayerSize: canvasSize)
                 
                 if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
                     
@@ -337,13 +336,13 @@ class ImgesToVideoViewController: UIViewController {
         return (isPortrait:isPortrait,orientation:orientation)
     }
     
-    func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset]) -> AVMutableVideoComposition? {
+    func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset],addBackground:Bool = false) -> AVMutableVideoComposition? {
                 
         var instructions = [AVMutableVideoCompositionInstruction]()
         var duration:CMTime = .zero
         var highestFrameRate = 0
-        
-        
+        var layerRects = [CGRect]()
+        var timeRanges = [Float64]()
         let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
         let parentAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
 
@@ -381,6 +380,8 @@ class ImgesToVideoViewController: UIViewController {
                 
                 let size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
                 let point2 = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), finalTransform)
+                layerRects.append(CGRect(x: point2.x, y: point2.y, width: size2.width, height: size2.height))
+                
                 print("scaled size of merging asset \(size2) \(point2)")
                 
                 layerInstruction.setTransform(finalTransform, at: duration)
@@ -400,6 +401,7 @@ class ImgesToVideoViewController: UIViewController {
                 
                 let instruction = AVMutableVideoCompositionInstruction()
                 instruction.timeRange = CMTimeRangeMake(start: duration, duration: asset.duration)
+                timeRanges.append(CMTimeGetSeconds(asset.duration))
                 instruction.layerInstructions = [layerInstruction]
                 instructions.append(instruction)
                 
@@ -413,27 +415,50 @@ class ImgesToVideoViewController: UIViewController {
         videoComposition.renderSize = canvasSize
         videoComposition.instructions = instructions
         
+        if addBackground {
+            self.addBackground(image: UIImage(color: .red)!, videoComposition: videoComposition,layerRects: layerRects, layerRanges: timeRanges, parentLayerSize: canvasSize)
+        }
+
+        
         return videoComposition
     }
     
-    func addBackground(image:UIImage,composition:AVMutableVideoComposition,origin:CGPoint,layerSize:CGSize,parentLayerSize:CGSize) -> Void {
-                
+    func addBackground(image:UIImage,videoComposition:AVMutableVideoComposition,layerRects:[CGRect],layerRanges:[Float64],parentLayerSize:CGSize) -> Void {
+        
+
+        
         let parentSize = parentLayerSize
 
         let parentLayer = CALayer()
-        let videoLayer = AVPlayerLayer()
+        let videoLayer = CALayer()
         parentLayer.contents = image.cgImage
         parentLayer.frame = CGRect(x: 0, y: 0, width: parentSize.width, height: parentSize.height)
         
-        videoLayer.frame = CGRect(x: origin.x, y: origin.y, width: layerSize.width, height: layerSize.height)
-        videoLayer.videoGravity = .resizeAspect
+        videoLayer.frame = layerRects.first!
+        //videoLayer.videoGravity = .resize
         videoLayer.backgroundColor = UIColor.blue.cgColor
         
+        let currentLayerTime = videoLayer.convertTime(CACurrentMediaTime(), from: nil)
+        let duration = 2.0
+        
+        for i  in 0..<layerRects.count - 1 {
+            let animation = CABasicAnimation()
+            animation.keyPath = "frame.size"
+            animation.fromValue = NSValue(cgSize: videoLayer.frame.size)
+            animation.toValue = NSValue(cgSize: layerRects[i + 1].size)
+            animation.duration = duration
+            animation.beginTime = layerRanges[i] - duration
+            //currentLayerTime + Double(layerRanges[i] - 1)
+            //animation.fillMode = CAMediaTimingFillMode
+            animation.isRemovedOnCompletion = false
+            videoLayer.add(animation, forKey: "frame.size")
+            //videoLayer.frame = layerRects[i + 1]
+        }
         
         parentLayer.addSublayer(videoLayer)
         parentLayer.isGeometryFlipped = true
         
-        composition.animationTool = AVVideoCompositionCoreAnimationTool(
+        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
             postProcessingAsVideoLayer: videoLayer,
             in: parentLayer)
         
