@@ -220,7 +220,7 @@ class ImgesToVideoViewController: UIViewController {
         
         if let url = Bundle.main.url(forResource: "sixthClip", withExtension: "MOV"){
             let secondAsset = AVAsset(url: url)
-            assets.append(secondAsset)
+            //assets.append(secondAsset)
         }
         if let url = Bundle.main.url(forResource: "secondClip", withExtension: "MP4"){
             let secondAsset = AVAsset(url: url)
@@ -259,14 +259,14 @@ class ImgesToVideoViewController: UIViewController {
                     canvasSize.height = canvasSize.width * (self.selectedRatio.height / self.selectedRatio.width)
                 }
                 
-                var layerSize = CGSize(width: canvasSize.width - 20, height: canvasSize.height - 20)
+//                var layerSize = CGSize(width: canvasSize.width - 20, height: canvasSize.height - 20)
 
-                print("canvas \(canvasSize) layer \(layerSize)")
+                //print("canvas \(canvasSize) layer \(layerSize)")
                 guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets,addBackground: true) else {return}
                 
-                let Y = (canvasSize.height - layerSize.height)/2
-                let X = (canvasSize.width - layerSize.width)/2
-                let layerOrigin = CGPoint(x: X, y: Y)
+//                let Y = (canvasSize.height - layerSize.height)/2
+//                let X = (canvasSize.width - layerSize.width)/2
+//                let layerOrigin = CGPoint(x: X, y: Y)
                 
                 
                 if let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality){
@@ -344,7 +344,7 @@ class ImgesToVideoViewController: UIViewController {
         var layerRects = [CGRect]()
         var timeRanges = [Float64]()
         let parentVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid)
-        let parentAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+        var parentAudioTrack:AVMutableCompositionTrack?
 
         for asset in assets {
             
@@ -393,6 +393,9 @@ class ImgesToVideoViewController: UIViewController {
                 try? parentVideoTrack?.insertTimeRange(timeRange, of: videoTrack, at: duration)
                 
                 if let audioTrack = asset.tracks(withMediaType: .audio).first {
+                    if parentAudioTrack == nil{
+                        parentAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+                    }
                     try? parentAudioTrack?.insertTimeRange(timeRange, of: audioTrack, at: duration)
                 }
                 
@@ -438,7 +441,6 @@ class ImgesToVideoViewController: UIViewController {
         //videoLayer.videoGravity = .resize
         videoLayer.backgroundColor = UIColor.blue.cgColor
         
-        let currentLayerTime = videoLayer.convertTime(CACurrentMediaTime(), from: nil)
         let duration = 2.0
         
         for i  in 0..<layerRects.count - 1 {
