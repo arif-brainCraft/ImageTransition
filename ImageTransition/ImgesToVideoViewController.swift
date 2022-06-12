@@ -356,8 +356,11 @@ class ImgesToVideoViewController: UIViewController {
                 
                 
                 let naturalSize = videoTrack.naturalSize
-                let newsize = AVMakeRect(aspectRatio: naturalSize, insideRect: CGRect(x: 0, y: 0, width: canvasSize.width, height: canvasSize.height))
+                var newsize = AVMakeRect(aspectRatio: naturalSize, insideRect: CGRect(x: 0, y: 0, width: canvasSize.width, height: canvasSize.height))
                 
+                if videoView.frame.size == self.playerLayer.frame.size {
+                    newsize = CGRect(x: newsize.minX, y: newsize.minY, width: canvasSize.width, height: canvasSize.height)
+                }
                 
                 
                 var finalTransform = videoTrack.preferredTransform.scaledBy(x:newsize.width/naturalSize.width, y: newsize.height/naturalSize.height)
@@ -443,19 +446,19 @@ class ImgesToVideoViewController: UIViewController {
         
         let duration = 2.0
         
-        for i  in 0..<layerRects.count - 1 {
-            let animation = CABasicAnimation()
-            animation.keyPath = "frame.size"
-            animation.fromValue = NSValue(cgSize: videoLayer.frame.size)
-            animation.toValue = NSValue(cgSize: layerRects[i + 1].size)
-            animation.duration = duration
-            animation.beginTime = layerRanges[i] - duration
-            //currentLayerTime + Double(layerRanges[i] - 1)
-            //animation.fillMode = CAMediaTimingFillMode
-            animation.isRemovedOnCompletion = false
-            videoLayer.add(animation, forKey: "frame.size")
-            //videoLayer.frame = layerRects[i + 1]
-        }
+//        for i  in 0..<layerRects.count - 1 {
+//            let animation = CABasicAnimation()
+//            animation.keyPath = "frame.size"
+//            animation.fromValue = NSValue(cgSize: videoLayer.frame.size)
+//            animation.toValue = NSValue(cgSize: layerRects[i + 1].size)
+//            animation.duration = duration
+//            animation.beginTime = layerRanges[i] - duration
+//            //currentLayerTime + Double(layerRanges[i] - 1)
+//            //animation.fillMode = CAMediaTimingFillMode
+//            animation.isRemovedOnCompletion = false
+//            videoLayer.add(animation, forKey: "frame.size")
+//            //videoLayer.frame = layerRects[i + 1]
+//        }
         
         parentLayer.addSublayer(videoLayer)
         parentLayer.isGeometryFlipped = true
