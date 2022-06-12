@@ -220,7 +220,7 @@ class ImgesToVideoViewController: UIViewController {
         
         if let url = Bundle.main.url(forResource: "sixthClip", withExtension: "MOV"){
             let secondAsset = AVAsset(url: url)
-            //assets.append(secondAsset)
+            assets.append(secondAsset)
         }
         if let url = Bundle.main.url(forResource: "secondClip", withExtension: "MP4"){
             let secondAsset = AVAsset(url: url)
@@ -262,7 +262,7 @@ class ImgesToVideoViewController: UIViewController {
 //                var layerSize = CGSize(width: canvasSize.width - 20, height: canvasSize.height - 20)
 
                 //print("canvas \(canvasSize) layer \(layerSize)")
-                guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets,addBackground: true) else {return}
+                guard let videoComposition = self.getScaledVideoComposition(composition: composition, canvasSize: canvasSize, assets: assets,addBackground: true,aspectFit: self.fitButton.tag == 1 ? true : false) else {return}
                 
 //                let Y = (canvasSize.height - layerSize.height)/2
 //                let X = (canvasSize.width - layerSize.width)/2
@@ -336,7 +336,7 @@ class ImgesToVideoViewController: UIViewController {
         return (isPortrait:isPortrait,orientation:orientation)
     }
     
-    func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset],addBackground:Bool = false) -> AVMutableVideoComposition? {
+    func getScaledVideoComposition(composition:AVMutableComposition,canvasSize:CGSize,assets:[AVAsset],addBackground:Bool = false,aspectFit:Bool = true) -> AVMutableVideoComposition? {
                 
         var instructions = [AVMutableVideoCompositionInstruction]()
         var duration:CMTime = .zero
@@ -358,7 +358,7 @@ class ImgesToVideoViewController: UIViewController {
                 let naturalSize = videoTrack.naturalSize
                 var newsize = AVMakeRect(aspectRatio: naturalSize, insideRect: CGRect(x: 0, y: 0, width: canvasSize.width, height: canvasSize.height))
                 
-                if videoView.frame.size == self.playerLayer.frame.size {
+                if aspectFit == false{
                     newsize = CGRect(x: newsize.minX, y: newsize.minY, width: canvasSize.width, height: canvasSize.height)
                 }
                 
@@ -378,14 +378,13 @@ class ImgesToVideoViewController: UIViewController {
                     finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x + (canvasSize.width/2 - size.width/2), y: (canvasSize.height/2 - size.height/2)))
                 }else{
                     finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: -point.x + (canvasSize.width/2 - size1.width/2), y: (canvasSize.height/2 - size1.height/2)))
-
                 }
                 
                 let size2 = __CGSizeApplyAffineTransform(naturalSize, finalTransform)
                 let point2 = __CGPointApplyAffineTransform(CGPoint(x: 0, y: 0), finalTransform)
                 layerRects.append(CGRect(x: point2.x, y: point2.y, width: size2.width, height: size2.height))
                 
-                print("scaled size of merging asset \(size2) \(point2)")
+                print("scaled video size \(size2) \(point2)")
                 
                 layerInstruction.setTransform(finalTransform, at: duration)
 
@@ -443,8 +442,9 @@ class ImgesToVideoViewController: UIViewController {
         videoLayer.frame = layerRects.first!
         //videoLayer.videoGravity = .resize
         videoLayer.backgroundColor = UIColor.blue.cgColor
-        
-        let duration = 2.0
+        print("scaled export size  parent: \(parentSize) layer: \(videoLayer.frame)")
+
+//        let duration = 2.0
         
 //        for i  in 0..<layerRects.count - 1 {
 //            let animation = CABasicAnimation()
@@ -628,7 +628,9 @@ class ImgesToVideoViewController: UIViewController {
     @IBAction func aspectFitButtonPressed(_ sender: Any?) {
         self.fitButton.backgroundColor = .lightGray
         self.fillButton.backgroundColor = .white
-        
+        self.fitButton.tag = fitButton.tag == 1 ? 0 : 1
+        self.fillButton.tag = fillButton.tag == 1 ? 0 : 1
+
         playerLayer.videoGravity = .resizeAspect
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
@@ -644,7 +646,8 @@ class ImgesToVideoViewController: UIViewController {
         
         self.fitButton.backgroundColor = .white
         self.fillButton.backgroundColor = .lightGray
-        
+        self.fillButton.tag = fillButton.tag == 1 ? 0 : 1
+        self.fitButton.tag = fitButton.tag == 1 ? 0 : 1
         playerLayer.videoGravity = .resizeAspectFill
         
         let rect = getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds)
