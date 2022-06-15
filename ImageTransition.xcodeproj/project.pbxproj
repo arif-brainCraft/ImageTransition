@@ -38,6 +38,10 @@
 		130F1FC9284CDFC80063F8BC /* fourthClip.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FC8284CDFC50063F8BC /* fourthClip.mp4 */; };
 		130F1FCB284E04E80063F8BC /* fifthClip.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FCA284E04E80063F8BC /* fifthClip.MOV */; };
 		130F1FCD284E130F0063F8BC /* sixthClip.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FCC284E130F0063F8BC /* sixthClip.MOV */; };
+		139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D0285880AF00432E16 /* VideoCompositionManager.swift */; };
+		139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */; };
+		139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */; };
+		139D18D72858A54600432E16 /* SlideShowTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D62858A54600432E16 /* SlideShowTemplate.swift */; };
 		13DC7137282A6D5200E2811C /* 0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7136282A6D5200E2811C /* 0.jpg */; };
 		13DC7139282A8DA400E2811C /* Abstract.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 13DC7138282A8BD500E2811C /* Abstract.mp4 */; };
 		13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E66332283A7C050059802E /* CustomTransitionEffect.swift */; };
@@ -89,6 +93,10 @@
 		130F1FC8284CDFC50063F8BC /* fourthClip.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = fourthClip.mp4; sourceTree = "<group>"; };
 		130F1FCA284E04E80063F8BC /* fifthClip.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = fifthClip.MOV; sourceTree = "<group>"; };
 		130F1FCC284E130F0063F8BC /* sixthClip.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = sixthClip.MOV; sourceTree = "<group>"; };
+		139D18D0285880AF00432E16 /* VideoCompositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompositionManager.swift; sourceTree = "<group>"; };
+		139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WhiteMinimalBgFilter.metal; sourceTree = "<group>"; };
+		139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteMinimalBgFilter.swift; sourceTree = "<group>"; };
+		139D18D62858A54600432E16 /* SlideShowTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideShowTemplate.swift; sourceTree = "<group>"; };
 		13DC7136282A6D5200E2811C /* 0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpg; sourceTree = "<group>"; };
 		13DC7138282A8BD500E2811C /* Abstract.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Abstract.mp4; sourceTree = "<group>"; };
 		13E66332283A7C050059802E /* CustomTransitionEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTransitionEffect.swift; sourceTree = "<group>"; };
@@ -157,6 +165,8 @@
 				130A86EE281A7EB200943CCA /* CombineTransitionMovieMaker.swift */,
 				13E66336283B58E00059802E /* BCLTransition.swift */,
 				13E66359283D13920059802E /* AspectRatioCollectionCell.swift */,
+				139D18D0285880AF00432E16 /* VideoCompositionManager.swift */,
+				139D18D62858A54600432E16 /* SlideShowTemplate.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -216,6 +226,8 @@
 				13E66357283CEF2F0059802E /* RandomWindowBlind.swift */,
 				130F1FB6283F5D310063F8BC /* DoomScreenTransition.metal */,
 				130F1FB8283F5E6E0063F8BC /* DoomScreenTransition.swift */,
+				139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */,
+				139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -373,6 +385,7 @@
 			files = (
 				13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */,
 				13E66354283BCFE90059802E /* RandomAngularDreamy.swift in Sources */,
+				139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */,
 				13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */,
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
 				13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */,
@@ -382,7 +395,9 @@
 				130F1FB9283F5E6E0063F8BC /* DoomScreenTransition.swift in Sources */,
 				13E66337283B58E00059802E /* BCLTransition.swift in Sources */,
 				13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */,
+				139D18D72858A54600432E16 /* SlideShowTemplate.swift in Sources */,
 				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,
+				139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */,
 				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
@@ -390,6 +405,7 @@
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
 				130F1FBF284634E50063F8BC /* UIImageExtension.swift in Sources */,
 				13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */,
+				139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */,
 				13E6634E283BBAE90059802E /* BurnTransition.swift in Sources */,
 				13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */,
 				130F1FB1283E3BED0063F8BC /* RandomWindowBlind.metal in Sources */,

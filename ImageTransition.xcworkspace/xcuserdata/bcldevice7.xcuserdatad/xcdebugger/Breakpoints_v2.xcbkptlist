@@ -26,8 +26,8 @@
             filePath = "ImageTransition/ImgesToVideoViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "292"
-            endingLineNumber = "292"
+            startingLineNumber = "305"
+            endingLineNumber = "305"
             landmarkName = "exportButtonPressed()"
             landmarkType = "7">
          </BreakpointContent>
@@ -35,16 +35,96 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D2D19622-8196-4B81-AD7D-862A36AE7038"
-            shouldBeEnabled = "No"
+            uuid = "1FEBB34F-79E4-4A1F-B508-73DACF3C319A"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ImageTransition/ImgesToVideoViewController.swift"
+            filePath = "ImageTransition/SlideShowTemplate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "398"
-            endingLineNumber = "398"
-            landmarkName = "getScaledVideoComposition(composition:canvasSize:assets:addBackground:aspectFit:)"
+            startingLineNumber = "127"
+            endingLineNumber = "127"
+            landmarkName = "createVideo(allImages:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "CFE7AB4A-BF01-48CB-8D24-39063628A7E6"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ImageTransition/SlideShowTemplate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "createVideo(allImages:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0FE4E635-6D7F-4E9D-BEAD-1410899571A0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ImageTransition/SlideShowTemplate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "125"
+            endingLineNumber = "125"
+            landmarkName = "createVideo(allImages:completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0FE4E635-6D7F-4E9D-BEAD-1410899571A0 - c4bd3709126d014e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ImageTransition.SlideShowTemplate.createVideo(allImages: Swift.Array&lt;__C.UIImage&gt;, completion: (Swift.Result&lt;Foundation.URL, Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ImageTransition"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bcldevice7/Documents/ImageTransition/ImageTransition/SlideShowTemplate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "125"
+                  endingLineNumber = "125"
+                  offsetFromSymbolStart = "9372">
+               </Location>
+               <Location
+                  uuid = "0FE4E635-6D7F-4E9D-BEAD-1410899571A0 - c4bd3709126d014e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ImageTransition.SlideShowTemplate.createVideo(allImages: Swift.Array&lt;__C.UIImage&gt;, completion: (Swift.Result&lt;Foundation.URL, Swift.Error&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "ImageTransition"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/bcldevice7/Documents/ImageTransition/ImageTransition/SlideShowTemplate.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "125"
+                  endingLineNumber = "125"
+                  offsetFromSymbolStart = "9416">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BC9C1EED-03E5-4E14-A66D-43E26B022597"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ImageTransition/SlideShowTemplate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "107"
+            endingLineNumber = "107"
+            landmarkName = "createVideo(allImages:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

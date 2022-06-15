@@ -71,7 +71,7 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         return kernel
     }
     
-    private func samplerImage(name: String) -> MTIImage? {
+    public func samplerImage(name: String) -> MTIImage? {
         let bundle = Bundle(for: BCLTransition.self)
         guard let bundleUrl = bundle.url(forResource: "Assets", withExtension: "bundle"),
             let resourceBundle = Bundle(url: bundleUrl) else {

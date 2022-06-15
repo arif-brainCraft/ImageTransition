@@ -20,6 +20,7 @@ using namespace metal;
 
 namespace metalpetal {
 
+
     enum class ResizeMode { cover, contains, stretch };
 
     METAL_FUNC float2 cover(float2 uv, float ratio, float r) {
