@@ -104,15 +104,19 @@ class SlideShowTemplate{
             
             let bgImage = whiteMinimalBgFilter.outputImage!
             
-            var translate = CGFloat(progress * 10)
             
             var translateTF = CGAffineTransform(translationX: imageSize.width/2 - bgSize.width/2, y: imageSize.height/2 - bgSize.height/2)
-            let scaleValue = CGFloat(simd_clamp(progress, 0.7, 1.0))
+            let scaleValue = CGFloat(simd_clamp(progress, 0.6, 1.0))
+            
+
             translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
-            let width = (bgImage.size.width + translate) / bgImage.size.width
-            let height = (bgImage.size.height + translate) / bgImage.size.height
-            let translateTB = CGAffineTransform(scaleX:width , y: height)
-            print("translate \(translate)")
+
+            if scaleValue < 0.61 {
+                let translate = CGFloat(sin(progress * 15) )
+                let vibrantT = CGAffineTransform(translationX: translate, y: translate)
+                translateTF = translateTF.concatenating(vibrantT)
+            }
+
             
             let frame = try? BCLTransition.context?.makeCIImage(from:bgImage)//.transformed(by:translateTB)
 
