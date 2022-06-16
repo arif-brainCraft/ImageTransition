@@ -78,13 +78,13 @@ class SlideShowTemplate{
         
         guard let ciimage = CIImage(image: image) else{return}
         
-        let scaleTB = CGAffineTransform(scaleX: 0.8, y: 0.7)
+        let scaleTB = CGAffineTransform(scaleX: 0.7, y: 0.7)
         gaussianBlurFilter?.setValue(ciimage.transformed(by:scaleTB ), forKey: kCIInputImageKey)
         gaussianBlurFilter?.setValue(15, forKey: kCIInputRadiusKey)
         
         blendFilter?.setDefaults()
         
-        let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.5)
+        let scaleTF = CGAffineTransform(scaleX: 0.6, y: 0.5)
         let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
         let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
         
@@ -106,13 +106,15 @@ class SlideShowTemplate{
             
             var translate = CGFloat(progress * 10)
             
-            let translateTF = CGAffineTransform(translationX: imageSize.width/2 - bgSize.width/2 - translate, y: imageSize.height/2 - bgSize.height/2 + translate)
+            var translateTF = CGAffineTransform(translationX: imageSize.width/2 - bgSize.width/2, y: imageSize.height/2 - bgSize.height/2)
+            let scaleValue = CGFloat(simd_clamp(progress, 0.7, 1.0))
+            translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
             let width = (bgImage.size.width + translate) / bgImage.size.width
             let height = (bgImage.size.height + translate) / bgImage.size.height
             let translateTB = CGAffineTransform(scaleX:width , y: height)
             print("translate \(translate)")
             
-            let frame = try? BCLTransition.context?.makeCIImage(from:bgImage).transformed(by:translateTB)
+            let frame = try? BCLTransition.context?.makeCIImage(from:bgImage)//.transformed(by:translateTB)
 
             
             blendFilter2?.setDefaults()
