@@ -67,62 +67,26 @@ class SlideShowTemplate{
 
         whiteMinimalBgFilter.inputImage = mtiImage
         whiteMinimalBgFilter.destImage = mtiImage
-        let totalFrame = Int(whiteMinimalBgFilter.duration * 20)
+        let totalFrame = Int(whiteMinimalBgFilter.duration * 30)
         let frameDuration:Double = 1.0
         var presentTime = CMTimeMake(value: Int64(frameDuration * Double(0) * 1000), timescale: 1000)
         let frameBeginTime = presentTime
         
-        
-        let imageSize = image.size
-//        let resizedImage = image.resized(to: CGSize(width: imageSize.width * 0.6, height: imageSize.height * 0.6))
-        
-        guard let ciimage = CIImage(image: image) else{return}
-        
-        let scaleTB = CGAffineTransform(scaleX: 0.7, y: 0.7)
-        gaussianBlurFilter?.setValue(ciimage.transformed(by:scaleTB ), forKey: kCIInputImageKey)
-        gaussianBlurFilter?.setValue(15, forKey: kCIInputRadiusKey)
-        
-        blendFilter?.setDefaults()
-        
-        let scaleTF = CGAffineTransform(scaleX: 0.6, y: 0.5)
-        let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
-        let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
-        
-        let scaledCiImage = ciimage.transformed(by:scaleTF )
-        blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
-        blendFilter?.setValue(gaussianBlurFilter?.outputImage, forKey: kCIInputBackgroundImageKey)
-        
-        var blendOutputImage = blendFilter?.value(forKey: "outputImage") as? CIImage
-        
+        let blendOutputImage = blendWihtBlurBackground(image: image)
         
         for frameNumber in 0..<totalFrame {
+            
             let progress = Float(frameNumber) / Float(totalFrame)
             whiteMinimalBgFilter.progress = progress
             
             let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
             presentTime = CMTimeAdd(frameBeginTime, frameTime)
             
-            let bgImage = whiteMinimalBgFilter.outputImage!
-            
-            
-            var translateTF = CGAffineTransform(translationX: imageSize.width/2 - bgSize.width/2, y: imageSize.height/2 - bgSize.height/2)
-            let scaleValue = CGFloat(simd_clamp(progress, 0.6, 1.0))
-            
-
-            translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
-
-            if scaleValue < 0.61 {
-                let translate = CGFloat(sin(progress * 15) )
-                let vibrantT = CGAffineTransform(translationX: translate, y: translate)
-                translateTF = translateTF.concatenating(vibrantT)
-            }
-
-            
-            let frame = try? BCLTransition.context?.makeCIImage(from:bgImage)//.transformed(by:translateTB)
-
+            let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!)
+            let animatedBlend = applySingleAnimation(image: blendOutputImage!, progress: progress, canvasSize: outputSize)
             
             blendFilter2?.setDefaults()
-            blendFilter2?.setValue(blendOutputImage?.transformed(by:translateTF), forKey:kCIInputImageKey)
+            blendFilter2?.setValue(animatedBlend, forKey:kCIInputImageKey)
             blendFilter2?.setValue(frame, forKey: kCIInputBackgroundImageKey)
 
             
@@ -141,10 +105,6 @@ class SlideShowTemplate{
 
             }
 
-            
-
-            
-            
         }
         
         writerInput.markAsFinished()
@@ -171,6 +131,68 @@ class SlideShowTemplate{
         return attributes
     }
     
+    func blendWihtBlurBackground(image:UIImage) -> CIImage? {
+        
+        let imageSize = image.size
+
+        guard let ciimage = CIImage(image: image) else{return nil}
+        
+        let scaleTB = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        gaussianBlurFilter?.setValue(ciimage.transformed(by:scaleTB ), forKey: kCIInputImageKey)
+        gaussianBlurFilter?.setValue(15, forKey: kCIInputRadiusKey)
+        
+        blendFilter?.setDefaults()
+        
+        let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.6)
+        let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
+        let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
+        
+        let scaledCiImage = ciimage.transformed(by:scaleTF )
+        blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
+        blendFilter?.setValue(gaussianBlurFilter?.outputImage, forKey: kCIInputBackgroundImageKey)
+        
+        if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
+            return resizeImage(sourceImage: blendImage, targetSize: bgSize)
+        }
+        return nil
+    }
+    
+    func applySingleAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
+        
+        let size = image.extent.size
+        var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2, y: canvasSize.height/2 - size.height/2)
+        //translateTF = CGAffineTransform(translationX: canvasSize.width/2, y: canvasSize.height/2)
+        let scaleValue = CGFloat(simd_clamp(progress, 0.7, 1.0))
+        
+        let point = __CGPointApplyAffineTransform(CGPoint.zero, translateTF)
+        print("progress \(progress) scalvalue \(point)")
+        translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
+
+        if scaleValue < 0.71 {
+            let translate = CGFloat(sin(progress * 15) )
+            let vibrantT = CGAffineTransform(translationX: translate, y: translate)
+            translateTF = translateTF.concatenating(vibrantT)
+        }
+        
+        return image.transformed(by:translateTF)
+
+    }
     
     
+    func resizeImage(sourceImage:CIImage,targetSize:CGSize) -> CIImage? {
+        
+        let resizeFilter = CIFilter(name:"CILanczosScaleTransform")!
+
+        // Desired output size
+
+        // Compute scale and corrective aspect ratio
+        let scale = targetSize.height / sourceImage.extent.height
+        let aspectRatio = targetSize.width/(sourceImage.extent.width * scale)
+
+        // Apply resizing
+        resizeFilter.setValue(sourceImage, forKey: kCIInputImageKey)
+        resizeFilter.setValue(scale, forKey: kCIInputScaleKey)
+        resizeFilter.setValue(aspectRatio, forKey: kCIInputAspectRatioKey)
+        return resizeFilter.outputImage
+    }
 }
