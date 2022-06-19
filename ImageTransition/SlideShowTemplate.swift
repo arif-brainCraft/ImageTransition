@@ -78,7 +78,6 @@ class SlideShowTemplate{
             let frameDuration:Double = 1.0
             let frameBeginTime = presentTime
             
-            let blendOutputImage = blendWihtBlurBackground(image: image)!
 
             for frameNumber in 0..<totalFrame {
                 
@@ -89,6 +88,8 @@ class SlideShowTemplate{
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
                 
+                let blendOutputImage = blendWihtBlurBackground(image: image, progress: progress)!
+
                 
                 let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!)
                 let animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
@@ -142,7 +143,19 @@ class SlideShowTemplate{
         return attributes
     }
     
-    func blendWihtBlurBackground(image:UIImage) -> CIImage? {
+    func changeOpacity(image:CIImage, value:CGFloat) -> CIImage? {
+        
+        let rgba:[CGFloat] = [0.0, 0.0, 0.0, value]
+
+        let colorMatrix = CIFilter(name: "CIColorMatrix")
+
+        colorMatrix?.setDefaults()
+        colorMatrix?.setValue(image, forKey: kCIInputImageKey)
+        colorMatrix?.setValue(CIVector(values: rgba, count: 4), forKey: "inputAVector")
+        return colorMatrix?.outputImage
+    }
+    
+    func blendWihtBlurBackground(image:UIImage,progress:Float) -> CIImage? {
         
         let imageSize = image.size
 
@@ -151,21 +164,21 @@ class SlideShowTemplate{
         let clampFilter = CIFilter(name: "CIAffineClamp")
         clampFilter?.setDefaults()
         clampFilter?.setValue(ciimage, forKey: kCIInputImageKey)
-        let scaleTB = CGAffineTransform(scaleX: 0.7, y: 0.7)
+        let scaleTB = CGAffineTransform(scaleX: 0.6, y: 0.6)
         
         let gaussianBlurFilter = CIFilter(name:"CIGaussianBlur")
         gaussianBlurFilter?.setValue(clampFilter?.outputImage?.transformed(by:scaleTB ), forKey: kCIInputImageKey)
         gaussianBlurFilter?.setValue(10, forKey: kCIInputRadiusKey)
         
-        let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.5)
+        let scaleTF = CGAffineTransform(scaleX: 0.6, y: 0.4)
         let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
         let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
         
         let blurOutput = gaussianBlurFilter?.outputImage?.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
         
         let blendFilter = CIFilter(name: "CISourceOverCompositing")
-        
-        let scaledCiImage = ciimage.transformed(by:scaleTF )
+        let scaledCiImage = changeOpacity(image: ciimage.transformed(by:scaleTF ), value: CGFloat(progress))!
+
         blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
         blendFilter?.setValue(blurOutput, forKey: kCIInputBackgroundImageKey)
         
@@ -178,18 +191,19 @@ class SlideShowTemplate{
     func applySingleAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
         
         let size = image.extent.size
-        var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2 + 35 , y: canvasSize.height/2 - size.height/2 + 35 )
+        var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2 , y: canvasSize.height/2 - size.height/2)
         let initialScale = 0.5
         let scaleValue = CGFloat(initialScale + (Double(progress) * (1.0 - initialScale)))
         //CGFloat(simd_clamp(progress, 0.8, 1.0))
         
         translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
 
-        if scaleValue < 0.81 {
-            let translate = CGFloat(sin(progress * 15) )
-            let vibrantT = CGAffineTransform(translationX: translate, y: translate)
-            translateTF = translateTF.concatenating(vibrantT)
-        }
+//        if scaleValue < 0.81 {
+//            let translate = CGFloat(sin(progress * 15) )
+//            let vibrantT = CGAffineTransform(translationX: translate, y: translate)
+//            translateTF = translateTF.concatenating(vibrantT)
+//        }
+
         
         return image.transformed(by:translateTF)
 
