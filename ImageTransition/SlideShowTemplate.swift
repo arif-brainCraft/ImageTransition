@@ -176,8 +176,10 @@ class SlideShowTemplate{
         
         let blurOutput = gaussianBlurFilter?.outputImage?.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
         
+        let opacity = CGFloat(sinf(progress * 3.1416 * 3  + 4.7) * 0.5 + 0.5)
+
         let blendFilter = CIFilter(name: "CISourceOverCompositing")
-        let scaledCiImage = changeOpacity(image: ciimage.transformed(by:scaleTF ), value: CGFloat(progress))!
+        let scaledCiImage = changeOpacity(image: ciimage.transformed(by:scaleTF ), value: opacity)!
 
         blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
         blendFilter?.setValue(blurOutput, forKey: kCIInputBackgroundImageKey)
