@@ -157,20 +157,20 @@ class SlideShowTemplate{
         gaussianBlurFilter?.setValue(clampFilter?.outputImage?.transformed(by:scaleTB ), forKey: kCIInputImageKey)
         gaussianBlurFilter?.setValue(10, forKey: kCIInputRadiusKey)
         
-        let blendFilter = CIFilter(name: "CISourceOverCompositing")
-        
         let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.5)
         let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
         let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
         
+        let blurOutput = gaussianBlurFilter?.outputImage?.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
+        
+        let blendFilter = CIFilter(name: "CISourceOverCompositing")
+        
         let scaledCiImage = ciimage.transformed(by:scaleTF )
         blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
-        blendFilter?.setValue(gaussianBlurFilter?.outputImage, forKey: kCIInputBackgroundImageKey)
+        blendFilter?.setValue(blurOutput, forKey: kCIInputBackgroundImageKey)
         
         if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
-            //return resizeImage(sourceImage: blendImage, targetSize: bgSize)
-
-            return blendImage.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
+            return blendImage
         }
         return nil
     }
@@ -179,8 +179,9 @@ class SlideShowTemplate{
         
         let size = image.extent.size
         var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2 + 35 , y: canvasSize.height/2 - size.height/2 + 35 )
-        //translateTF = CGAffineTransform(translationX: canvasSize.width/2, y: canvasSize.height/2)
-        let scaleValue = CGFloat(simd_clamp(progress, 0.8, 1.0))
+        let initialScale = 0.5
+        let scaleValue = CGFloat(initialScale + (Double(progress) * (1.0 - initialScale)))
+        //CGFloat(simd_clamp(progress, 0.8, 1.0))
         
         translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
 
