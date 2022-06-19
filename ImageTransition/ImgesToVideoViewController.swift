@@ -38,14 +38,14 @@ class ImgesToVideoViewController: UIViewController {
         resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds))
         setUpSubviews()
         //createVideo()
-        slideShowTemplate.createVideo(allImages: loadImages(count: 1)) { [weak self] result in
+        slideShowTemplate.createVideo(allImages: loadImages(count: 2)) { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
                 self.fileUrl = url
                 self.playVideo(url: url)
             case .failure(_): break
-                
+
             }
         }
         
@@ -102,7 +102,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.whiteMinimalBgFilter]
+        let effects: [BCLTransition.Effect] = [.whiteMinimalBgFilter,.burn]
         
         var blendEffects = [Int]()
         
@@ -233,7 +233,7 @@ class ImgesToVideoViewController: UIViewController {
         
         if let url = Bundle.main.url(forResource: "sixthClip", withExtension: "MOV"){
             let secondAsset = AVAsset(url: url)
-            assets.append(secondAsset)
+            //assets.append(secondAsset)
         }
         if let url = Bundle.main.url(forResource: "secondClip", withExtension: "MP4"){
             let secondAsset = AVAsset(url: url)
@@ -427,7 +427,7 @@ class ImgesToVideoViewController: UIViewController {
         self.ratioCollectionView.reloadData()
         
         
-        slideShowTemplate.createVideo(allImages: loadImages(count: 1)) { [weak self] result in
+        slideShowTemplate.createVideo(allImages: loadImages(count: 3)) { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
