@@ -17,7 +17,8 @@ class SlideShowTemplate{
     var blendFilter:CIFilter!
 
     let transformFilter = MTITransformFilter()
-    
+    let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
+
 
     
     func createVideo(allImages:[UIImage], completion:@escaping MTMovieMakerCompletion) -> Void {
@@ -77,7 +78,7 @@ class SlideShowTemplate{
             let frameDuration:Double = 1.0
             let frameBeginTime = presentTime
             
-            let blendOutputImage = blendWihtBlurBackground(image: image)
+            let blendOutputImage = blendWihtBlurBackground(image: image)!
 
             for frameNumber in 0..<totalFrame {
                 
@@ -87,9 +88,10 @@ class SlideShowTemplate{
                 let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-
+                
+                
                 let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!)
-                let animatedBlend = applySingleAnimation(image: blendOutputImage!, progress: progress, canvasSize: outputSize)
+                let animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
                 blendFilter?.setDefaults()
                 blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
                 blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
@@ -146,15 +148,18 @@ class SlideShowTemplate{
 
         guard let ciimage = CIImage(image: image) else{return nil}
         
-        let scaleTB = CGAffineTransform(scaleX: 0.8, y: 0.8)
+        let clampFilter = CIFilter(name: "CIAffineClamp")
+        clampFilter?.setDefaults()
+        clampFilter?.setValue(ciimage, forKey: kCIInputImageKey)
+        let scaleTB = CGAffineTransform(scaleX: 0.7, y: 0.7)
         
         let gaussianBlurFilter = CIFilter(name:"CIGaussianBlur")
-        gaussianBlurFilter?.setValue(ciimage.transformed(by:scaleTB ), forKey: kCIInputImageKey)
-        gaussianBlurFilter?.setValue(15, forKey: kCIInputRadiusKey)
+        gaussianBlurFilter?.setValue(clampFilter?.outputImage?.transformed(by:scaleTB ), forKey: kCIInputImageKey)
+        gaussianBlurFilter?.setValue(10, forKey: kCIInputRadiusKey)
         
         let blendFilter = CIFilter(name: "CISourceOverCompositing")
         
-        let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.6)
+        let scaleTF = CGAffineTransform(scaleX: 0.7, y: 0.5)
         let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
         let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
         
@@ -163,7 +168,9 @@ class SlideShowTemplate{
         blendFilter?.setValue(gaussianBlurFilter?.outputImage, forKey: kCIInputBackgroundImageKey)
         
         if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
-            return resizeImage(sourceImage: blendImage, targetSize: bgSize)
+            //return resizeImage(sourceImage: blendImage, targetSize: bgSize)
+
+            return blendImage.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
         }
         return nil
     }
@@ -171,12 +178,10 @@ class SlideShowTemplate{
     func applySingleAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
         
         let size = image.extent.size
-        var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2 + 10, y: canvasSize.height/2 - size.height/2 + 10)
+        var translateTF = CGAffineTransform(translationX: canvasSize.width/2 - size.width/2 + 35 , y: canvasSize.height/2 - size.height/2 + 35 )
         //translateTF = CGAffineTransform(translationX: canvasSize.width/2, y: canvasSize.height/2)
         let scaleValue = CGFloat(simd_clamp(progress, 0.8, 1.0))
         
-        let point = __CGPointApplyAffineTransform(CGPoint.zero, translateTF)
-        //print("progress \(progress) scalvalue \(point)")
         translateTF = translateTF.concatenating(CGAffineTransform(scaleX: scaleValue, y: scaleValue))
 
         if scaleValue < 0.81 {
