@@ -78,6 +78,7 @@ class SlideShowTemplate{
             let frameDuration:Double = 1.0
             let frameBeginTime = presentTime
             
+            let blendOutputImage = blendWihtBlurBackground(image: image)!
 
             for frameNumber in 0..<totalFrame {
                 
@@ -88,11 +89,11 @@ class SlideShowTemplate{
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
                 
-                let blendOutputImage = blendWihtBlurBackground(image: image, progress: progress)!
 
                 
                 let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!)
-                let animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
+                let animatedBlend = applyDoubleAnimation(first: blendOutputImage, second: blendOutputImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+                //applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
                 blendFilter?.setDefaults()
                 blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
                 blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
@@ -155,7 +156,7 @@ class SlideShowTemplate{
         return colorMatrix?.outputImage
     }
     
-    func blendWihtBlurBackground(image:UIImage,progress:Float) -> CIImage? {
+    func blendWihtBlurBackground(image:UIImage) -> CIImage? {
         
         let imageSize = image.size
 
@@ -176,12 +177,12 @@ class SlideShowTemplate{
         
         let blurOutput = gaussianBlurFilter?.outputImage?.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
         
-        let opacity = CGFloat(sinf(progress * 3.1416 * 3  + 4.7) * 0.5 + 0.5)
+        //let opacity = CGFloat(sinf(progress * 3.1416 * 3  + 4.7) * 0.5 + 0.5)
 
         let blendFilter = CIFilter(name: "CISourceOverCompositing")
-        let scaledCiImage = changeOpacity(image: ciimage.transformed(by:scaleTF ), value: opacity)!
+        let scaledCiImage = ciimage.transformed(by:scaleTF ).transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2))
 
-        blendFilter?.setValue(scaledCiImage.transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2)), forKey:kCIInputImageKey)
+        blendFilter?.setValue(scaledCiImage, forKey:kCIInputImageKey)
         blendFilter?.setValue(blurOutput, forKey: kCIInputBackgroundImageKey)
         
         if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
@@ -209,6 +210,41 @@ class SlideShowTemplate{
         
         return image.transformed(by:translateTF)
 
+    }
+    
+    func applyDoubleAnimation(first:CIImage,second:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
+                
+        let center = CGPoint(x: canvasSize.width/2 - first.extent.size.width/2, y: canvasSize.height/2 - first.extent.size.height/2)
+        
+        var translateF = CGAffineTransform(translationX: center.x  - 70 , y: center.y  - 60)
+        
+        let initialScale = 0.8
+        let scaleF = CGFloat(initialScale + (Double(progress) * (1 - initialScale)))
+        
+        translateF = translateF.concatenating(CGAffineTransform(scaleX: scaleF, y: scaleF))
+        
+        let scaleS = CGFloat(0.5 + (Double(sin( progress * 2.5)) * (0.8 - 0.5)))
+        
+        var translateS = CGAffineTransform(scaleX: scaleS, y: scaleS)
+        
+        let translation = (85.0 + (CGFloat(cos(progress * 3.1416 * 1.5 ) + 2.33) * 0.3) * 85.0)
+        print("scaleS \(scaleS)")
+        
+        translateS = translateS.concatenating(CGAffineTransform(translationX: center.x + translation + 30, y: center.y + translation ))
+        
+        
+        let blendFilter = CIFilter(name: "CISourceOverCompositing")
+
+        blendFilter?.setValue(second.transformed(by:translateS), forKey:kCIInputImageKey)
+        blendFilter?.setValue(first.transformed(by:translateF), forKey: kCIInputBackgroundImageKey)
+        
+        if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
+            return blendImage
+        }
+        
+        return nil
+
+        
     }
     
     
