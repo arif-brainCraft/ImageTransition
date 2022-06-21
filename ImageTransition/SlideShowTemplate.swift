@@ -79,7 +79,7 @@ class SlideShowTemplate{
             let frameBeginTime = presentTime
             
             let blendOutputImage = blendWihtBlurBackground(image: image)!
-
+            let random = Int.random(in: 0...1)
             for frameNumber in 0..<totalFrame {
                 
                 let progress = Float(frameNumber) / Float(totalFrame)
@@ -89,11 +89,16 @@ class SlideShowTemplate{
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
                 
-
-                
                 let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!)
-                let animatedBlend = applyDoubleAnimation(first: blendOutputImage, second: blendOutputImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
-                //applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
+                let animatedBlend : CIImage!
+                
+                if random == 0 {
+                    animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
+
+                }else{
+                    animatedBlend = applyDoubleAnimation(first: blendOutputImage, second: blendOutputImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+                }
+                
                 blendFilter?.setDefaults()
                 blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
                 blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
