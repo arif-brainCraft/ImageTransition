@@ -12,7 +12,7 @@ using namespace metalpetal;
 
 constant float gt = .0075;
 constant half mt = .7;
-constant half maxWidth = 0.4;
+constant half maxWidth = 0.35;
 
 bool isGrey(float2 uv,float p) {
     p = sin(.5 * 3.14159 * p);
