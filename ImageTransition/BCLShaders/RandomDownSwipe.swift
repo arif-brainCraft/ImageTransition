@@ -11,6 +11,7 @@ public class RandomDownSwipe: BCLTransition {
     public override init() {
         super.init()
         self.duration = 4.0;
+        self.parameters = ["startingAngle": startingAngle]
     }
     public var startingAngle: Float = 90
 
@@ -18,9 +19,4 @@ public class RandomDownSwipe: BCLTransition {
         return "randomDownSwipeFragment"
     }
 
-    override var parameters: [String: Any] {
-        return [
-            "startingAngle": startingAngle
-        ]
-    }
 }

@@ -18,7 +18,5 @@ public class DoomScreenTransition: BCLTransition {
         return "doomScreenTransitionFragment"
     }
 
-    override var parameters: [String: Any] {
-        return [:]
-    }
+
 }

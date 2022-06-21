@@ -25,7 +25,7 @@ extension BCLTransition{
         case randomDownSwipe
         case doomScreenTransition
         case whiteMinimalBgFilter
-        
+        case directionalSlide
         public var transition: BCLTransition {
             switch self {
             case .waterDrop: return WaterDropTransition()
@@ -37,6 +37,7 @@ extension BCLTransition{
             case .randomDownSwipe: return RandomDownSwipe()
             case .doomScreenTransition: return DoomScreenTransition()
             case .whiteMinimalBgFilter: return WhiteMinimalBgFilter()
+            case .directionalSlide: return DirectionalSlide()
             }
         }
         
@@ -51,6 +52,7 @@ extension BCLTransition{
             case .randomDownSwipe: return "RandomDownSwipe"
             case .doomScreenTransition: return "DoomScreenTransition"
             case .whiteMinimalBgFilter: return "WhiteMinimalBgFilter"
+            case .directionalSlide: return "DirectionalSlide"
             }
         }
     }

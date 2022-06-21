@@ -12,6 +12,7 @@ public class DreamyWindowSlice: BCLTransition {
     public override init() {
         super.init()
         self.duration = 3.0;
+        self.parameters = ["startingAngle": startingAngle]
     }
     public var startingAngle: Float = 90
 
@@ -19,9 +20,5 @@ public class DreamyWindowSlice: BCLTransition {
         return "dreamyWindowSliceFragment"
     }
 
-    override var parameters: [String: Any] {
-        return [
-            "startingAngle": startingAngle
-        ]
-    }
+
 }

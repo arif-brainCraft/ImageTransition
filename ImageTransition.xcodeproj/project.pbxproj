@@ -38,6 +38,8 @@
 		130F1FC9284CDFC80063F8BC /* fourthClip.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FC8284CDFC50063F8BC /* fourthClip.mp4 */; };
 		130F1FCB284E04E80063F8BC /* fifthClip.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FCA284E04E80063F8BC /* fifthClip.MOV */; };
 		130F1FCD284E130F0063F8BC /* sixthClip.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FCC284E130F0063F8BC /* sixthClip.MOV */; };
+		133D1E912861D09A0033AD55 /* DirectionalSlide.metal in Sources */ = {isa = PBXBuildFile; fileRef = 133D1E902861D09A0033AD55 /* DirectionalSlide.metal */; };
+		133D1E932861D1AD0033AD55 /* DirectionalSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */; };
 		139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D0285880AF00432E16 /* VideoCompositionManager.swift */; };
 		139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */; };
 		139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */; };
@@ -93,6 +95,8 @@
 		130F1FC8284CDFC50063F8BC /* fourthClip.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = fourthClip.mp4; sourceTree = "<group>"; };
 		130F1FCA284E04E80063F8BC /* fifthClip.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = fifthClip.MOV; sourceTree = "<group>"; };
 		130F1FCC284E130F0063F8BC /* sixthClip.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = sixthClip.MOV; sourceTree = "<group>"; };
+		133D1E902861D09A0033AD55 /* DirectionalSlide.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DirectionalSlide.metal; sourceTree = "<group>"; };
+		133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionalSlide.swift; sourceTree = "<group>"; };
 		139D18D0285880AF00432E16 /* VideoCompositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompositionManager.swift; sourceTree = "<group>"; };
 		139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WhiteMinimalBgFilter.metal; sourceTree = "<group>"; };
 		139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteMinimalBgFilter.swift; sourceTree = "<group>"; };
@@ -228,6 +232,8 @@
 				130F1FB8283F5E6E0063F8BC /* DoomScreenTransition.swift */,
 				139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */,
 				139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */,
+				133D1E902861D09A0033AD55 /* DirectionalSlide.metal */,
+				133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -397,6 +403,7 @@
 				13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */,
 				139D18D72858A54600432E16 /* SlideShowTemplate.swift in Sources */,
 				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,
+				133D1E932861D1AD0033AD55 /* DirectionalSlide.swift in Sources */,
 				139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */,
 				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
@@ -404,6 +411,7 @@
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
 				130F1FBF284634E50063F8BC /* UIImageExtension.swift in Sources */,
+				133D1E912861D09A0033AD55 /* DirectionalSlide.metal in Sources */,
 				13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */,
 				139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */,
 				13E6634E283BBAE90059802E /* BurnTransition.swift in Sources */,

@@ -16,7 +16,6 @@ class SlideShowTemplate{
 
     var blendFilter:CIFilter!
     var outputSize:CGSize!
-    let transformFilter = MTITransformFilter()
     let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
 
 
@@ -59,9 +58,10 @@ class SlideShowTemplate{
         
         writer?.startSession(atSourceTime: .zero)
         blendFilter = CIFilter(name: "CISourceOverCompositing")
-        
         var presentTime = CMTime.zero
-
+        
+        var lastFrame:CIImage?
+        
         for index in 0..<allImages.count {
             print("presentTime outer//////////////\(CMTimeGetSeconds(presentTime))")
 
@@ -76,53 +76,82 @@ class SlideShowTemplate{
             let totalFrame = Int(whiteMinimalBgFilter.duration * 60)
 
             let frameDuration:Double = 1.0
-            let frameBeginTime = presentTime
+            var frameBeginTime = presentTime
             
             let blendOutputImage = blendWihtBlurBackground(image: image)!
             let random = Int.random(in: 0...1)
+            
+            if index > 0, let inputFrame = lastFrame {
+                
+                let transformFilter = DirectionalSlide()
+                
+                if Int.random(in: 0...1) == 0 {
+                    transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+                }else{
+                    transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
+                }
+                transformFilter.duration = 2.0
+                let totalFrame = Int(transformFilter.duration * 60)
+                
+                whiteMinimalBgFilter.progress = 0
+                
+                transformFilter.inputImage = MTIImage(ciImage: inputFrame).oriented(.downMirrored) .unpremultiplyingAlpha()
+                transformFilter.destImage = whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
+                
+                for frameNumber in 0..<totalFrame {
+                    
+                    let progress = Float(frameNumber) / Float(totalFrame)
+                    transformFilter.progress = progress
+                    let frameTime = CMTimeMake(value: Int64(transformFilter.duration * Double(progress) * 1000), timescale: 1000)
+                    presentTime = CMTimeAdd(frameBeginTime, frameTime)
+                    print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
+
+                    while !writerInput.isReadyForMoreMediaData {
+                        Thread.sleep(forTimeInterval: 0.01)
+                    }
+                    
+                    var pixelBuffer: CVPixelBuffer?
+                    CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
+                    
+                    if let buffer = pixelBuffer,let frame = transformFilter.outputImage {
+                        try? BCLTransition.context?.render(frame, to: buffer)
+                        pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
+                        print(".", separator: " ", terminator: " ")
+
+                    }
+
+                }
+                
+                lastFrame = nil
+                presentTime = CMTimeAdd(presentTime, CMTime(value: 10, timescale: 1000))
+                print("presentTime/////// \(CMTimeGetSeconds(presentTime))")
+
+                frameBeginTime = presentTime
+            }
+            
+
             for frameNumber in 0..<totalFrame {
                 
                 let progress = Float(frameNumber) / Float(totalFrame)
-                whiteMinimalBgFilter.progress = progress
                 
                 let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-                
-                let frame = try? BCLTransition.context?.makeCIImage(from:whiteMinimalBgFilter.outputImage!.resized(to: outputSize)!)
-                let animatedBlend : CIImage!
-                
-                if random == 0 {
-                    animatedBlend = applyDoubleAnimation(first: blendOutputImage, second: blendOutputImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
 
-                    //animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
-
-                }else{
-                    animatedBlend = applyDoubleAnimation(first: blendOutputImage, second: blendOutputImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
-                }
-                
-                blendFilter?.setDefaults()
-                blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
-                blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
-
-                
                 while !writerInput.isReadyForMoreMediaData {
                     Thread.sleep(forTimeInterval: 0.01)
                 }
                 
-                var pixelBuffer: CVPixelBuffer?
-                CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
+                let finalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage, progress: progress, isSingle: random == 0 ? true:false)
                 
-                if let buffer = pixelBuffer,let frame = blendFilter?.outputImage {
-                    let mtiFrame = MTIImage(ciImage: frame)
-                    try? BCLTransition.context?.render(mtiFrame, to: buffer)
-                    pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
-                    print(".", separator: " ", terminator: " ")
-
+                if frameNumber == totalFrame - 1  {
+                    lastFrame = finalFrame
                 }
+                
+                addBufferToPool(adapter: pixelBufferAdaptor, pool: pixelBufferPool, frame: finalFrame!, presentTime: presentTime)
 
             }
-            presentTime = CMTimeAdd(presentTime, CMTime(value: 1000, timescale: 1000))
+            presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
         }
         
 
@@ -140,6 +169,42 @@ class SlideShowTemplate{
             }
         }
         
+    }
+    
+    func addBufferToPool(adapter:AVAssetWriterInputPixelBufferAdaptor,pool:CVPixelBufferPool,frame:CIImage,presentTime:CMTime) -> Void {
+        
+        var pixelBuffer: CVPixelBuffer?
+        CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &pixelBuffer)
+        
+        if let buffer = pixelBuffer{
+            let mtiFrame = MTIImage(ciImage: frame)
+            try? BCLTransition.context?.render(mtiFrame, to: buffer)
+            adapter.append(buffer, withPresentationTime: presentTime)
+            print(".", separator: " ", terminator: " ")
+
+        }
+    }
+    
+    func generateFinalFrame(bgFilter:BCLTransition,foregroundImage:CIImage,progress:Float,isSingle:Bool) -> CIImage? {
+        bgFilter.progress = progress
+        let frame = try? BCLTransition.context?.makeCIImage(from:bgFilter.outputImage!.resized(to: outputSize)!)
+
+        let animatedBlend : CIImage!
+        
+        if isSingle {
+            animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+
+            //animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
+
+        }else{
+            animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+        }
+        
+        blendFilter?.setDefaults()
+        blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
+        blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
+        
+        return blendFilter.outputImage
     }
     
     private func sourceBufferAttributes(outputSize: CGSize) -> [String: Any] {

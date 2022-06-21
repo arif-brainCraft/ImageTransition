@@ -102,7 +102,7 @@ class ImgesToVideoViewController: UIViewController {
     
     func createVideo() -> Void {
         
-        let effects: [BCLTransition.Effect] = [.whiteMinimalBgFilter,.burn]
+        let effects: [BCLTransition.Effect] = [.directionalSlide,.burn]
         
         var blendEffects = [Int]()
         

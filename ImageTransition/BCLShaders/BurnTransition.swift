@@ -11,6 +11,8 @@ public class BurnTransition: BCLTransition {
     public override init() {
         super.init()
         self.duration = 3.0;
+        self.parameters = ["startingAngle": MTIVector(value: simd_float3(color.red, color.green, color.blue))]
+
     }
     public var color: MTIColor = MTIColor(red: 0.9, green: 0.4, blue: 0.2, alpha: 1.0)
 
@@ -18,9 +20,5 @@ public class BurnTransition: BCLTransition {
         return "BurnFragment"
     }
 
-    override var parameters: [String: Any] {
-        return [
-            "color": MTIVector(value: simd_float3(color.red, color.green, color.blue))
-        ]
-    }
+
 }

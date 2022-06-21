@@ -18,7 +18,5 @@ public class WhiteMinimalBgFilter: BCLTransition {
         return "whiteMinimalBgFilterFragment"
     }
 
-    override var parameters: [String: Any] {
-        return [:]
-    }
+
 }

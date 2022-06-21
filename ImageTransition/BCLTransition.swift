@@ -40,7 +40,7 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
     
     // Subclasses must provide fragmentName
     var fragmentName: String { return "" }
-    var parameters: [String: Any] { return [:] }
+    var parameters: [String: Any] = [String: Any]()
     var samplers: [String: String] { return [:] }
     
     public var outputImage: MTIImage? {
