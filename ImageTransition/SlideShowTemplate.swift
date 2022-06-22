@@ -14,11 +14,14 @@ class SlideShowTemplate{
     
     var allImages:[UIImage]!
 
-    var blendFilter:CIFilter!
     var outputSize:CGSize!
+    
     let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
-
-
+    
+    var writerInput:AVAssetWriterInput!
+    var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
+    var pixelBufferPool:CVPixelBufferPool!
+    
     
     func createVideo(allImages:[UIImage], completion:@escaping MTMovieMakerCompletion) -> Void {
         self.allImages = allImages
@@ -42,9 +45,9 @@ class SlideShowTemplate{
             AVVideoWidthKey: outputSize.width,
             AVVideoHeightKey: outputSize.height
         ]
-        let writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+        writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
         let attributes = sourceBufferAttributes(outputSize: outputSize)
-        let pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
+        pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
                                                                       sourcePixelBufferAttributes: attributes)
         writer?.add(writerInput)
 
@@ -52,12 +55,13 @@ class SlideShowTemplate{
             fatalError("Can not start writing")
         }
         
-        guard let pixelBufferPool = pixelBufferAdaptor.pixelBufferPool else {
+        self.pixelBufferPool = pixelBufferAdaptor?.pixelBufferPool
+
+        guard self.pixelBufferPool != nil else {
             fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
         }
-        
+
         writer?.startSession(atSourceTime: .zero)
-        blendFilter = CIFilter(name: "CISourceOverCompositing")
         var presentTime = CMTime.zero
         
         var lastFrame:CIImage?
@@ -106,18 +110,10 @@ class SlideShowTemplate{
                     presentTime = CMTimeAdd(frameBeginTime, frameTime)
                     print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
 
-                    while !writerInput.isReadyForMoreMediaData {
-                        Thread.sleep(forTimeInterval: 0.01)
-                    }
-                    
-                    var pixelBuffer: CVPixelBuffer?
-                    CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
-                    
-                    if let buffer = pixelBuffer,let frame = transformFilter.outputImage {
-                        try? BCLTransition.context?.render(frame, to: buffer)
-                        pixelBufferAdaptor.append(buffer, withPresentationTime: presentTime)
-                        print(".", separator: " ", terminator: " ")
-
+                    if let frame = transformFilter.outputImage {
+                        if let ciimage = try? BCLTransition.context?.makeCIImage(from: frame){
+                            addBufferToPool(frame: ciimage, presentTime: presentTime)
+                        }
                     }
 
                 }
@@ -137,10 +133,6 @@ class SlideShowTemplate{
                 let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
                 presentTime = CMTimeAdd(frameBeginTime, frameTime)
                 print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-
-                while !writerInput.isReadyForMoreMediaData {
-                    Thread.sleep(forTimeInterval: 0.01)
-                }
                 
                 let finalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage, progress: progress, isSingle: random == 0 ? true:false)
                 
@@ -148,7 +140,7 @@ class SlideShowTemplate{
                     lastFrame = finalFrame
                 }
                 
-                addBufferToPool(adapter: pixelBufferAdaptor, pool: pixelBufferPool, frame: finalFrame!, presentTime: presentTime)
+                addBufferToPool(frame: finalFrame!, presentTime: presentTime)
 
             }
             presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
@@ -171,7 +163,15 @@ class SlideShowTemplate{
         
     }
     
-    func addBufferToPool(adapter:AVAssetWriterInputPixelBufferAdaptor,pool:CVPixelBufferPool,frame:CIImage,presentTime:CMTime) -> Void {
+    func addBufferToPool(frame:CIImage,presentTime:CMTime) -> Void {
+        
+        guard let pool = self.pixelBufferPool,let adapter = pixelBufferAdaptor else {
+            return
+        }
+        
+        while !writerInput.isReadyForMoreMediaData {
+            Thread.sleep(forTimeInterval: 0.01)
+        }
         
         var pixelBuffer: CVPixelBuffer?
         CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &pixelBuffer)
@@ -181,7 +181,6 @@ class SlideShowTemplate{
             try? BCLTransition.context?.render(mtiFrame, to: buffer)
             adapter.append(buffer, withPresentationTime: presentTime)
             print(".", separator: " ", terminator: " ")
-
         }
     }
     
@@ -200,11 +199,12 @@ class SlideShowTemplate{
             animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
         }
         
+        let blendFilter = CIFilter(name: "CISourceOverCompositing")
         blendFilter?.setDefaults()
         blendFilter?.setValue(animatedBlend, forKey:kCIInputImageKey)
         blendFilter?.setValue(frame, forKey: kCIInputBackgroundImageKey)
         
-        return blendFilter.outputImage
+        return blendFilter?.outputImage
     }
     
     private func sourceBufferAttributes(outputSize: CGSize) -> [String: Any] {
