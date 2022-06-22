@@ -21,7 +21,7 @@ class SlideShowTemplate{
     var writerInput:AVAssetWriterInput!
     var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
     var pixelBufferPool:CVPixelBufferPool!
-    
+    let framePerSecond = 60.0
     
     func createVideo(allImages:[UIImage], completion:@escaping MTMovieMakerCompletion) -> Void {
         self.allImages = allImages
@@ -66,6 +66,9 @@ class SlideShowTemplate{
         
         var lastFrame:CIImage?
         
+        let transformFilter = DirectionalSlide()
+
+        
         for index in 0..<allImages.count {
             print("presentTime outer//////////////\(CMTimeGetSeconds(presentTime))")
 
@@ -77,7 +80,7 @@ class SlideShowTemplate{
             
             whiteMinimalBgFilter.inputImage = mtiImage
             whiteMinimalBgFilter.destImage = mtiImage
-            let totalFrame = Int(whiteMinimalBgFilter.duration * 60)
+            let totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond)
 
             let frameDuration:Double = 1.0
             var frameBeginTime = presentTime
@@ -85,45 +88,13 @@ class SlideShowTemplate{
             let blendOutputImage = blendWihtBlurBackground(image: image)!
             let random = Int.random(in: 0...1)
             
-            if index > 0, let inputFrame = lastFrame {
-                
-                let transformFilter = DirectionalSlide()
-                
-                if Int.random(in: 0...1) == 0 {
-                    transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
-                }else{
-                    transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
-                }
-                transformFilter.duration = 2.0
-                let totalFrame = Int(transformFilter.duration * 60)
-                
-                whiteMinimalBgFilter.progress = 0
-                
-                transformFilter.inputImage = MTIImage(ciImage: inputFrame).oriented(.downMirrored) .unpremultiplyingAlpha()
-                transformFilter.destImage = whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
-                
-                for frameNumber in 0..<totalFrame {
-                    
-                    let progress = Float(frameNumber) / Float(totalFrame)
-                    transformFilter.progress = progress
-                    let frameTime = CMTimeMake(value: Int64(transformFilter.duration * Double(progress) * 1000), timescale: 1000)
-                    presentTime = CMTimeAdd(frameBeginTime, frameTime)
-                    print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-
-                    if let frame = transformFilter.outputImage {
-                        if let ciimage = try? BCLTransition.context?.makeCIImage(from: frame){
-                            addBufferToPool(frame: ciimage, presentTime: presentTime)
-                        }
-                    }
-
-                }
-                
-                lastFrame = nil
-                presentTime = CMTimeAdd(presentTime, CMTime(value: 10, timescale: 1000))
-                print("presentTime/////// \(CMTimeGetSeconds(presentTime))")
-
-                frameBeginTime = presentTime
+            
+            if Int.random(in: 0...1) == 0 {
+                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+            }else{
+                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
             }
+            transformFilter.duration = 2.0
             
 
             for frameNumber in 0..<totalFrame {
@@ -140,7 +111,19 @@ class SlideShowTemplate{
                     lastFrame = finalFrame
                 }
                 
-                addBufferToPool(frame: finalFrame!, presentTime: presentTime)
+                let totalTransformFrame = Int(transformFilter.duration * framePerSecond)
+
+                
+                if index > 0 && lastFrame != nil && frameNumber < totalTransformFrame  {
+                    let inputImage = MTIImage(ciImage: lastFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                    let destinationImage = MTIImage(ciImage: finalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                    let progress = Float(frameNumber) / Float(totalTransformFrame)
+
+                    applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: progress, presentTime: presentTime)
+                }else{
+                    addBufferToPool(frame: finalFrame!, presentTime: presentTime)
+                }
+                
 
             }
             presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
@@ -158,6 +141,26 @@ class SlideShowTemplate{
                     print("video written succesfully")
                     completion(.success(tempURL))
                 }
+            }
+        }
+        
+    }
+    
+    func applyTransformFilter(transformFilter:BCLTransition,inputImage:MTIImage, destinationImage:MTIImage,progress:Float,presentTime:CMTime) -> Void {
+        
+        transformFilter.inputImage = inputImage
+        transformFilter.destImage = destinationImage
+        //whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
+        
+
+        transformFilter.progress = progress
+//        let frameTime = CMTimeMake(value: Int64(transformFilter.duration * Double(progress) * 1000), timescale: 1000)
+//        presentTime = CMTimeAdd(frameBeginTime, frameTime)
+      //  print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
+
+        if let frame = transformFilter.outputImage {
+            if let ciimage = try? BCLTransition.context?.makeCIImage(from: frame){
+                addBufferToPool(frame: ciimage, presentTime: presentTime)
             }
         }
         
