@@ -91,12 +91,7 @@ class SlideShowTemplate{
 
         writer?.startSession(atSourceTime: .zero)
         var presentTime = CMTime.zero
-        var frameBeginTime = CMTime.zero
         
-        var lastFrame:CIImage?
-        
-
-
         var totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond) * allImages.count
         totalFrame += Int(transformFilter.duration * framePerSecond) * (allImages.count - 1)
         var imageIndex = 0
@@ -132,9 +127,6 @@ class SlideShowTemplate{
                 }
             }
 
-            //var currentAnimProgress = (progress - (1.0/Float( allImages.count)) * Float(imageIndex)) / (1.0 / Float(allImages.count))
-
-            //let transitionProgress = currentAnimProgress + currentAnimProgress * Float( 1.0 - transformFilter.duration / 10.0)
             var transitionProgress = currentAnimProgress / (0.6)
             print(" progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress) ")
             if imageIndex > 0 && transitionProgress <= 1.0 {
@@ -158,68 +150,6 @@ class SlideShowTemplate{
                 
             }
         }
-        
-
-//        for index in 0..<allImages.count {
-//            print("presentTime outer//////////////\(CMTimeGetSeconds(presentTime))")
-//
-//            let image = allImages[index]
-//
-//            let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
-//
-//
-//            whiteMinimalBgFilter.inputImage = mtiImage
-//            whiteMinimalBgFilter.destImage = mtiImage
-//            let totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond)
-//
-//            let frameDuration:Double = 1.0
-//            var frameBeginTime = presentTime
-//
-//            let blendOutputImage = blendWihtBlurBackground(image: image)!
-//            let random = Int.random(in: 0...1)
-//
-//
-//            if Int.random(in: 0...1) == 0 {
-//                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
-//            }else{
-//                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
-//            }
-//            transformFilter.duration = 2.0
-//
-//
-//            for frameNumber in 0..<totalFrame {
-//
-//                let progress = Float(frameNumber) / Float(totalFrame)
-//
-//                let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
-//                presentTime = CMTimeAdd(frameBeginTime, frameTime)
-//                print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-//
-//                let finalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage, progress: progress, isSingle: random == 0 ? true:false)
-//
-//                if frameNumber == totalFrame - 1  {
-//                    lastFrame = finalFrame
-//                }
-//
-//                let totalTransformFrame = Int(transformFilter.duration * framePerSecond)
-//
-//
-//                if index > 0 && lastFrame != nil && frameNumber < totalTransformFrame  {
-//                    let inputImage = MTIImage(ciImage: lastFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-//                    let destinationImage = MTIImage(ciImage: finalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-//                    let progress = Float(frameNumber) / Float(totalTransformFrame)
-//
-//                    applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: progress, presentTime: presentTime)
-//                }else{
-//                    addBufferToPool(frame: finalFrame!, presentTime: presentTime)
-//                }
-//
-//
-//            }
-//            presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
-//        }
-        
-
         
         writerInput.markAsFinished()
         writer?.finishWriting {
@@ -284,9 +214,9 @@ class SlideShowTemplate{
         let animatedBlend : CIImage!
         
         if isSingle {
-            animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+            //animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
 
-            //animatedBlend = applySingleAnimation(image:blendOutputImage , progress: progress, canvasSize: outputSize)
+            animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
 
         }else{
             animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
