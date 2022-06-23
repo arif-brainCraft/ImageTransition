@@ -21,7 +21,35 @@ class SlideShowTemplate{
     var writerInput:AVAssetWriterInput!
     var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
     var pixelBufferPool:CVPixelBufferPool!
-    let framePerSecond = 60.0
+    let framePerSecond = 30.0
+    
+    
+    let transformFilter = DirectionalSlide()
+    var whiteMinimalBgFilter = WhiteMinimalBgFilter()
+    var prevMinimumBgFilter:WhiteMinimalBgFilter?
+    var blendOutputImage:CIImage?
+    var prevBlendOutputImage:CIImage?
+    
+    func setFilterWithImage(image:UIImage) -> Void {
+        
+        prevMinimumBgFilter = whiteMinimalBgFilter
+        prevBlendOutputImage = blendOutputImage
+        
+        blendOutputImage = blendWihtBlurBackground(image: image)!
+
+        let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
+        whiteMinimalBgFilter = WhiteMinimalBgFilter()
+        whiteMinimalBgFilter.inputImage = mtiImage
+        whiteMinimalBgFilter.destImage = mtiImage
+        
+        if Int.random(in: 0...1) == 0 {
+            transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+        }else{
+            transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
+        }
+        transformFilter.duration = 1.5
+        transformFilter.progress = 0
+    }
     
     func createVideo(allImages:[UIImage], completion:@escaping MTMovieMakerCompletion) -> Void {
         self.allImages = allImages
@@ -63,71 +91,133 @@ class SlideShowTemplate{
 
         writer?.startSession(atSourceTime: .zero)
         var presentTime = CMTime.zero
+        var frameBeginTime = CMTime.zero
         
         var lastFrame:CIImage?
         
-        let transformFilter = DirectionalSlide()
 
-        
-        for index in 0..<allImages.count {
-            print("presentTime outer//////////////\(CMTimeGetSeconds(presentTime))")
 
-            let image = allImages[index]
-            
-            let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
-            
-            let whiteMinimalBgFilter = WhiteMinimalBgFilter()
-            
-            whiteMinimalBgFilter.inputImage = mtiImage
-            whiteMinimalBgFilter.destImage = mtiImage
-            let totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond)
+        var totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond) * allImages.count
+        totalFrame += Int(transformFilter.duration * framePerSecond) * (allImages.count - 1)
+        var imageIndex = 0
+        var currentAnim = 0,prevAnim = 0
 
-            let frameDuration:Double = 1.0
-            var frameBeginTime = presentTime
-            
-            let blendOutputImage = blendWihtBlurBackground(image: image)!
-            let random = Int.random(in: 0...1)
-            
-            
-            if Int.random(in: 0...1) == 0 {
-                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+        setFilterWithImage(image: allImages.first!)
+
+        for frameNumber in 0..<totalFrame {
+
+            let progress = Float(frameNumber) / Float(totalFrame)
+
+            let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration  * Double(allImages.count) / Double(totalFrame)  * 1000.0), timescale: 1000)
+            if progress == 0 {
+                presentTime = CMTime.zero
             }else{
-                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
+                presentTime = CMTimeAdd(presentTime, frameTime)
             }
-            transformFilter.duration = 2.0
+            //print("presentTime inner \(CMTimeGetSeconds(presentTime)) frame \(frameTime.value) progress \(progress)")
+
+            let totalFrameForCurrent = Int(whiteMinimalBgFilter.duration * framePerSecond) * (imageIndex + 1)
             
+            var currentAnimProgress = (progress).truncatingRemainder(dividingBy: (1.0/Float( allImages.count))) * (Float( allImages.count))
 
-            for frameNumber in 0..<totalFrame {
-                
-                let progress = Float(frameNumber) / Float(totalFrame)
-                
-                let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
-                presentTime = CMTimeAdd(frameBeginTime, frameTime)
-                print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-                
-                let finalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage, progress: progress, isSingle: random == 0 ? true:false)
-                
-                if frameNumber == totalFrame - 1  {
-                    lastFrame = finalFrame
+
+
+            if progress != 0 && (currentAnimProgress >= 0.0 && currentAnimProgress <= 0.001) {
+                imageIndex += 1
+                if imageIndex < allImages.count {
+                    setFilterWithImage(image: allImages[imageIndex])
+                    prevAnim = currentAnim
+                    currentAnim = Int.random(in: 0...1)
+                    presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
                 }
-                
-                let totalTransformFrame = Int(transformFilter.duration * framePerSecond)
-
-                
-                if index > 0 && lastFrame != nil && frameNumber < totalTransformFrame  {
-                    let inputImage = MTIImage(ciImage: lastFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    let destinationImage = MTIImage(ciImage: finalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    let progress = Float(frameNumber) / Float(totalTransformFrame)
-
-                    applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: progress, presentTime: presentTime)
-                }else{
-                    addBufferToPool(frame: finalFrame!, presentTime: presentTime)
-                }
-                
-
             }
-            presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
+
+            //var currentAnimProgress = (progress - (1.0/Float( allImages.count)) * Float(imageIndex)) / (1.0 / Float(allImages.count))
+
+            //let transitionProgress = currentAnimProgress + currentAnimProgress * Float( 1.0 - transformFilter.duration / 10.0)
+            var transitionProgress = currentAnimProgress / (0.6)
+            print(" progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress) ")
+            if imageIndex > 0 && transitionProgress <= 1.0 {
+                
+                
+                let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+
+                let prevFinalFrame = generateFinalFrame(bgFilter: prevMinimumBgFilter!, foregroundImage: prevBlendOutputImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
+
+                let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+
+
+                applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: transitionProgress, presentTime: presentTime)
+
+            }else{
+                
+                let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+
+                addBufferToPool(frame: currentFinalFrame!, presentTime: presentTime)
+                
+            }
         }
+        
+
+//        for index in 0..<allImages.count {
+//            print("presentTime outer//////////////\(CMTimeGetSeconds(presentTime))")
+//
+//            let image = allImages[index]
+//
+//            let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
+//
+//
+//            whiteMinimalBgFilter.inputImage = mtiImage
+//            whiteMinimalBgFilter.destImage = mtiImage
+//            let totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond)
+//
+//            let frameDuration:Double = 1.0
+//            var frameBeginTime = presentTime
+//
+//            let blendOutputImage = blendWihtBlurBackground(image: image)!
+//            let random = Int.random(in: 0...1)
+//
+//
+//            if Int.random(in: 0...1) == 0 {
+//                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+//            }else{
+//                transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
+//            }
+//            transformFilter.duration = 2.0
+//
+//
+//            for frameNumber in 0..<totalFrame {
+//
+//                let progress = Float(frameNumber) / Float(totalFrame)
+//
+//                let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration * Double(progress) * 1000), timescale: 1000)
+//                presentTime = CMTimeAdd(frameBeginTime, frameTime)
+//                print("presentTime inner \(CMTimeGetSeconds(presentTime)) progress \(progress)")
+//
+//                let finalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage, progress: progress, isSingle: random == 0 ? true:false)
+//
+//                if frameNumber == totalFrame - 1  {
+//                    lastFrame = finalFrame
+//                }
+//
+//                let totalTransformFrame = Int(transformFilter.duration * framePerSecond)
+//
+//
+//                if index > 0 && lastFrame != nil && frameNumber < totalTransformFrame  {
+//                    let inputImage = MTIImage(ciImage: lastFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+//                    let destinationImage = MTIImage(ciImage: finalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+//                    let progress = Float(frameNumber) / Float(totalTransformFrame)
+//
+//                    applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: progress, presentTime: presentTime)
+//                }else{
+//                    addBufferToPool(frame: finalFrame!, presentTime: presentTime)
+//                }
+//
+//
+//            }
+//            presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
+//        }
         
 
         
