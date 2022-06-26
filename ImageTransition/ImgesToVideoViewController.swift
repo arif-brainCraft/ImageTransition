@@ -38,7 +38,7 @@ class ImgesToVideoViewController: UIViewController {
         resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds))
         setUpSubviews()
         //createVideo()
-        slideShowTemplate.createVideo(allImages: loadImages(count: 5)) { [weak self] result in
+        slideShowTemplate.createVideo(allImages: loadImages(count: 4)) { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
