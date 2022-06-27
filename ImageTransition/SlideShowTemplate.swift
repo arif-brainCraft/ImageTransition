@@ -12,7 +12,6 @@ import CoreMedia
 
 class SlideShowTemplate{
     
-    var allImages:[UIImage]!
 
     var outputSize:CGSize!
     
@@ -24,13 +23,17 @@ class SlideShowTemplate{
     let framePerSecond = 30.0
     
     
-    let transformFilter = DirectionalSlide()
-    var whiteMinimalBgFilter = WhiteMinimalBgFilter()
+    var transformFilter:DirectionalSlide?
+    var whiteMinimalBgFilter:WhiteMinimalBgFilter?
     var prevMinimumBgFilter:WhiteMinimalBgFilter?
     var blendOutputImage:CIImage?
     var prevBlendOutputImage:CIImage?
     
     func setFilterWithImage(image:UIImage) -> Void {
+        
+        guard transformFilter != nil && whiteMinimalBgFilter != nil else {
+            return
+        }
         
         prevMinimumBgFilter = whiteMinimalBgFilter
         prevBlendOutputImage = blendOutputImage
@@ -39,157 +42,169 @@ class SlideShowTemplate{
 
         let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
         whiteMinimalBgFilter = WhiteMinimalBgFilter()
-        whiteMinimalBgFilter.inputImage = mtiImage
-        whiteMinimalBgFilter.destImage = mtiImage
+        whiteMinimalBgFilter?.inputImage = mtiImage
+        whiteMinimalBgFilter?.destImage = mtiImage
         
         if Int.random(in: 0...1) == 0 {
-            transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+            transformFilter?.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
         }else{
-            transformFilter.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
+            transformFilter?.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
         }
-        transformFilter.duration = 1.5
-        transformFilter.progress = 0
+        transformFilter?.duration = 1.5
+        transformFilter?.progress = 0
     }
     
-    func createVideo(allImages:[UIImage], completion:@escaping MTMovieMakerCompletion) -> Void {
-        autoreleasepool {
-            self.allImages = allImages
-
-            outputSize = CGSize(width: allImages.first!.size.width, height: allImages.first!.size.width)
+    func createVideo(allImageUrls:[URL], completion:@escaping MTMovieMakerCompletion) -> Void {
+        
+        guard allImageUrls.count > 0 else{return}
+        
+        whiteMinimalBgFilter = WhiteMinimalBgFilter()
+        transformFilter = DirectionalSlide()
+        
+        let firstImage = loadImageFromUrl(url: allImageUrls.first!)
+        
+        outputSize = CGSize(width: firstImage.size.width, height: firstImage.size.width)
+        
+        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        
+        let path = documentDirectory.appendingPathComponent("slideshow.mp4").path
+        let tempURL = URL(fileURLWithPath: path)
+        
+        //let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("slideshow.mp4"))
+        
+        if FileManager.default.fileExists(atPath: tempURL.path) {
+            try? FileManager.default.removeItem(at: tempURL)
+        }
+        
+        let writer = try? AVAssetWriter(outputURL: tempURL, fileType: .mp4)
+        let videoSettings: [String: Any] = [
+            AVVideoCodecKey: AVVideoCodecType.h264,
+            AVVideoWidthKey: outputSize.width,
+            AVVideoHeightKey: outputSize.height
+        ]
+        writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
+        let attributes = sourceBufferAttributes(outputSize: outputSize)
+        pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
+                                                                  sourcePixelBufferAttributes: attributes)
+        writer?.add(writerInput)
+        
+        guard let success = writer?.startWriting(), success == true else {
+            fatalError("Can not start writing")
+        }
+        
+        self.pixelBufferPool = pixelBufferAdaptor?.pixelBufferPool
+        
+        guard self.pixelBufferPool != nil else {
+            fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
+        }
+        
+        writer?.startSession(atSourceTime: .zero)
+        
+        var presentTime = CMTime.zero
+        var imageIndex = 0
+        var currentAnim = 0,prevAnim = 0
+        
+        let duration = whiteMinimalBgFilter!.duration * Double(allImageUrls.count) + 1.0 * Double(allImageUrls.count)
+        
+        let totalFrame = Int(duration * framePerSecond)
+        
+        let pause:Float = Float(1.0 / duration)
+        var animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
+        animProgress = animProgress / Float(duration)
+        let transitionAnimProgress = (animProgress * 50.0 / 100.0)
+        print("pause \(pause) animprogress \(animProgress) transitionProgress \(transitionAnimProgress)")
+        setFilterWithImage(image: firstImage)
+        
+        var start:Float = 0, end = start + animProgress
+        var tStart = end + pause, tEnd = tStart + transitionAnimProgress
+        
+        for frameNumber in 0..<totalFrame {
             
-            guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+            let progress = Float(frameNumber) / Float(totalFrame)
             
-            let path = documentDirectory.appendingPathComponent("slideshow.mp4").path
-            let tempURL = URL(fileURLWithPath: path)
+            let frameTime = CMTimeMake(value: Int64((duration / Double( totalFrame)) * 1000.0), timescale: 1000)
             
-            //let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("slideshow.mp4"))
-
-            if FileManager.default.fileExists(atPath: tempURL.path) {
-                try? FileManager.default.removeItem(at: tempURL)
+            if progress == 0 {
+                presentTime = CMTime.zero
+            }else{
+                presentTime = CMTimeAdd(presentTime, frameTime)
             }
             
-            let writer = try? AVAssetWriter(outputURL: tempURL, fileType: .mp4)
-            let videoSettings: [String: Any] = [
-                AVVideoCodecKey: AVVideoCodecType.h264,
-                AVVideoWidthKey: outputSize.width,
-                AVVideoHeightKey: outputSize.height
-            ]
-            writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
-            let attributes = sourceBufferAttributes(outputSize: outputSize)
-            pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
-                                                                          sourcePixelBufferAttributes: attributes)
-            writer?.add(writerInput)
-
-            guard let success = writer?.startWriting(), success == true else {
-                fatalError("Can not start writing")
+            if progress >= end + pause  {
+                
+                imageIndex += 1
+                
+                start = (animProgress + pause) * Float(imageIndex)
+                end = start + animProgress
+                print("imageIndex \(imageIndex) progress \(progress)")
+                
+                if imageIndex < allImageUrls.count {
+                    setFilterWithImage(image: loadImageFromUrl(url: allImageUrls[imageIndex]))
+                    prevAnim = currentAnim
+                    currentAnim = Int.random(in: 0..<2)
+                    presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
+                }
             }
             
-            self.pixelBufferPool = pixelBufferAdaptor?.pixelBufferPool
-
-            guard self.pixelBufferPool != nil else {
-                fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
+            
+            
+            let currentAnimProgress = simd_smoothstep(start, end, progress)
+            print(" outer progress \(progress) start\(start) end \(end) currentAnim \(currentAnimProgress) ")
+            
+            
+            if progress > tEnd {
+                tStart = end + pause
+                tEnd = tStart + transitionAnimProgress
             }
-
-            writer?.startSession(atSourceTime: .zero)
-            
-            var presentTime = CMTime.zero
-            var imageIndex = 0
-            var currentAnim = 0,prevAnim = 0
-            
-            let duration = whiteMinimalBgFilter.duration * Double(allImages.count) + 1.0 * Double(allImages.count)
-
-            let totalFrame = Int(duration * framePerSecond)
-            
-            let pause:Float = Float(1.0 / duration)
-            var animProgress = (Float(duration) - Float(1 * allImages.count)) / Float(allImages.count)
-            animProgress = animProgress / Float(duration)
-            let transitionAnimProgress = (animProgress * 50.0 / 100.0)
-            print("pause \(pause) animprogress \(animProgress) transitionProgress \(transitionAnimProgress)")
-            setFilterWithImage(image: allImages.first!)
-            
-            var start:Float = 0, end = start + animProgress
-            var tStart = end + pause, tEnd = tStart + transitionAnimProgress
-
-            for frameNumber in 0..<totalFrame {
-
-                let progress = Float(frameNumber) / Float(totalFrame)
-                
-                let frameTime = CMTimeMake(value: Int64((duration / Double( totalFrame)) * 1000.0), timescale: 1000)
-
-                if progress == 0 {
-                    presentTime = CMTime.zero
-                }else{
-                    presentTime = CMTimeAdd(presentTime, frameTime)
-                }
-
-                let totalFrameForCurrent = Int(whiteMinimalBgFilter.duration * framePerSecond) * (imageIndex + 1)
-                
-                
-                if progress >= end + pause  {
-                    
-                    imageIndex += 1
-                    
-                    start = (animProgress + pause) * Float(imageIndex)
-                    end = start + animProgress
-                    print("imageIndex \(imageIndex) progress \(progress)")
-                    
-                    if imageIndex < allImages.count {
-                        setFilterWithImage(image: allImages[imageIndex])
-                        prevAnim = currentAnim
-                        currentAnim = Int.random(in: 0..<2)
-                        presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
-                    }
-                }
-                
-                
-                
-                let currentAnimProgress = simd_smoothstep(start, end, progress)
-                print(" outer progress \(progress) start\(start) end \(end) currentAnim \(currentAnimProgress) ")
-
-                
-                if progress > tEnd {
-                    tStart = end + pause
-                    tEnd = tStart + transitionAnimProgress
-                }
-                
+            autoreleasepool {
                 let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
                 if progress >= tStart && progress <= tEnd {
                     
                     print("progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress)")
-
-                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
-
+                    
+                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+                    
                     let prevFinalFrame = generateFinalFrame(bgFilter: prevMinimumBgFilter!, foregroundImage: prevBlendOutputImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
-
+                    
                     let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
                     let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-
-
-                    applyTransformFilter(transformFilter: transformFilter, inputImage: inputImage, destinationImage: destinationImage, progress: transitionProgress, presentTime: presentTime)
-
+                    
+                    
+                    applyTransformFilter(transformFilter: transformFilter!, inputImage: inputImage, destinationImage: destinationImage, progress: transitionProgress, presentTime: presentTime)
+                    
                 }else{
                     
-                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
-
+                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+                    
                     addBufferToPool(frame: currentFinalFrame!, presentTime: presentTime)
                     
                 }
             }
+        }
+        
+        writerInput.markAsFinished()
+        writer?.finishWriting {
             
-            writerInput.markAsFinished()
-            writer?.finishWriting {
-                DispatchQueue.main.async {
-                    if let error = writer?.error {
-                        print("video written failed \(error.localizedDescription)")
-                        completion(.failure(error))
-                    } else {
-                        print("video written succesfully")
-                        completion(.success(tempURL))
-                    }
+            
+            
+            DispatchQueue.main.async {
+                if let error = writer?.error {
+                    print("video written failed \(error.localizedDescription)")
+                    completion(.failure(error))
+                } else {
+                    print("video written succesfully")
+                    completion(.success(tempURL))
                 }
             }
         }
         
+    }
+    
+    func loadImageFromUrl(url:URL) -> UIImage {
+        if let image = UIImage(contentsOfFile: url.path) {
+            return image
+        }
+        return UIImage()
     }
     
     func applyTransformFilter(transformFilter:BCLTransition,inputImage:MTIImage, destinationImage:MTIImage,progress:Float,presentTime:CMTime) -> Void {
@@ -213,12 +228,11 @@ class SlideShowTemplate{
     }
     
     func addBufferToPool(frame:CIImage,presentTime:CMTime) -> Void {
-        
         guard let pool = self.pixelBufferPool,let adapter = pixelBufferAdaptor else {
             return
         }
         
-        while !writerInput.isReadyForMoreMediaData {
+        while !self.writerInput.isReadyForMoreMediaData {
             Thread.sleep(forTimeInterval: 0.01)
         }
         
@@ -230,6 +244,7 @@ class SlideShowTemplate{
             try? BCLTransition.context?.render(mtiFrame, to: buffer)
             adapter.append(buffer, withPresentationTime: presentTime)
             print(".", separator: " ", terminator: " ")
+            
         }
     }
     
