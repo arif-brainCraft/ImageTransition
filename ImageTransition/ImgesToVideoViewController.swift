@@ -38,7 +38,7 @@ class ImgesToVideoViewController: UIViewController {
         resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds))
         setUpSubviews()
         //createVideo()
-        slideShowTemplate.createVideo(allImages: loadImages(count: 4)) { [weak self] result in
+        slideShowTemplate.createVideo(allImages: loadImages(count: 5)) { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
@@ -217,6 +217,17 @@ class ImgesToVideoViewController: UIViewController {
                 }
             }
             
+        }
+        return images
+    }
+    
+    func loadImageUrls(count:Int) -> [URL] {
+        var images = [URL]()
+        for _ in 0..<count {
+            let i = Int.random(in: 0..<9)
+            if let url = Bundle.main.url(forResource: String(i), withExtension: "jpg") {
+                images.append(url)
+            }
         }
         return images
     }

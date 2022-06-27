@@ -96,26 +96,19 @@ class SlideShowTemplate{
             var imageIndex = 0
             var currentAnim = 0,prevAnim = 0
             
-            
-    //        let pause:Float = 0.03
-    //        let animProgress = (Float(1.0) / Float (allImages.count)) - pause
-    //        let transitionProgress = pause + 0.1
-            
-    //        var totalFrame = Int(whiteMinimalBgFilter.duration * framePerSecond) * allImages.count
-    //        totalFrame += Int(transformFilter.duration * framePerSecond) * (allImages.count - 1)
-            
-            let duration = whiteMinimalBgFilter.duration * Double(allImages.count) + 1.0 * Double(allImages.count - 1)
+            let duration = whiteMinimalBgFilter.duration * Double(allImages.count) + 1.0 * Double(allImages.count)
 
             let totalFrame = Int(duration * framePerSecond)
             
             let pause:Float = Float(1.0 / duration)
-            let animProgress = (Float(duration) - Float(1 * allImages.count - 1)) / (Float(duration) * Float(allImages.count) )
-            let transitionProgress = pause + (animProgress * 30.0 / 100.0)
-            
+            var animProgress = (Float(duration) - Float(1 * allImages.count)) / Float(allImages.count)
+            animProgress = animProgress / Float(duration)
+            let transitionAnimProgress = (animProgress * 50.0 / 100.0)
+            print("pause \(pause) animprogress \(animProgress) transitionProgress \(transitionAnimProgress)")
             setFilterWithImage(image: allImages.first!)
             
-            var start:Float = 0, end = start + animProgress + pause
-            var tStart = end, tEnd = tStart + transitionProgress
+            var start:Float = 0, end = start + animProgress
+            var tStart = end + pause, tEnd = tStart + transitionAnimProgress
 
             for frameNumber in 0..<totalFrame {
 
@@ -123,31 +116,23 @@ class SlideShowTemplate{
                 
                 let frameTime = CMTimeMake(value: Int64((duration / Double( totalFrame)) * 1000.0), timescale: 1000)
 
-                //let frameTime = CMTimeMake(value: Int64(whiteMinimalBgFilter.duration  * Double(allImages.count) / Double(totalFrame)  * 1000.0), timescale: 1000)
                 if progress == 0 {
                     presentTime = CMTime.zero
                 }else{
                     presentTime = CMTimeAdd(presentTime, frameTime)
                 }
-                //print("presentTime inner \(CMTimeGetSeconds(presentTime)) frame \(frameTime.value) progress \(progress)")
 
                 let totalFrameForCurrent = Int(whiteMinimalBgFilter.duration * framePerSecond) * (imageIndex + 1)
                 
                 
-                if progress > end + pause  {
-                    start = (animProgress + pause) * Float(imageIndex)
-                    end = start + animProgress + pause
-                }
-                
-
-                var currentAnimProgress = simd_smoothstep(start, end, progress)
-                
-                //var currentAnimProgress = (progress).truncatingRemainder(dividingBy: (1.0/Float( allImages.count))) * (Float( allImages.count))
-
-
-
-                if progress == end && (currentAnimProgress == 1) {
+                if progress >= end + pause  {
+                    
                     imageIndex += 1
+                    
+                    start = (animProgress + pause) * Float(imageIndex)
+                    end = start + animProgress
+                    print("imageIndex \(imageIndex) progress \(progress)")
+                    
                     if imageIndex < allImages.count {
                         setFilterWithImage(image: allImages[imageIndex])
                         prevAnim = currentAnim
@@ -157,16 +142,20 @@ class SlideShowTemplate{
                 }
                 
                 
+                
+                let currentAnimProgress = simd_smoothstep(start, end, progress)
+                print(" outer progress \(progress) start\(start) end \(end) currentAnim \(currentAnimProgress) ")
+
+                
                 if progress > tEnd {
-                    tStart = end
-                    tEnd = tStart + transitionProgress
+                    tStart = end + pause
+                    tEnd = tStart + transitionAnimProgress
                 }
                 
-                var transitionProgress = simd_smoothstep(tStart, tEnd, progress)
-                print(" progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress) ")
+                let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
                 if progress >= tStart && progress <= tEnd {
                     
-                    currentAnimProgress = simd_smoothstep(tStart, tStart + animProgress + pause, progress)
+                    print("progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress)")
 
                     let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
 
