@@ -183,10 +183,8 @@ class SlideShowTemplate{
         }
         
         writerInput.markAsFinished()
+        
         writer?.finishWriting {
-            
-            
-            
             DispatchQueue.main.async {
                 if let error = writer?.error {
                     print("video written failed \(error.localizedDescription)")
@@ -254,10 +252,10 @@ class SlideShowTemplate{
 
         let animatedBlend : CIImage!
         
-        if isSingle {
-            //animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
+        if true {
 
-            animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
+            //animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
+            animatedBlend = spiralAnimation(image: foregroundImage, progress: progress, canvasSize: outputSize)
 
         }else{
             animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
@@ -325,6 +323,26 @@ class SlideShowTemplate{
             return blendImage
         }
         return nil
+    }
+    
+    func spiralAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
+        let size = image.extent.size
+        
+        let angle = progress * 250.0
+        
+        let r = angle
+        let x = CGFloat(r * cos(angle))
+        let y  = CGFloat(r * sin(angle))
+        
+        print("value of angle \(angle) x \(x) y \(y)")
+
+        
+        var translateTF = CGAffineTransform(translationX:  x, y: y)
+
+        let initialScale = 0.3
+        let scaleValue = CGFloat(initialScale + (Double(progress) * (0.5 - initialScale)))
+
+        return image.transformed(by:translateTF)
     }
     
     func applySingleAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
