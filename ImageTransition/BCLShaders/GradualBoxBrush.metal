@@ -70,9 +70,9 @@ fragment float4 gradualBoxBrushFragment (VertexOut vertexIn [[ stage_in ]],
  // License: MIT
 
 
-             const highp float mt = .9;
+             const highp float mt = .7;
              uniform float radius ;//= 0.4;
-             uniform float width ;// = 0.02;
+             uniform float boxWidth ;// = 0.02;
              uniform int start; // = 0;
              uniform float base;// = 0;
              
@@ -80,7 +80,7 @@ fragment float4 gradualBoxBrushFragment (VertexOut vertexIn [[ stage_in ]],
    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
  }
              
-             bool isOnBoxBorder(vec2 uv,float p,float radius){
+             bool isOnBoxBorder(vec2 uv,float p,float radius,float width){
                
                float angle = clamp(float(start),0.0,3.0);
                float a = 0.0 - angle, b = 1.0 - angle, c = 2.0 - angle,d = 3.0 - angle;
@@ -109,10 +109,11 @@ fragment float4 gradualBoxBrushFragment (VertexOut vertexIn [[ stage_in ]],
                return false;
              }
              
-             bool isInBox(vec2 p,float progress,float radius){
+             bool isInBox(vec2 p,float progress,float radius,float width){
                
-               float r = (0.5 - radius);
-               float X = r * rand(p);
+               float r = (0.5 - radius + width);
+               float X = r * rand(p);//length(p * vec2(0.3));
+               //X += exp(-60.0 *p.y);
                if (p.x >= X && p.x <= (1.0 -X) * progress && p.y >= r && p.y < (1.0 - r)  )
                {
                  return true;
@@ -122,10 +123,10 @@ fragment float4 gradualBoxBrushFragment (VertexOut vertexIn [[ stage_in ]],
                
              }
              
-             bool isWithinRange(vec2 uv, float innerR,float outerR){
+             bool isWithinRange(vec2 uv, float innerR,float outerR,float width){
                
-               float r1 = (0.5 - innerR);
-               float r2 = (0.5 - outerR);
+               float r1 = (0.5 - innerR + width);
+               float r2 = (0.5 - outerR + width);
                
                bool X = (uv.x >= r1 && uv.x <= 1.0 - r1) && (uv.y >= r1 && uv.y <= 1.0 - r1);
                bool Y = (uv.x >= r2 && uv.x <= (1.0 - r2)) && (uv.y >= r2 && uv.y <= (1.0 - r2));
@@ -145,56 +146,42 @@ fragment float4 gradualBoxBrushFragment (VertexOut vertexIn [[ stage_in ]],
                
                float r = radius - 0.1  ;
 
-               
-               
-               
                if (progress >= 0.4){
                  
-                 float r2 = r + smoothstep(0.5,0.8,progress)/30.0;
+                 float r2 = r + smoothstep(0.6,0.7,progress)/30.0;
                  float r3 = r + smoothstep(0.5,0.8,progress)/10.0;
 
                  
-                 if(isOnBoxBorder(uv,1.0,r2)){
+                 //outer box
+                 if(isOnBoxBorder(uv,1.0,r3,boxWidth)){
                    return vec4(1.);
                  }
                  
-                 
-                 if(isOnBoxBorder(uv,1.0,r3)){
+                 float innerBoxWidth = boxWidth - 0.01;
+                 //inner box
+                 if(isOnBoxBorder(uv,smoothstep(0.7,0.9,progress),r2,innerBoxWidth)){
                    return vec4(1.);
                  }
-                 
-                 if(isWithinRange(uv,r2,r3)){
+                 //outer box image
+                 if(isWithinRange(uv,r2,r3,boxWidth)){
                    return getFromColor(zoom(uv, 1.0 -( 1.0 / (r3 * 2.))));
                  }
-                 
-                 if (isInBox(uv,1.0,r2)) {
+                 //inner box image
+                 if (isInBox(uv,1.0,r2,boxWidth)) {
                    return getFromColor(zoom(uv, 1.0 -( 1.0 / (r2 * 2.))));
                  }
-                 // if(isWithinRange(uv,0.0,r3)){
-                 //   return getFromColor(zoom(uv, 1.0 -( 1.0 / (r3 * 2.))));
-                 // }
-                 
-                 
-                 
-                  
-                 
-                 // if (isInBox(uv,1.0,r3)) {
-                 //   return getFromColor(zoom(uv, 1.0 -( 1.0 / (r3 * 2.))));
-                 // }
                  
                }else{
                  
-                 if(isOnBoxBorder(uv,smoothstep(0.0,0.2,progress),r)){
+                 if(isOnBoxBorder(uv,smoothstep(0.0,0.2,progress),r,boxWidth)){
                    return vec4(1.);
                  }
                  
-                 if (isInBox(uv,smoothstep(0.2,0.4,progress),r)) {
+                 if (isInBox(uv,smoothstep(0.2,0.4,progress),r,boxWidth)) {
                    return getFromColor(zoom(uv, 1.0 -( 1.0 / (r * 2.))));
                  }
                }
                
-               
-               
-               return mix(getFromColor(uv),vec4(0.),mt);
+               return mix(getFromColor(uv),vec4(1.0),mt);
              }
  */
