@@ -22,7 +22,7 @@ class ImgesToVideoViewController: UIViewController {
     private var exportButton : UIBarButtonItem!
     var movieMaker:CombineTransitionMovieMaker?
     let videoCompositionManager = VideoCompositionManager()
-    let slideShowTemplate = SlideShowTemplate()
+    let slideShowTemplate = GradualBoxTemplate()
     var fileUrl:URL?
     let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16),CGSize(width: 16, height: 9)]
     var selectedRatio:CGSize!

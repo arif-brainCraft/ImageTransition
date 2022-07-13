@@ -26,7 +26,10 @@ extension BCLTransition{
         case doomScreenTransition
         case whiteMinimalBgFilter
         case directionalSlide
-        case gradualBoxBrushFragment
+        case gradualBox
+        case gradualBoxBrushStroke
+        case gradualBoxZoom
+        case gradualDoubleBoxZoom
         public var transition: BCLTransition {
             switch self {
             case .waterDrop: return WaterDropTransition()
@@ -39,7 +42,10 @@ extension BCLTransition{
             case .doomScreenTransition: return DoomScreenTransition()
             case .whiteMinimalBgFilter: return WhiteMinimalBgFilter()
             case .directionalSlide: return DirectionalSlide()
-            case .gradualBoxBrushFragment: return GradualBoxBrush()
+            case .gradualBox: return GradualBoxBrush()
+            case .gradualBoxBrushStroke: return GradualBoxBrushStroke()
+            case .gradualBoxZoom: return GradualBoxZoom()
+            case .gradualDoubleBoxZoom: return GradualDoubleBoxZoom()
             }
         }
         
@@ -55,7 +61,10 @@ extension BCLTransition{
             case .doomScreenTransition: return "DoomScreenTransition"
             case .whiteMinimalBgFilter: return "WhiteMinimalBgFilter"
             case .directionalSlide: return "DirectionalSlide"
-            case .gradualBoxBrushFragment: return "GradualBoxBrush"
+            case .gradualBox: return "GradualBoxBrush"
+            case .gradualBoxBrushStroke: return "gradualBoxBrushStroke"
+            case .gradualBoxZoom: return "gradualBoxZoom"
+            case .gradualDoubleBoxZoom: return "GradualDoubleBoxZoom"
             }
         }
     }

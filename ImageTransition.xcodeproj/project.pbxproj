@@ -42,6 +42,14 @@
 		133D1E932861D1AD0033AD55 /* DirectionalSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */; };
 		1376AB8E286B0FE400F1BF3E /* GradualBoxBrush.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */; };
 		1376AB90286B3D8700F1BF3E /* GradualBoxBrush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */; };
+		1376AB92287E990E00F1BF3E /* GradualBoxBrushStroke.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */; };
+		1376AB94287EA0E000F1BF3E /* GradualBoxBrushStroke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB93287EA0E000F1BF3E /* GradualBoxBrushStroke.swift */; };
+		1376AB97287EA29F00F1BF3E /* GradualBoxTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB96287EA29F00F1BF3E /* GradualBoxTemplate.swift */; };
+		1376AB9C287EDB1700F1BF3E /* b4.png in Resources */ = {isa = PBXBuildFile; fileRef = 1376AB99287EDB1600F1BF3E /* b4.png */; };
+		1376AB9D287EDB1700F1BF3E /* b3.png in Resources */ = {isa = PBXBuildFile; fileRef = 1376AB9A287EDB1700F1BF3E /* b3.png */; };
+		1376AB9E287EDB1700F1BF3E /* b5.png in Resources */ = {isa = PBXBuildFile; fileRef = 1376AB9B287EDB1700F1BF3E /* b5.png */; };
+		1376ABA0287EF27B00F1BF3E /* GradualBoxZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB9F287EF27B00F1BF3E /* GradualBoxZoom.swift */; };
+		1376ABA4287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */; };
 		139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D0285880AF00432E16 /* VideoCompositionManager.swift */; };
 		139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */; };
 		139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */; };
@@ -101,6 +109,14 @@
 		133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionalSlide.swift; sourceTree = "<group>"; };
 		1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrush.metal; sourceTree = "<group>"; };
 		1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxBrush.swift; sourceTree = "<group>"; };
+		1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrushStroke.metal; sourceTree = "<group>"; };
+		1376AB93287EA0E000F1BF3E /* GradualBoxBrushStroke.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxBrushStroke.swift; sourceTree = "<group>"; };
+		1376AB96287EA29F00F1BF3E /* GradualBoxTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxTemplate.swift; sourceTree = "<group>"; };
+		1376AB99287EDB1600F1BF3E /* b4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = b4.png; sourceTree = "<group>"; };
+		1376AB9A287EDB1700F1BF3E /* b3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = b3.png; sourceTree = "<group>"; };
+		1376AB9B287EDB1700F1BF3E /* b5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = b5.png; sourceTree = "<group>"; };
+		1376AB9F287EF27B00F1BF3E /* GradualBoxZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxZoom.swift; sourceTree = "<group>"; };
+		1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradualDoubleBoxZoom.swift; sourceTree = "<group>"; };
 		139D18D0285880AF00432E16 /* VideoCompositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompositionManager.swift; sourceTree = "<group>"; };
 		139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WhiteMinimalBgFilter.metal; sourceTree = "<group>"; };
 		139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteMinimalBgFilter.swift; sourceTree = "<group>"; };
@@ -161,6 +177,7 @@
 		130A86C02817F42300943CCA /* ImageTransition */ = {
 			isa = PBXGroup;
 			children = (
+				1376AB95287EA27E00F1BF3E /* Templates */,
 				130F1FBD284634CF0063F8BC /* Extensions */,
 				13E66338283B5A900059802E /* BCLShaders */,
 				130A86C12817F42300943CCA /* AppDelegate.swift */,
@@ -174,7 +191,6 @@
 				13E66336283B58E00059802E /* BCLTransition.swift */,
 				13E66359283D13920059802E /* AspectRatioCollectionCell.swift */,
 				139D18D0285880AF00432E16 /* VideoCompositionManager.swift */,
-				139D18D62858A54600432E16 /* SlideShowTemplate.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -213,10 +229,32 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		1376AB95287EA27E00F1BF3E /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				139D18D62858A54600432E16 /* SlideShowTemplate.swift */,
+				1376AB96287EA29F00F1BF3E /* GradualBoxTemplate.swift */,
+			);
+			path = Templates;
+			sourceTree = "<group>";
+		};
+		1376AB98287EDAEF00F1BF3E /* BrushStrokes */ = {
+			isa = PBXGroup;
+			children = (
+				1376AB9A287EDB1700F1BF3E /* b3.png */,
+				1376AB99287EDB1600F1BF3E /* b4.png */,
+				1376AB9B287EDB1700F1BF3E /* b5.png */,
+			);
+			path = BrushStrokes;
+			sourceTree = "<group>";
+		};
 		13E66338283B5A900059802E /* BCLShaders */ = {
 			isa = PBXGroup;
 			children = (
+				1376AB98287EDAEF00F1BF3E /* BrushStrokes */,
 				13E66332283A7C050059802E /* CustomTransitionEffect.swift */,
+				1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */,
+				1376AB93287EA0E000F1BF3E /* GradualBoxBrushStroke.swift */,
 				130F1FB3283E54A20063F8BC /* RandomDownSwipe.metal */,
 				130F1FB2283E54A20063F8BC /* RandomDownSwipe.swift */,
 				13E6634F283BC7490059802E /* RandomAngularDreamy.metal */,
@@ -240,6 +278,8 @@
 				133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */,
 				1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */,
 				1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */,
+				1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */,
+				1376AB9F287EF27B00F1BF3E /* GradualBoxZoom.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -327,18 +367,21 @@
 				130A86E12817F7F000943CCA /* 8.jpg in Resources */,
 				130A86E72817F7F000943CCA /* 3.jpg in Resources */,
 				130F1FC7284CDF580063F8BC /* thirdClip.mp4 in Resources */,
+				1376AB9D287EDB1700F1BF3E /* b3.png in Resources */,
 				130A86E52817F7F000943CCA /* 2.jpg in Resources */,
 				130F1FC3284CB5A60063F8BC /* moshow2.mp4 in Resources */,
 				130A86CE2817F42500943CCA /* LaunchScreen.storyboard in Resources */,
 				130F1FC9284CDFC80063F8BC /* fourthClip.mp4 in Resources */,
 				130F1FC1284CB3C80063F8BC /* moshow.MOV in Resources */,
 				130F1FC5284CDEB80063F8BC /* secondClip.MP4 in Resources */,
+				1376AB9C287EDB1700F1BF3E /* b4.png in Resources */,
 				13DC7137282A6D5200E2811C /* 0.jpg in Resources */,
 				130F1FCB284E04E80063F8BC /* fifthClip.MOV in Resources */,
 				130A86E42817F7F000943CCA /* 5.jpg in Resources */,
 				130F1FCD284E130F0063F8BC /* sixthClip.MOV in Resources */,
 				130A86CB2817F42500943CCA /* Assets.xcassets in Resources */,
 				130A86E02817F7F000943CCA /* 7.jpg in Resources */,
+				1376AB9E287EDB1700F1BF3E /* b5.png in Resources */,
 				130A86DF2817F7F000943CCA /* 6.jpg in Resources */,
 				130A86C92817F42300943CCA /* Main.storyboard in Resources */,
 				130A86EC2819202400943CCA /* audio2.mp3 in Resources */,
@@ -395,6 +438,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1376ABA4287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift in Sources */,
 				1376AB8E286B0FE400F1BF3E /* GradualBoxBrush.metal in Sources */,
 				13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */,
 				13E66354283BCFE90059802E /* RandomAngularDreamy.swift in Sources */,
@@ -403,6 +447,7 @@
 				130A86C62817F42300943CCA /* ViewController.swift in Sources */,
 				13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */,
 				130F1FBC283F9FE70063F8BC /* DoomScreenTransition.metal in Sources */,
+				1376AB97287EA29F00F1BF3E /* GradualBoxTemplate.swift in Sources */,
 				130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */,
 				13E6634A283BBA570059802E /* AngularTransition.swift in Sources */,
 				130F1FB9283F5E6E0063F8BC /* DoomScreenTransition.swift in Sources */,
@@ -415,6 +460,7 @@
 				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
+				1376ABA0287EF27B00F1BF3E /* GradualBoxZoom.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
 				130F1FBF284634E50063F8BC /* UIImageExtension.swift in Sources */,
@@ -423,6 +469,8 @@
 				139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */,
 				13E6634E283BBAE90059802E /* BurnTransition.swift in Sources */,
 				13E6633A283B5AAF0059802E /* WaterDropTransition.metal in Sources */,
+				1376AB92287E990E00F1BF3E /* GradualBoxBrushStroke.metal in Sources */,
+				1376AB94287EA0E000F1BF3E /* GradualBoxBrushStroke.swift in Sources */,
 				130F1FB1283E3BED0063F8BC /* RandomWindowBlind.metal in Sources */,
 				1376AB90286B3D8700F1BF3E /* GradualBoxBrush.swift in Sources */,
 				13E66335283A7CE60059802E /* WaterDropTransition.swift in Sources */,

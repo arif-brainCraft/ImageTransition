@@ -8,6 +8,7 @@
 import Foundation
 
 import MetalPetal
+import MTTransitions
 
 /// The callback when transition updated
 public typealias MTTransitionUpdater = (_ image: MTIImage) -> Void
