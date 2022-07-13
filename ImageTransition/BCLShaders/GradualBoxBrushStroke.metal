@@ -12,7 +12,7 @@ using namespace metalpetal;
 
 
 constant float mt=.5;
-constant float radius=.3;
+constant float radius=.35;
 constant float boxWidth=.02;
 constant int start=0;
 constant float base=0.;
@@ -80,6 +80,28 @@ bool gbbs_isInBox(float2 p,float progress,float radius,float width,float rotatio
     
     return false;
     
+}
+
+float4 gbbs_linearBlur(float intensity,float2 uv,texture2d<float, access::sample> texture,float ratio,float fromR){
+    
+    float4 c1 = float4(0.0);
+    float passes = 6.;
+    
+    float disp = intensity*(0.5);
+    for (int xi=0; xi<passes; xi++)
+    {
+        float x = float(xi) / float(passes) - 0.5;
+        for (int yi=0; yi<passes; yi++)
+        {
+            float y = float(yi) / float(passes) - 0.5;
+            float2 v = float2(x,y);
+            float d = disp;
+            c1 += getFromColor( uv + d*v,texture,ratio,fromR);
+        }
+    }
+    c1 /= float(passes*passes);
+
+    return c1;
 }
 
 bool gbbs_isInBrushStroke(float2 p,float progress,float4 texture){
@@ -153,7 +175,8 @@ fragment float4 gradualBoxBrushStroke(VertexOut vertexIn [[ stage_in ]],
     }
     
     //return mix(getFromColor(uv),float4(1.),mt);
-    return mix(getFromColor(uv,fromTexture,ratio,_fromR),float4(1.0),mt);
+    return mix(getFromColor(uv,fromTexture,ratio,_fromR),float4(0.0),mt);
+
 }
 
 fragment float4 gradualBoxZoom(VertexOut vertexIn [[ stage_in ]],
@@ -228,7 +251,9 @@ fragment float4 gradualBoxZoom(VertexOut vertexIn [[ stage_in ]],
     }
   }
   
-  return mix(getFromColor(uv,fromTexture,ratio,_fromR),float4(1.0),mt);
+  //return mix(getFromColor(uv,fromTexture,ratio,_fromR),float4(1.0),mt);
+    return gbbs_linearBlur(0.1,uv,fromTexture,ratio,_fromR);
+
 }
 
 fragment float4 gradualDoubleBoxZoom (VertexOut vertexIn [[ stage_in ]],
@@ -295,9 +320,7 @@ fragment float4 gradualDoubleBoxZoom (VertexOut vertexIn [[ stage_in ]],
     }
   }
   
-  
-  
-  return mix(getFromColor(uv,fromTexture,ratio,_fromR),float4(1.),mt);
+  return gbbs_linearBlur(0.1,uv,fromTexture,ratio,_fromR);
 }
 
 //void main(){

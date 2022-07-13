@@ -21,7 +21,7 @@ class GradualBoxTemplate{
     var writerInput:AVAssetWriterInput!
     var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
     var pixelBufferPool:CVPixelBufferPool!
-    let framePerSecond = 30.0
+    let framePerSecond = 40.0
     
     
     var transitionFilter:BCLTransition?
