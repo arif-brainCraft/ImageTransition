@@ -16,7 +16,6 @@ constant float radius=.35;
 constant float boxWidth=.02;
 constant int start=0;
 constant float base=0.;
-constant float PI_Value = 3.1416;
 constant float rotation=.05;
 
 //constant float u_time;
@@ -33,6 +32,17 @@ float2 gbbs_rotZ(float2 p,float a){
     
 }
 
+float4 gbbs_drawRect(float w, float h, float2 uv, float d, float hRot, float wRot, float s) {
+    float4 o = float4(1.);
+    uv -= 0.5;
+    float2 rU = gbbs_rotZ(uv, hRot);
+    //uv += 0.5;
+    o *= float4(min(exp((-abs(rU.y - rU.x) + h + s * rU.x/12.)/d), 1.));
+    rU = gbbs_rotZ(uv, wRot);
+    o *= float4(min(exp((-abs(rU.y - rU.x) + w)/d), 1.));
+    return o;
+}
+
 bool gbbs_isOnBoxBorder(float2 uv,float p,float radius,float width,float rotation){
     
     uv-=.5;
@@ -40,15 +50,15 @@ bool gbbs_isOnBoxBorder(float2 uv,float p,float radius,float width,float rotatio
     uv+=.5;
     float angle=clamp(float(start),0.,3.);
     float a=0.-angle,b=1.-angle,c=2.-angle,d=3.-angle;
-    
+
     a=a<0.?4.+a:a;
     b=b<0.?4.+b:b;
     c=c<0.?4.+c:c;
     d=d<0.?4.+d:d;
-    
+
     float r=(.5-radius);
     float progress=(p)*4.;
-    
+
     if(uv.x>=(r)&&uv.x<=((1.-r)*smoothstep(a,a+1.,progress))
        &&uv.y>=r&&uv.y-base<=(r+width)){
         return true;
@@ -61,8 +71,9 @@ bool gbbs_isOnBoxBorder(float2 uv,float p,float radius,float width,float rotatio
              &&uv.x>=(r)&&uv.x<=(r+width)){
         return true;
     }
-    
+
     return false;
+    
 }
 
 bool gbbs_isInBox(float2 p,float progress,float radius,float width,float rotation){
