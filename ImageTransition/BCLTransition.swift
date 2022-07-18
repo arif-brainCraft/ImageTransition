@@ -50,7 +50,6 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         }
         var images: [MTIImage] = [input, dest]
         let outputDescriptors = [ MTIRenderPassOutputDescriptor(dimensions: MTITextureDimensions(cgSize: input.size), pixelFormat: outputPixelFormat)]
-        
         for key in samplers.keys {
             if let name = samplers[key], let samplerImage = samplerImage(name: name) {
                 images.append(samplerImage)

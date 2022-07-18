@@ -190,6 +190,7 @@ class GradualBoxTemplate{
                 tStart = end + pause
                 tEnd = tStart + transitionAnimProgress
             }
+            
             autoreleasepool {
                 let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
                 if progress >= tStart && progress <= tEnd {

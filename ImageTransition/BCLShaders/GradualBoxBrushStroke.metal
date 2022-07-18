@@ -24,11 +24,29 @@ constant float rotation=.05;
 //constant sampler2D u_tex0;
 //constant sampler2D u_tex1;
 
-
-float2 gbbs_rotZ(float2 p,float a){
+ float2 gbbs_rotZ(float2 p,float a){
     float c=cos(a);
     float s=sin(a);
     return matrix_float2x2(c,-s,s,c)*p;
+    
+}
+float2 gbbs_zoom(float2 uv,float amount){
+    return .5+((uv-.5)*(1.-amount));
+}
+float4 drawLine(float2 p1, float2 p2,float2 uv, float4 color,float thickness){
+    
+    float2 p21 = p2 - p1;
+    float2 p31 = uv - p1;
+    
+    float d = dot(p21, p31) / length(p21);
+    float2 p4 = p1 + normalize(p21) * d;
+    
+    if (all(p4 - uv < thickness)
+        && length(p4 - p1) <= length(p21)
+        && length(p4 - p2) <= length(p21)){
+        return float4(0.0,1.0,0.0,1.0);
+    }
+    return float4(0.0);
     
 }
 
@@ -149,10 +167,6 @@ bool gbbs_isWithinRange(float2 uv,float innerR,float outerR,float width,float ro
     return false;
 }
 
-float2 gbbs_zoom(float2 uv,float amount){
-    return .5+((uv-.5)*(1.-amount));
-}
-
 fragment float4 gradualBoxBrushStroke(VertexOut vertexIn [[ stage_in ]],
                   texture2d<float, access::sample> fromTexture [[ texture(0) ]],
                   texture2d<float, access::sample> brushTexture [[ texture(1) ]],
@@ -172,7 +186,7 @@ fragment float4 gradualBoxBrushStroke(VertexOut vertexIn [[ stage_in ]],
     
     
     
-    if(gbbs_isOnBoxBorder(uv,smoothstep(0.05,.4,progress),r,boxWidth,rotation)){
+    if(gbbs_isOnBoxBorder(uv,smoothstep(0.05,.7,progress),r,boxWidth,rotation)){
         float positive = step(0.5,uv.x);
         if(positive == 0. && gbbs_isInBrushStroke(uv,1.,brushColor)){
             return getFromColor(uv, fromTexture, ratio, _fromR);
