@@ -41,7 +41,7 @@ class GradualBoxTemplate{
 
         blendOutputImage = blendWihtBlurBackground(image: image)!
 
-        let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
+        let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
         
         let rand = Int.random(in: 0...2)
         
@@ -59,8 +59,8 @@ class GradualBoxTemplate{
             let i = Int.random(in: 3..<6)
             if let url = Bundle.main.url(forResource: "b\(i)", withExtension: "png") {
                 let image = loadImageFromUrl(url: url)
-                let mtiStroke = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
-                currentFilter?.destImage = mtiStroke.unpremultiplyingAlpha()
+                let mtiStroke = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
+                currentFilter?.destImage = mtiStroke!.unpremultiplyingAlpha()
 
             }
         }else{
@@ -95,7 +95,7 @@ class GradualBoxTemplate{
         
         let firstImage = loadImageFromUrl(url: allImageUrls.first!)
         
-        outputSize = CGSize(width: firstImage.size.width, height: firstImage.size.width)
+        outputSize = CGSize(width: 1080, height: 1080)
         
         guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
         
