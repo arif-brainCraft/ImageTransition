@@ -7,7 +7,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.ExceptionBreakpoint">
          <BreakpointContent
-            uuid = "9893E101-AD44-420B-91CB-8D6CE62512DE"
+            uuid = "16167406-5C91-4130-8AEA-0F6DF528A1A7"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -19,16 +19,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9556D70F-9A44-40B2-B25E-1798609264CD"
+            uuid = "63EA81C1-8675-46E8-89A1-66C4C94A944D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ImageTransition/ImgesToVideoViewController.swift"
+            filePath = "ImageTransition/Templates/GradualBoxTemplate.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "316"
-            endingLineNumber = "316"
-            landmarkName = "exportButtonPressed()"
+            startingLineNumber = "201"
+            endingLineNumber = "201"
+            landmarkName = "createVideo(allImageUrls:completion:forExport:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

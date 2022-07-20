@@ -38,16 +38,19 @@ class ImgesToVideoViewController: UIViewController {
         resizeVideView(rect: getResizedRectAsRatio(aspectRatio: selectedRatio,rect: self.videoView.superview!.bounds))
         setUpSubviews()
         //createVideo()
-        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 3)) { [weak self] result in
+
+        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 3), completion:{ [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
                 self.fileUrl = url
-                self.playVideo(url: url)
+                self.playVideo(url: url!)
             case .failure(_): break
 
+            case .none:
+                break
             }
-        }
+        }, forExport: true)
         
     }
     
@@ -126,7 +129,7 @@ class ImgesToVideoViewController: UIViewController {
                 case .success(let url):
                     print(url)
                     self.fileUrl = url
-                    self.playVideo(url: url)
+                    self.playVideo(url: url!)
                     
                     //                    let asset = AVURLAsset(url: url)
                     //                    asset.loadValuesAsynchronously(forKeys: ["tracks"]) {
@@ -171,6 +174,8 @@ class ImgesToVideoViewController: UIViewController {
                     break
                     
                 case .failure(let error):
+                    break
+                case .none:
                     break
                 }
             })
@@ -438,16 +443,18 @@ class ImgesToVideoViewController: UIViewController {
         self.ratioCollectionView.reloadData()
         
         
-        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 5)) { [weak self] result in
+        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 5), completion: { [weak self] result in
             guard let self = self else {return}
             switch result {
             case .success(let url):
                 self.fileUrl = url
-                self.playVideo(url: url)
+                self.playVideo(url: url!)
             case .failure(_): break
                 
+            case .none:
+                break
             }
-        }
+        }, forExport: true)
         //self.createVideo()
     }
     

@@ -7,9 +7,11 @@
 
 import UIKit
 import MetalPetal
-import CoreImage
-import CoreMedia
 import MTTransitions
+
+protocol SlideShowTemplateDelegate:NSObject {
+    func showImage(image:MTIImage) -> Void
+}
 
 class GradualBoxTemplate{
     
@@ -18,9 +20,6 @@ class GradualBoxTemplate{
     
     let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
     
-    var writerInput:AVAssetWriterInput!
-    var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
-    var pixelBufferPool:CVPixelBufferPool!
     let framePerSecond = 40.0
     
     
@@ -30,16 +29,17 @@ class GradualBoxTemplate{
     var prevFilter:BCLTransition?
 
 //    var whiteMinimalBgFilter:WhiteMinimalBgFilter?
-//    var prevMinimumBgFilter:WhiteMinimalBgFilter?
-    var blendOutputImage:CIImage?
-    var prevBlendOutputImage:CIImage?
+////    var prevMinimumBgFilter:WhiteMinimalBgFilter?
+//    var blendOutputImage:CIImage?
+//    var prevBlendOutputImage:CIImage?
+    weak var delegate:SlideShowTemplateDelegate?
     
     func setFilterWithImage(image:UIImage) -> Void {
 
         prevFilter = currentFilter
-        prevBlendOutputImage = blendOutputImage
-
-        blendOutputImage = blendWihtBlurBackground(image: image)!
+//        prevBlendOutputImage = blendOutputImage
+//
+//        blendOutputImage = blendWihtBlurBackground(image: image)!
 
         let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
         
@@ -86,9 +86,10 @@ class GradualBoxTemplate{
         transitionFilter?.progress = 0
     }
     
-    func createVideo(allImageUrls:[URL], completion:@escaping MTMovieMakerCompletion) -> Void {
+    func createVideo(allImageUrls:[URL], completion:@escaping MTMovieMakerCompletion,forExport:Bool) -> Void {
         
         guard allImageUrls.count > 0 else{return}
+        var assetWriter:AssetWriter?
         
         currentFilter = GradualBoxBrushStroke()
         transitionFilter = DirectionalSlide()
@@ -97,40 +98,10 @@ class GradualBoxTemplate{
         
         outputSize = CGSize(width: 1080, height: 1080)
         
-        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        
-        let path = documentDirectory.appendingPathComponent("slideshow.mp4").path
-        let tempURL = URL(fileURLWithPath: path)
-        
-        //let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("slideshow.mp4"))
-        
-        if FileManager.default.fileExists(atPath: tempURL.path) {
-            try? FileManager.default.removeItem(at: tempURL)
+        if forExport {
+            assetWriter = AssetWriter(output: outputSize)
+            assetWriter?.startSession()
         }
-        
-        let writer = try? AVAssetWriter(outputURL: tempURL, fileType: .mp4)
-        let videoSettings: [String: Any] = [
-            AVVideoCodecKey: AVVideoCodecType.h264,
-            AVVideoWidthKey: outputSize.width,
-            AVVideoHeightKey: outputSize.height
-        ]
-        writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
-        let attributes = sourceBufferAttributes(outputSize: outputSize)
-        pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
-                                                                  sourcePixelBufferAttributes: attributes)
-        writer?.add(writerInput)
-        
-        guard let success = writer?.startWriting(), success == true else {
-            fatalError("Can not start writing")
-        }
-        
-        self.pixelBufferPool = pixelBufferAdaptor?.pixelBufferPool
-        
-        guard self.pixelBufferPool != nil else {
-            fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
-        }
-        
-        writer?.startSession(atSourceTime: .zero)
         
         var presentTime = CMTime.zero
         var imageIndex = 0
@@ -192,25 +163,44 @@ class GradualBoxTemplate{
             }
             
             autoreleasepool {
+                
+                if !forExport {
+                    Thread.sleep(forTimeInterval: CMTimeGetSeconds(frameTime))
+                }
+                
                 let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
                 if progress >= tStart && progress <= tEnd {
                     
                     print("progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress)")
+                    currentFilter?.progress = currentAnimProgress
+                    prevFilter?.progress = 1 - currentAnimProgress
                     
-                    let currentFinalFrame = generateFinalFrame(bgFilter: currentFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
-                    
-                    let prevFinalFrame = generateFinalFrame(bgFilter: prevFilter!, foregroundImage: prevBlendOutputImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
-                    
-                    let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    
-                    
-                    applyTransformFilter(transformFilter: transitionFilter!, inputImage: inputImage, destinationImage: destinationImage, progress: transitionProgress, presentTime: presentTime)
+                    transitionFilter?.inputImage = prevFilter?.outputImage?.oriented(.downMirrored).unpremultiplyingAlpha()
+                    transitionFilter?.destImage = currentFilter?.outputImage?.oriented(.downMirrored).unpremultiplyingAlpha()
+                    transitionFilter?.progress = transitionProgress
+                    if let finalFrame = transitionFilter?.outputImage{
+                        
+                        if forExport {
+                            if let ciimage = try? BCLTransition.context?.makeCIImage(from: finalFrame){
+                                assetWriter?.addBufferToPool(frame: ciimage, presentTime: presentTime)
+
+                            }
+                        }else{
+                            self.delegate?.showImage(image: finalFrame)
+                        }
+                    }
                     
                 }else{
-                    
-                    if let currentFinalFrame = generateFinalFrame(bgFilter: currentFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false){
-                        addBufferToPool(frame: currentFinalFrame, presentTime: presentTime)
+                    currentFilter?.progress = currentAnimProgress
+                    if let finalFrame = currentFilter?.outputImage{
+                        if forExport {
+                            if let ciimage = try? BCLTransition.context?.makeCIImage(from: finalFrame){
+                                assetWriter?.addBufferToPool(frame: ciimage, presentTime: presentTime)
+                            }
+                        }else{
+                            self.delegate?.showImage(image:  finalFrame)
+                        }
+                        
                     }
                     
                     
@@ -218,19 +208,12 @@ class GradualBoxTemplate{
             }
         }
         
-        writerInput.markAsFinished()
-        
-        writer?.finishWriting {
-            DispatchQueue.main.async {
-                if let error = writer?.error {
-                    print("video written failed \(error.localizedDescription)")
-                    completion(.failure(error))
-                } else {
-                    print("video written succesfully")
-                    completion(.success(tempURL))
-                }
-            }
+        if forExport {
+            assetWriter?.finishWriting(completion: completion)
+        }else{
+            completion(.success(nil))
         }
+
         
     }
     
@@ -241,7 +224,7 @@ class GradualBoxTemplate{
         return UIImage()
     }
     
-    func applyTransformFilter(transformFilter:BCLTransition,inputImage:MTIImage, destinationImage:MTIImage,progress:Float,presentTime:CMTime) -> Void {
+    func applyTransformFilter(transformFilter:BCLTransition,inputImage:MTIImage, destinationImage:MTIImage,progress:Float,presentTime:CMTime) -> CIImage? {
         
         transformFilter.inputImage = inputImage
         transformFilter.destImage = destinationImage
@@ -252,39 +235,23 @@ class GradualBoxTemplate{
 //        let frameTime = CMTimeMake(value: Int64(transformFilter.duration * Double(progress) * 1000), timescale: 1000)
 //        presentTime = CMTimeAdd(frameBeginTime, frameTime)
       //  print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-
+        
         if let frame = transformFilter.outputImage {
-            if let ciimage = try? BCLTransition.context?.makeCIImage(from: frame){
-                addBufferToPool(frame: ciimage, presentTime: presentTime)
-            }
+            return try? BCLTransition.context?.makeCIImage(from: frame)
         }
         
-    }
-    
-    func addBufferToPool(frame:CIImage,presentTime:CMTime) -> Void {
-        guard let pool = self.pixelBufferPool,let adapter = pixelBufferAdaptor else {
-            return
-        }
+        return nil
         
-        while !self.writerInput.isReadyForMoreMediaData {
-            Thread.sleep(forTimeInterval: 0.01)
-        }
-        
-        var pixelBuffer: CVPixelBuffer?
-        CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &pixelBuffer)
-        
-        if let buffer = pixelBuffer{
-            let mtiFrame = MTIImage(ciImage: frame)
-            try? BCLTransition.context?.render(mtiFrame, to: buffer)
-            adapter.append(buffer, withPresentationTime: presentTime)
-            print(".", separator: " ", terminator: " ")
-            
-        }
     }
     
     func generateFinalFrame(bgFilter:BCLTransition,foregroundImage:CIImage,progress:Float,isSingle:Bool) -> CIImage? {
+        
+        guard let bgImage = bgFilter.outputImage else {
+            return CIImage()
+        }
+        
         bgFilter.progress = progress
-        let frame = try? BCLTransition.context?.makeCIImage(from:bgFilter.outputImage!.resized(to: outputSize)!)
+        let frame = try? BCLTransition.context?.makeCIImage(from:bgImage.resized(to: outputSize)!)
 
         let animatedBlend : CIImage!
         
@@ -305,14 +272,7 @@ class GradualBoxTemplate{
         return frame
     }
     
-    private func sourceBufferAttributes(outputSize: CGSize) -> [String: Any] {
-        let attributes: [String: Any] = [
-            (kCVPixelBufferPixelFormatTypeKey as String): kCVPixelFormatType_32BGRA,
-            (kCVPixelBufferWidthKey as String): outputSize.width,
-            (kCVPixelBufferHeightKey as String): outputSize.height
-        ]
-        return attributes
-    }
+
     
     func changeOpacity(image:CIImage, value:CGFloat) -> CIImage? {
         
@@ -370,7 +330,7 @@ class GradualBoxTemplate{
         let x = CGFloat(r * cos(angle))
         let y  = CGFloat(r * sin(angle))
         
-        print("value of angle \(angle) x \(x) y \(y)")
+        //print("value of angle \(angle) x \(x) y \(y)")
 
         
         var translateTF = CGAffineTransform(translationX:  x, y: y)

@@ -16,7 +16,7 @@ public enum MTMovieMakerError: Error {
 
 public typealias MTMovieMakerProgressHandler = (Float) -> Void
 
-public typealias MTMovieMakerCompletion = (Result<URL, Error>) -> Void
+public typealias MTMovieMakerCompletion = (Result<URL?, Error>?) -> Void
 
 class CombineTransitionMovieMaker:NSObject {
     
