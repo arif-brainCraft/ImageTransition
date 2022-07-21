@@ -24,8 +24,8 @@ class TemplatesViewController: UIViewController {
         slideShowTemplate.delegate = self
         
         
-        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
-        displayLink.add(to: .current, forMode: .default)
+//        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
+//        displayLink.add(to: .current, forMode: .default)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -57,7 +57,7 @@ class TemplatesViewController: UIViewController {
     
     @objc func displayLinkHandler(){
         let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
-        print("actualFramesPerSecond \(displayLink.timestamp)")
+        //print("actualFramesPerSecond \(displayLink.timestamp)")
         
 
     }
@@ -80,7 +80,7 @@ extension TemplatesViewController:SlideShowTemplateDelegate{
         print("showImage called")
         DispatchQueue.main.async {
             autoreleasepool {
-                self.slideShowView.image = nil
+               // self.slideShowView.image = nil
                 self.slideShowView.image = image
             }
         }
@@ -110,7 +110,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TemplateCollectionViewCell", for: indexPath) as! TemplateCollectionViewCell
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
         cell.backgroundColor = .lightGray
-        
+       // cell.localThread = DispatchQueue(label:"templateThread\(indexPath.section)\(indexPath.row)")
         cell.slideShowTemplate = GradualBoxTemplate()
         cell.imageUrls = loadImageUrls(count: 5)
         cell.showSelectedTemplate()

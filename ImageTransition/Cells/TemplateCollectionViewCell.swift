@@ -13,6 +13,8 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     @IBOutlet var imageView:MTIImageView!
     @IBOutlet var nameLabel:UILabel!
     var imageUrls = [URL]()
+    var localThread:DispatchQueue?
+    var workItem:DispatchWorkItem?
     
     var slideShowTemplate:GradualBoxTemplate?{
         didSet{
@@ -26,26 +28,47 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         imageUrls = [URL]()
+        slideShowTemplate?.stopCreatingVideo()
         slideShowTemplate?.delegate = nil
         slideShowTemplate = nil
         imageView.image = nil
+        workItem?.cancel()
+        workItem = nil
+        
     }
     
     func showSelectedTemplate() -> Void {
         
-        DispatchQueue.global().async {
-            self.slideShowTemplate?.createVideo(allImageUrls: self.imageUrls, completion:{ result in
-                switch result {
-                case .success(let url):
-                    self.showSelectedTemplate()
-                    break
-                    
-                case .failure(_): break
+        autoreleasepool {
+            workItem?.cancel()
+            workItem = DispatchWorkItem(block: {
+                self.slideShowTemplate?.createVideo(allImageUrls: self.imageUrls, completion:{ result in
+                    switch result {
+                    case .success(let url):
+                        if self.workItem?.isCancelled == false {
+                            self.showSelectedTemplate()
+                        }
+                        break
 
-                case .none:
-                    break
-                }
-            }, forExport: false)
+                    case .failure(_): break
+
+                    case .none:
+                        break
+                    }
+                }, forExport: false)
+            })
+            
+            DispatchQueue.global().async {
+                self.workItem?.perform()
+            }
+            
+//            localThread?.async {
+//                self.workItem.perform()
+//            }
+            
+            workItem?.notify(queue: .main) {
+                
+            }
         }
         
 
@@ -55,13 +78,14 @@ class TemplateCollectionViewCell: UICollectionViewCell {
 
 extension TemplateCollectionViewCell:SlideShowTemplateDelegate{
     func showImage(image: MTIImage) {
+        if workItem == nil || workItem!.isCancelled {
+           return
+        }
         DispatchQueue.main.async {
             autoreleasepool {
-                self.imageView.image = nil
+                //self.imageView.image = nil
                 self.imageView.image = image
             }
         }
     }
-    
-    
 }

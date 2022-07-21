@@ -33,6 +33,7 @@ class GradualBoxTemplate{
 //    var blendOutputImage:CIImage?
 //    var prevBlendOutputImage:CIImage?
     weak var delegate:SlideShowTemplateDelegate?
+    var isStopped = false
     
     func setFilterWithImage(image:UIImage) -> Void {
 
@@ -41,49 +42,51 @@ class GradualBoxTemplate{
 //
 //        blendOutputImage = blendWihtBlurBackground(image: image)!
 
-        let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
-        
-        let rand = Int.random(in: 0...2)
-        
-        if rand == 0 {
-            currentFilter = GradualBoxBrushStroke()
-        }else if rand == 1 {
-            currentFilter = GradualBoxZoom()
-        }else{
-            currentFilter = GradualDoubleBoxZoom()
-        }
-        
-        currentFilter?.inputImage = mtiImage
-        
-        if currentFilter!.isKind(of: GradualBoxBrushStroke.self) {
-            let i = Int.random(in: 3..<6)
-            if let url = Bundle.main.url(forResource: "b\(i)", withExtension: "png") {
-                let image = loadImageFromUrl(url: url)
-                let mtiStroke = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
-                currentFilter?.destImage = mtiStroke!.unpremultiplyingAlpha()
-
-            }
-        }else{
-            currentFilter?.destImage = currentFilter?.inputImage
-        }
-        
-        if Int.random(in: 0...1) == 0 {
-            transitionFilter = BCLTransition.Effect.angular.transition
-        }else{
-            transitionFilter = BCLTransition.Effect.angular.transition
-            transitionFilter?.duration = 1.5
-
-        }
-        
-        if transitionFilter!.isKind(of: DirectionalSlide.self) {
-            if Int.random(in: 0...1) == 0 {
-                transitionFilter?.parameters["direction"] = simd_float2(x: 1.0, y: 0.0)
+        autoreleasepool {
+            let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
+            
+            let rand = Int.random(in: 0...2)
+            
+            if rand == 0 {
+                currentFilter = GradualBoxBrushStroke()
+            }else if rand == 1 {
+                currentFilter = GradualBoxZoom()
             }else{
-                transitionFilter?.parameters["direction"] = simd_float2(x: -1.0, y: 0.0)
+                currentFilter = GradualDoubleBoxZoom()
             }
+            
+            currentFilter?.inputImage = mtiImage
+            
+            if currentFilter!.isKind(of: GradualBoxBrushStroke.self) {
+                let i = Int.random(in: 3..<6)
+                if let url = Bundle.main.url(forResource: "b\(i)", withExtension: "png") {
+                    let image = loadImageFromUrl(url: url)
+                    let mtiStroke = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored).resized(to: outputSize)
+                    currentFilter?.destImage = mtiStroke!.unpremultiplyingAlpha()
+
+                }
+            }else{
+                currentFilter?.destImage = currentFilter?.inputImage
+            }
+            
+            if Int.random(in: 0...1) == 0 {
+                transitionFilter = BCLTransition.Effect.angular.transition
+            }else{
+                transitionFilter = BCLTransition.Effect.angular.transition
+                transitionFilter?.duration = 1.5
+
+            }
+            
+            if transitionFilter!.isKind(of: DirectionalSlide.self) {
+                if Int.random(in: 0...1) == 0 {
+                    transitionFilter?.parameters["direction"] = simd_float2(x: 1.0, y: 0.0)
+                }else{
+                    transitionFilter?.parameters["direction"] = simd_float2(x: -1.0, y: 0.0)
+                }
+            }
+            
+            transitionFilter?.progress = 0
         }
-        
-        transitionFilter?.progress = 0
     }
     
     func createVideo(allImageUrls:[URL], completion:@escaping MTMovieMakerCompletion,forExport:Bool) -> Void {
@@ -162,11 +165,15 @@ class GradualBoxTemplate{
                 tEnd = tStart + transitionAnimProgress
             }
             
+            if !forExport {
+                Thread.sleep(forTimeInterval: CMTimeGetSeconds(frameTime))
+            }
+            if self.isStopped {
+                break
+            }
+            
             autoreleasepool {
                 
-                if !forExport {
-                    Thread.sleep(forTimeInterval: CMTimeGetSeconds(frameTime))
-                }
                 
                 let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
                 if progress >= tStart && progress <= tEnd {
@@ -186,7 +193,9 @@ class GradualBoxTemplate{
 
                             }
                         }else{
-                            self.delegate?.showImage(image: finalFrame)
+                            //self.delegate?.showImage(image: finalFrame.resized(to: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width))!)
+                            self.delegate?.showImage(image:  finalFrame)
+
                         }
                     }
                     
@@ -198,7 +207,9 @@ class GradualBoxTemplate{
                                 assetWriter?.addBufferToPool(frame: ciimage, presentTime: presentTime)
                             }
                         }else{
+                            //self.delegate?.showImage(image:  finalFrame.resized(to: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width))!)
                             self.delegate?.showImage(image:  finalFrame)
+
                         }
                         
                     }
@@ -215,6 +226,10 @@ class GradualBoxTemplate{
         }
 
         
+    }
+    
+    func stopCreatingVideo() -> Void {
+        self.isStopped = true
     }
     
     func loadImageFromUrl(url:URL) -> UIImage {
