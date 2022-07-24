@@ -39,47 +39,66 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     
     func showSelectedTemplate() -> Void {
         
-        autoreleasepool {
-            workItem?.cancel()
-            workItem = DispatchWorkItem(block: {
-                self.slideShowTemplate?.createVideo(allImageUrls: self.imageUrls, completion:{ result in
-                    switch result {
-                    case .success(let url):
-                        if self.workItem?.isCancelled == false {
-                            self.showSelectedTemplate()
-                        }
-                        break
-
-                    case .failure(_): break
-
-                    case .none:
-                        break
+        workItem?.cancel()
+        
+        workItem = DispatchWorkItem(block: {
+            //                self.slideShowTemplate?.createVideo(allImageUrls: self.imageUrls, completion:{ result in
+            //                    switch result {
+            //                    case .success(let url):
+            //                        if self.workItem?.isCancelled == false {
+            //                            self.showSelectedTemplate()
+            //                        }
+            //                        break
+            //
+            //                    case .failure(_): break
+            //
+            //                    case .none:
+            //                        break
+            //                    }
+            //                }, forExport: false)
+            
+            self.slideShowTemplate?.start(completion: { result in
+                switch result {
+                case .success(let url):
+                    if self.workItem?.isCancelled == false {
+                        self.showSelectedTemplate()
                     }
-                }, forExport: false)
+                    break
+                    
+                case .failure(_): break
+                    
+                case .none:
+                    break
+                }
             })
             
-            DispatchQueue.global().async {
-                self.workItem?.perform()
-            }
             
-//            localThread?.async {
-//                self.workItem.perform()
-//            }
-            
-            workItem?.notify(queue: .main) {
-                
-            }
+        })
+        
+        DispatchQueue.global().async {
+            self.workItem?.perform()
         }
         
-
+        //            localThread?.async {
+        //                self.workItem.perform()
+        //            }
+        
+        self.workItem?.notify(queue: .main) {
+            
+        }
+        
+        
     }
     
+
+    
 }
+
 
 extension TemplateCollectionViewCell:SlideShowTemplateDelegate{
     func showImage(image: MTIImage) {
         if workItem == nil || workItem!.isCancelled {
-           return
+            return
         }
         DispatchQueue.main.async {
             autoreleasepool {

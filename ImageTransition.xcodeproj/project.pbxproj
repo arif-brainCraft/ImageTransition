@@ -53,8 +53,9 @@
 		139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D0285880AF00432E16 /* VideoCompositionManager.swift */; };
 		139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */; };
 		139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */; };
-		139D18D72858A54600432E16 /* SlideShowTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D62858A54600432E16 /* SlideShowTemplate.swift */; };
+		139D18D72858A54600432E16 /* SquareBoxPopTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D62858A54600432E16 /* SquareBoxPopTemplate.swift */; };
 		13A0BA532886E98300DD5B14 /* AssetWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A0BA522886E98300DD5B14 /* AssetWriter.swift */; };
+		13A0BA5528896F3900DD5B14 /* SlideShowTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A0BA5428896F3900DD5B14 /* SlideShowTemplate.swift */; };
 		13BCF20228841C5E001DBA9F /* 9.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 13BCF20128841C5E001DBA9F /* 9.jpg */; };
 		13BCF20628859D48001DBA9F /* TemplatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BCF20528859D48001DBA9F /* TemplatesViewController.swift */; };
 		13BCF20A2886AB2E001DBA9F /* TemplateCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BCF2092886AB2E001DBA9F /* TemplateCollectionViewCell.swift */; };
@@ -125,8 +126,9 @@
 		139D18D0285880AF00432E16 /* VideoCompositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompositionManager.swift; sourceTree = "<group>"; };
 		139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WhiteMinimalBgFilter.metal; sourceTree = "<group>"; };
 		139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteMinimalBgFilter.swift; sourceTree = "<group>"; };
-		139D18D62858A54600432E16 /* SlideShowTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideShowTemplate.swift; sourceTree = "<group>"; };
+		139D18D62858A54600432E16 /* SquareBoxPopTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareBoxPopTemplate.swift; sourceTree = "<group>"; };
 		13A0BA522886E98300DD5B14 /* AssetWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetWriter.swift; sourceTree = "<group>"; };
+		13A0BA5428896F3900DD5B14 /* SlideShowTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideShowTemplate.swift; sourceTree = "<group>"; };
 		13BCF20128841C5E001DBA9F /* 9.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 9.jpg; sourceTree = "<group>"; };
 		13BCF20528859D48001DBA9F /* TemplatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatesViewController.swift; sourceTree = "<group>"; };
 		13BCF2092886AB2E001DBA9F /* TemplateCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -246,8 +248,9 @@
 		1376AB95287EA27E00F1BF3E /* Templates */ = {
 			isa = PBXGroup;
 			children = (
-				139D18D62858A54600432E16 /* SlideShowTemplate.swift */,
+				139D18D62858A54600432E16 /* SquareBoxPopTemplate.swift */,
 				1376AB96287EA29F00F1BF3E /* GradualBoxTemplate.swift */,
+				13A0BA5428896F3900DD5B14 /* SlideShowTemplate.swift */,
 			);
 			path = Templates;
 			sourceTree = "<group>";
@@ -490,12 +493,13 @@
 				13E6635A283D13920059802E /* AspectRatioCollectionCell.swift in Sources */,
 				130F1FBC283F9FE70063F8BC /* DoomScreenTransition.metal in Sources */,
 				1376AB97287EA29F00F1BF3E /* GradualBoxTemplate.swift in Sources */,
+				13A0BA5528896F3900DD5B14 /* SlideShowTemplate.swift in Sources */,
 				130F1FB5283E54A20063F8BC /* RandomDownSwipe.metal in Sources */,
 				13E6634A283BBA570059802E /* AngularTransition.swift in Sources */,
 				130F1FB9283F5E6E0063F8BC /* DoomScreenTransition.swift in Sources */,
 				13E66337283B58E00059802E /* BCLTransition.swift in Sources */,
 				13E66358283CEF2F0059802E /* RandomWindowBlind.swift in Sources */,
-				139D18D72858A54600432E16 /* SlideShowTemplate.swift in Sources */,
+				139D18D72858A54600432E16 /* SquareBoxPopTemplate.swift in Sources */,
 				13E66340283B83D80059802E /* DreamyWindowSlice.swift in Sources */,
 				133D1E932861D1AD0033AD55 /* DirectionalSlide.swift in Sources */,
 				139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */,

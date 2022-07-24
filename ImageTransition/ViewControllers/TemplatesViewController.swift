@@ -14,13 +14,14 @@ class TemplatesViewController: UIViewController {
     
     var displayLink: CADisplayLink!
     var templates:[[Template]] = Templates.twoD(array: Templates.featured, by: 2)
-    let slideShowTemplate = GradualBoxTemplate()
+    var slideShowTemplate:GradualBoxTemplate!
 
     var mtiView:MTIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Slide Show Maker"
+        slideShowTemplate = GradualBoxTemplate(allImageUrls: self.loadImageUrls(count: 5), forExport: false)
         slideShowTemplate.delegate = self
         
         
@@ -38,10 +39,10 @@ class TemplatesViewController: UIViewController {
     func showSelectedTemplate() -> Void {
         
         DispatchQueue.global().async {
-            self.slideShowTemplate.createVideo(allImageUrls: self.loadImageUrls(count: 3), completion:{ result in
+            self.slideShowTemplate.start( completion:{ result in
                 switch result {
                 case .success(let url):
-                    self.showSelectedTemplate()
+                   // self.showSelectedTemplate()
                     break
                     
                 case .failure(_): break
@@ -49,7 +50,7 @@ class TemplatesViewController: UIViewController {
                 case .none:
                     break
                 }
-            }, forExport: false)
+            })
         }
         
 
@@ -76,8 +77,11 @@ class TemplatesViewController: UIViewController {
 
 
 extension TemplatesViewController:SlideShowTemplateDelegate{
+    func update(progress: Float) {
+        
+    }
+    
     func showImage(image: MTIImage) {
-        print("showImage called")
         DispatchQueue.main.async {
             autoreleasepool {
                // self.slideShowView.image = nil
@@ -111,9 +115,9 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
         cell.backgroundColor = .lightGray
        // cell.localThread = DispatchQueue(label:"templateThread\(indexPath.section)\(indexPath.row)")
-        cell.slideShowTemplate = GradualBoxTemplate()
+        cell.slideShowTemplate = GradualBoxTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
         cell.imageUrls = loadImageUrls(count: 5)
-        cell.showSelectedTemplate()
+        //cell.showSelectedTemplate()
         return cell
     }
     

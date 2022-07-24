@@ -22,7 +22,7 @@ class ImgesToVideoViewController: UIViewController {
     private var exportButton : UIBarButtonItem!
     var movieMaker:CombineTransitionMovieMaker?
     let videoCompositionManager = VideoCompositionManager()
-    let slideShowTemplate = GradualBoxTemplate()
+    var slideShowTemplate:GradualBoxTemplate!
     var fileUrl:URL?
     let aspectRatioes = [CGSize(width: 1, height: 1), CGSize(width: 4, height: 5),CGSize(width: 9, height: 16),CGSize(width: 16, height: 9)]
     var selectedRatio:CGSize!
@@ -39,18 +39,18 @@ class ImgesToVideoViewController: UIViewController {
         setUpSubviews()
         //createVideo()
 
-        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 3), completion:{ [weak self] result in
-            guard let self = self else {return}
-            switch result {
-            case .success(let url):
-                self.fileUrl = url
-                self.playVideo(url: url!)
-            case .failure(_): break
-
-            case .none:
-                break
-            }
-        }, forExport: true)
+//        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 3), completion:{ [weak self] result in
+//            guard let self = self else {return}
+//            switch result {
+//            case .success(let url):
+//                self.fileUrl = url
+//                self.playVideo(url: url!)
+//            case .failure(_): break
+//
+//            case .none:
+//                break
+//            }
+//        }, forExport: true)
         
     }
     
@@ -443,18 +443,18 @@ class ImgesToVideoViewController: UIViewController {
         self.ratioCollectionView.reloadData()
         
         
-        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 5), completion: { [weak self] result in
-            guard let self = self else {return}
-            switch result {
-            case .success(let url):
-                self.fileUrl = url
-                self.playVideo(url: url!)
-            case .failure(_): break
-                
-            case .none:
-                break
-            }
-        }, forExport: true)
+//        slideShowTemplate.createVideo(allImageUrls: loadImageUrls(count: 5), completion: { [weak self] result in
+//            guard let self = self else {return}
+//            switch result {
+//            case .success(let url):
+//                self.fileUrl = url
+//                self.playVideo(url: url!)
+//            case .failure(_): break
+//                
+//            case .none:
+//                break
+//            }
+//        }, forExport: true)
         //self.createVideo()
     }
     

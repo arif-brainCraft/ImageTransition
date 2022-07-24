@@ -17,7 +17,7 @@ struct Template{
 class Templates {
 
     static var featured = [
-        Template(name: "Over The Box", isPremium: false, className: SlideShowTemplate.self),
+        Template(name: "Over The Box", isPremium: false, className: SquareBoxPopTemplate.self),
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
