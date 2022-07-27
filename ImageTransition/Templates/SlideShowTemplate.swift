@@ -22,10 +22,10 @@ class SlideShowTemplate{
     var isStopped = false
     var forExport = false
     var duration:Double!
-    let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
+    //let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
     weak var delegate:SlideShowTemplateDelegate?
     var allImageUrls = [URL]()
-    
+    var displayCount = 0
     init(allImageUrls:[URL],forExport:Bool) {
         self.forExport = forExport
         self.allImageUrls = allImageUrls
@@ -164,5 +164,16 @@ class SlideShowTemplate{
         colorMatrix?.setValue(image, forKey: kCIInputImageKey)
         colorMatrix?.setValue(CIVector(values: rgba, count: 4), forKey: "inputAVector")
         return colorMatrix?.outputImage
+    }
+    
+    func increaseDisplayCount() -> Void {
+        self.displayCount += 1
+    }
+    func reset() -> Void {
+        self.displayCount = 0
+    }
+    
+    func getProgress() -> Float {
+        return Float(displayCount) / (Float(duration) * Float(framePerSecond))
     }
 }

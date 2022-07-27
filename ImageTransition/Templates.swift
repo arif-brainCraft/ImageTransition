@@ -27,6 +27,17 @@ class Templates {
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, className: GradualBoxTemplate.self),
+
     ]
     
     static func twoD(array:[Template],by:Int) -> [[Template]] {

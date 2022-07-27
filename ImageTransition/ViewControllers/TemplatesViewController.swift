@@ -7,6 +7,7 @@
 
 import UIKit
 import MetalPetal
+import CoreMedia
 
 class TemplatesViewController: UIViewController {
 
@@ -15,7 +16,7 @@ class TemplatesViewController: UIViewController {
     var displayLink: CADisplayLink!
     var templates:[[Template]] = Templates.twoD(array: Templates.featured, by: 2)
     var slideShowTemplate:GradualBoxTemplate!
-
+    var lastFrameTime:Float = 0
     var mtiView:MTIImageView!
     
     override func viewDidLoad() {
@@ -23,16 +24,17 @@ class TemplatesViewController: UIViewController {
         self.title = "Slide Show Maker"
         slideShowTemplate = GradualBoxTemplate(allImageUrls: self.loadImageUrls(count: 5), forExport: false)
         slideShowTemplate.delegate = self
-        
-        
-//        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
-//        displayLink.add(to: .current, forMode: .default)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        showSelectedTemplate()
+        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
+        displayLink.add(to: .current, forMode: .common)
+        if #available(iOS 15.0, *) {
+            displayLink.preferredFrameRateRange = CAFrameRateRange(minimum: 30, maximum: 40, __preferred: 30)
+        } else {
+            displayLink.preferredFramesPerSecond = 40
+        }
 
     }
     
@@ -52,15 +54,29 @@ class TemplatesViewController: UIViewController {
                 }
             })
         }
-        
 
     }
     
     @objc func displayLinkHandler(){
-        let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
-        //print("actualFramesPerSecond \(displayLink.timestamp)")
         
+        let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+        
+        let userInfo = ["actualFramesPerSecond" : actualFramesPerSecond]
+        print("actualFramesPerSecond \(actualFramesPerSecond)")
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil, userInfo: userInfo)
 
+        slideShowTemplate.increaseDisplayCount()
+        let progress = slideShowTemplate.getProgress()
+        autoreleasepool {
+            if let frame = slideShowTemplate.getFrame(progress:progress ){
+                self.showImage(image: frame)
+            }
+        }
+
+        if progress >= 1.0 {
+            slideShowTemplate.reset()
+        }
+        
     }
     
     func loadImageUrls(count:Int) -> [URL] {
@@ -110,6 +126,19 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         return templates[section].count
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let tempCell = cell as? TemplateCollectionViewCell  {
+            tempCell.addDisplayLink()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let tempCell = cell as? TemplateCollectionViewCell  {
+            tempCell.removeDisplayLink()
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TemplateCollectionViewCell", for: indexPath) as! TemplateCollectionViewCell
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
@@ -117,6 +146,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
        // cell.localThread = DispatchQueue(label:"templateThread\(indexPath.section)\(indexPath.row)")
         cell.slideShowTemplate = GradualBoxTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
         cell.imageUrls = loadImageUrls(count: 5)
+        //cell.displayLink = self.displayLink
         //cell.showSelectedTemplate()
         return cell
     }

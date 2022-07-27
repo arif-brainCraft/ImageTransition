@@ -13,9 +13,10 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     @IBOutlet var imageView:MTIImageView!
     @IBOutlet var nameLabel:UILabel!
     var imageUrls = [URL]()
-    var localThread:DispatchQueue?
-    var workItem:DispatchWorkItem?
     
+    var displayLink:CADisplayLink?
+    var lastFrameTime:Float = 0
+
     var slideShowTemplate:GradualBoxTemplate?{
         didSet{
             slideShowTemplate?.delegate = self
@@ -32,77 +33,42 @@ class TemplateCollectionViewCell: UICollectionViewCell {
         slideShowTemplate?.delegate = nil
         slideShowTemplate = nil
         imageView.image = nil
-        workItem?.cancel()
-        workItem = nil
-        
+        lastFrameTime = 0
     }
     
-    func showSelectedTemplate() -> Void {
-        
-        workItem?.cancel()
-        
-        workItem = DispatchWorkItem(block: {
-            //                self.slideShowTemplate?.createVideo(allImageUrls: self.imageUrls, completion:{ result in
-            //                    switch result {
-            //                    case .success(let url):
-            //                        if self.workItem?.isCancelled == false {
-            //                            self.showSelectedTemplate()
-            //                        }
-            //                        break
-            //
-            //                    case .failure(_): break
-            //
-            //                    case .none:
-            //                        break
-            //                    }
-            //                }, forExport: false)
-            
-            self.slideShowTemplate?.start(completion: { result in
-                switch result {
-                case .success(let url):
-                    if self.workItem?.isCancelled == false {
-                        self.showSelectedTemplate()
-                    }
-                    break
-                    
-                case .failure(_): break
-                    
-                case .none:
-                    break
-                }
-            })
-            
-            
-        })
-        
-        DispatchQueue.global().async {
-            self.workItem?.perform()
-        }
-        
-        //            localThread?.async {
-        //                self.workItem.perform()
-        //            }
-        
-        self.workItem?.notify(queue: .main) {
-            
-        }
-        
-        
+    func addDisplayLink() -> Void {
+        NotificationCenter.default.addObserver(self, selector: #selector(displayLinkHandler(notification:)), name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
     }
     
-
+    func removeDisplayLink() -> Void {
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
+    }
     
+    
+    @objc func displayLinkHandler(notification:Notification){
+        guard let actualFramesPerSecond = notification.userInfo?["actualFramesPerSecond"] as? Double else {
+            return
+        }
+        
+        slideShowTemplate?.increaseDisplayCount()
+        let progress = slideShowTemplate?.getProgress() ?? 0.0
+        if let frame = slideShowTemplate?.getFrame(progress:progress ){
+            self.showImage(image: frame)
+        }
+        if progress >= 1.0 {
+            slideShowTemplate?.reset()
+        }
+        
+        lastFrameTime += Float(1.0 / actualFramesPerSecond);
+    }
 }
 
 
 extension TemplateCollectionViewCell:SlideShowTemplateDelegate{
     func showImage(image: MTIImage) {
-        if workItem == nil || workItem!.isCancelled {
-            return
-        }
+
         DispatchQueue.main.async {
             autoreleasepool {
-                //self.imageView.image = nil
                 self.imageView.image = image
             }
         }
