@@ -25,6 +25,7 @@ class SlideShowTemplate{
     weak var delegate:SlideShowTemplateDelegate?
     var allImageUrls = [URL]()
     var displayCount = 0
+    
     init(allImageUrls:[URL],forExport:Bool) {
         self.forExport = forExport
         self.allImageUrls = allImageUrls

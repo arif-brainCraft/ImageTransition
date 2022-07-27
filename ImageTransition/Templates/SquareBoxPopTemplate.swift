@@ -10,241 +10,137 @@ import MetalPetal
 import CoreImage
 import CoreMedia
 
-class SquareBoxPopTemplate{
+class SquareBoxPopTemplate:SlideShowTemplate{
     
 
-    var outputSize:CGSize!
+    var transitionFilter:BCLTransition?
     
-    let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
+    var currentFilter: BCLTransition?
+    var prevFilter:BCLTransition?
     
-    var writerInput:AVAssetWriterInput!
-    var pixelBufferAdaptor:AVAssetWriterInputPixelBufferAdaptor!
-    var pixelBufferPool:CVPixelBufferPool!
-    let framePerSecond = 30.0
-    
-    
-    var transformFilter:DirectionalSlide?
-    var whiteMinimalBgFilter:WhiteMinimalBgFilter?
-    var prevMinimumBgFilter:WhiteMinimalBgFilter?
-    var blendOutputImage:CIImage?
-    var prevBlendOutputImage:CIImage?
-    
-    func setFilterWithImage(image:UIImage) -> Void {
-        
-        guard transformFilter != nil && whiteMinimalBgFilter != nil else {
-            return
-        }
-        
-        prevMinimumBgFilter = whiteMinimalBgFilter
-        prevBlendOutputImage = blendOutputImage
-        
-        blendOutputImage = blendWihtBlurBackground(image: image)!
+    var currentBlendImage:CIImage?
+    var prevBlendImage:CIImage?
 
-        let mtiImage = MTIImage(cgImage: image.cgImage!, options: [.SRGB: false]).oriented(.downMirrored)
-        whiteMinimalBgFilter = WhiteMinimalBgFilter()
-        whiteMinimalBgFilter?.inputImage = mtiImage
-        whiteMinimalBgFilter?.destImage = mtiImage
-        
-        if Int.random(in: 0...1) == 0 {
-            transformFilter?.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
-        }else{
-            transformFilter?.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
-        }
-        transformFilter?.duration = 1.5
-        transformFilter?.progress = 0
+    
+    override init(allImageUrls: [URL], forExport: Bool) {
+        super.init(allImageUrls: allImageUrls, forExport: forExport)
+        outputSize = CGSize(width: 1080, height: 1080)
+        setFilterWithImage(url: allImageUrls.first!)
+
+        self.duration = currentFilter!.duration * Double(allImageUrls.count) + 1.0 * Double(allImageUrls.count)
+
     }
     
-    func createVideo(allImageUrls:[URL], completion:@escaping MTMovieMakerCompletion) -> Void {
+    
+    func setFilterWithImage(url:URL) -> Void {
+
+
         
-        guard allImageUrls.count > 0 else{return}
+        prevFilter = currentFilter
+        prevBlendImage = currentBlendImage
         
-        whiteMinimalBgFilter = WhiteMinimalBgFilter()
-        transformFilter = DirectionalSlide()
+        currentBlendImage = self.blendWihtBlurBackground(image: loadImageFromUrl(url: url), bRatio: (x: 0.6, y: 0.7), fRatio: (x: 0.6, y: 0.4))
+
+        let mtiImage = MTIImage(contentsOf: url, size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
         
-        let firstImage = loadImageFromUrl(url: allImageUrls.first!)
+        currentFilter = WhiteMinimalBgFilter()
+        currentFilter?.inputImage = mtiImage
+        currentFilter?.destImage = mtiImage
         
-        outputSize = CGSize(width: firstImage.size.width, height: firstImage.size.width)
-        
-        guard let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        
-        let path = documentDirectory.appendingPathComponent("slideshow.mp4").path
-        let tempURL = URL(fileURLWithPath: path)
-        
-        //let tempURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("slideshow.mp4"))
-        
-        if FileManager.default.fileExists(atPath: tempURL.path) {
-            try? FileManager.default.removeItem(at: tempURL)
+        if Int.random(in: 0...1) == 0 {
+            transitionFilter?.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
+        }else{
+            transitionFilter?.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
         }
+        transitionFilter?.duration = 1.5
+        transitionFilter?.progress = 0
+    }
+    
+    
+    var currentAnim = 0,prevAnim = 0,currentImageIndex = 0
+    
+    override func getFrame(progress: Float) -> MTIImage? {
         
-        let writer = try? AVAssetWriter(outputURL: tempURL, fileType: .mp4)
-        let videoSettings: [String: Any] = [
-            AVVideoCodecKey: AVVideoCodecType.h264,
-            AVVideoWidthKey: outputSize.width,
-            AVVideoHeightKey: outputSize.height
-        ]
-        writerInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoSettings)
-        let attributes = sourceBufferAttributes(outputSize: outputSize)
-        pixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: writerInput,
-                                                                  sourcePixelBufferAttributes: attributes)
-        writer?.add(writerInput)
+        var pause:Float = 0
+        var animProgress:Float = 0
+        var transitionAnimProgress:Float = 0
+
         
-        guard let success = writer?.startWriting(), success == true else {
-            fatalError("Can not start writing")
-        }
-        
-        self.pixelBufferPool = pixelBufferAdaptor?.pixelBufferPool
-        
-        guard self.pixelBufferPool != nil else {
-            fatalError("AVAssetWriterInputPixelBufferAdaptor pixelBufferPool empty")
-        }
-        
-        writer?.startSession(atSourceTime: .zero)
-        
-        var presentTime = CMTime.zero
-        var imageIndex = 0
-        var currentAnim = 0,prevAnim = 0
-        
-        let duration = whiteMinimalBgFilter!.duration * Double(allImageUrls.count) + 1.0 * Double(allImageUrls.count)
-        
-        let totalFrame = Int(duration * framePerSecond)
-        
-        let pause:Float = Float(1.0 / duration)
-        var animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
+        pause = Float(1.0 / duration)
+        animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
         animProgress = animProgress / Float(duration)
-        let transitionAnimProgress = (animProgress * 50.0 / 100.0)
-        print("pause \(pause) animprogress \(animProgress) transitionProgress \(transitionAnimProgress)")
-        setFilterWithImage(image: firstImage)
+        transitionAnimProgress = (animProgress * 20.0 / 100.0)
         
         var start:Float = 0, end = start + animProgress
         var tStart = end + pause, tEnd = tStart + transitionAnimProgress
+
+        let imageIndex = Int(progress / (end + pause))
+
+        start = (animProgress + pause) * Float(imageIndex)
+        end = start + animProgress
         
-        for frameNumber in 0..<totalFrame {
+        if progress >= start && progress <= start + transitionAnimProgress && imageIndex > 0  {
+            tStart = start
+            tEnd = tStart + transitionAnimProgress
+        }else{
+            tStart = end + pause
+            tEnd = tStart + transitionAnimProgress
+        }
+        
+        
+        if imageIndex != currentImageIndex  {
+            currentImageIndex = imageIndex
+            print("imageIndex \(imageIndex) progress \(progress)")
             
-            let progress = Float(frameNumber) / Float(totalFrame)
-            
-            let frameTime = CMTimeMake(value: Int64((duration / Double( totalFrame)) * 1000.0), timescale: 1000)
-            
-            if progress == 0 {
-                presentTime = CMTime.zero
-            }else{
-                presentTime = CMTimeAdd(presentTime, frameTime)
+            if imageIndex < allImageUrls.count {
+                setFilterWithImage(url: allImageUrls[imageIndex])
+                prevAnim = currentAnim
+                currentAnim = Int.random(in: 0..<2)
+                //presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
             }
+        }
+        
+        let currentAnimProgress = simd_smoothstep(start, end, progress)
+
+        let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
+        //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
+
+        if progress >= tStart && progress <= tEnd {
             
-            if progress >= end + pause  {
-                
-                imageIndex += 1
-                
-                start = (animProgress + pause) * Float(imageIndex)
-                end = start + animProgress
-                print("imageIndex \(imageIndex) progress \(progress)")
-                
-                if imageIndex < allImageUrls.count {
-                    setFilterWithImage(image: loadImageFromUrl(url: allImageUrls[imageIndex]))
-                    prevAnim = currentAnim
-                    currentAnim = Int.random(in: 0..<2)
-                    presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
-                }
-            }
+            //print("transition progress \(transitionProgress)")
             
-            
-            
-            let currentAnimProgress = simd_smoothstep(start, end, progress)
-            print(" outer progress \(progress) start\(start) end \(end) currentAnim \(currentAnimProgress) ")
-            
-            
-            if progress > tEnd {
-                tStart = end + pause
-                tEnd = tStart + transitionAnimProgress
-            }
             autoreleasepool {
-                let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
-                if progress >= tStart && progress <= tEnd {
-                    
-                    print("progress \(progress) transition \(transitionProgress) currentAnim \(currentAnimProgress)")
-                    
-                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
-                    
-                    let prevFinalFrame = generateFinalFrame(bgFilter: prevMinimumBgFilter!, foregroundImage: prevBlendOutputImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
-                    
-                    let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                    
-                    
-                    applyTransformFilter(transformFilter: transformFilter!, inputImage: inputImage, destinationImage: destinationImage, progress: transitionProgress, presentTime: presentTime)
-                    
-                }else{
-                    
-                    let currentFinalFrame = generateFinalFrame(bgFilter: whiteMinimalBgFilter!, foregroundImage: blendOutputImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
-                    
-                    addBufferToPool(frame: currentFinalFrame!, presentTime: presentTime)
-                    
-                }
-            }
-        }
-        
-        writerInput.markAsFinished()
-        
-        writer?.finishWriting {
-            DispatchQueue.main.async {
-                if let error = writer?.error {
-                    print("video written failed \(error.localizedDescription)")
-                    completion(.failure(error))
-                } else {
-                    print("video written succesfully")
-                    completion(.success(tempURL))
-                }
-            }
-        }
-        
-    }
-    
-    func loadImageFromUrl(url:URL) -> UIImage {
-        if let image = UIImage(contentsOfFile: url.path) {
-            return image
-        }
-        return UIImage()
-    }
-    
-    func applyTransformFilter(transformFilter:BCLTransition,inputImage:MTIImage, destinationImage:MTIImage,progress:Float,presentTime:CMTime) -> Void {
-        
-        transformFilter.inputImage = inputImage
-        transformFilter.destImage = destinationImage
-        //whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
-        
+                let currentFinalFrame = generateFinalFrame(bgFilter: currentFilter!, foregroundImage: currentBlendImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+                
+                let prevFinalFrame = generateFinalFrame(bgFilter: prevFilter!, foregroundImage: prevBlendImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
+                
+                let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                
+                transitionFilter?.inputImage = inputImage
+                transitionFilter?.destImage = destinationImage
+                //whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
+                
 
-        transformFilter.progress = progress
-//        let frameTime = CMTimeMake(value: Int64(transformFilter.duration * Double(progress) * 1000), timescale: 1000)
-//        presentTime = CMTimeAdd(frameBeginTime, frameTime)
-      //  print("presentTime inner /////// \(CMTimeGetSeconds(presentTime)) progress \(progress)")
-
-        if let frame = transformFilter.outputImage {
-            if let ciimage = try? BCLTransition.context?.makeCIImage(from: frame){
-                addBufferToPool(frame: ciimage, presentTime: presentTime)
+                transitionFilter?.progress = progress
+                
             }
-        }
-        
-    }
-    
-    func addBufferToPool(frame:CIImage,presentTime:CMTime) -> Void {
-        guard let pool = self.pixelBufferPool,let adapter = pixelBufferAdaptor else {
-            return
-        }
-        
-        while !self.writerInput.isReadyForMoreMediaData {
-            Thread.sleep(forTimeInterval: 0.01)
-        }
-        
-        var pixelBuffer: CVPixelBuffer?
-        CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &pixelBuffer)
-        
-        if let buffer = pixelBuffer{
-            let mtiFrame = MTIImage(ciImage: frame)
-            try? BCLTransition.context?.render(mtiFrame, to: buffer)
-            adapter.append(buffer, withPresentationTime: presentTime)
-            print(".", separator: " ", terminator: " ")
             
+            return transitionFilter?.outputImage
+
+            
+        }else{
+            
+            let currentFinalFrame = generateFinalFrame(bgFilter: currentFilter!, foregroundImage: currentBlendImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
+
+            return MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+
         }
+        
     }
+    
+
+    
     
     func generateFinalFrame(bgFilter:BCLTransition,foregroundImage:CIImage,progress:Float,isSingle:Bool) -> CIImage? {
         bgFilter.progress = progress
@@ -254,8 +150,7 @@ class SquareBoxPopTemplate{
         
         if true {
 
-            //animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
-            animatedBlend = spiralAnimation(image: foregroundImage, progress: progress, canvasSize: outputSize)
+            animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
 
         }else{
             animatedBlend = applyDoubleAnimation(first: foregroundImage, second: foregroundImage.copy() as! CIImage, progress: progress, canvasSize: outputSize)
@@ -269,61 +164,6 @@ class SquareBoxPopTemplate{
         return blendFilter?.outputImage
     }
     
-    private func sourceBufferAttributes(outputSize: CGSize) -> [String: Any] {
-        let attributes: [String: Any] = [
-            (kCVPixelBufferPixelFormatTypeKey as String): kCVPixelFormatType_32BGRA,
-            (kCVPixelBufferWidthKey as String): outputSize.width,
-            (kCVPixelBufferHeightKey as String): outputSize.height
-        ]
-        return attributes
-    }
-    
-    func changeOpacity(image:CIImage, value:CGFloat) -> CIImage? {
-        
-        let rgba:[CGFloat] = [0.0, 0.0, 0.0, value]
-
-        let colorMatrix = CIFilter(name: "CIColorMatrix")
-
-        colorMatrix?.setDefaults()
-        colorMatrix?.setValue(image, forKey: kCIInputImageKey)
-        colorMatrix?.setValue(CIVector(values: rgba, count: 4), forKey: "inputAVector")
-        return colorMatrix?.outputImage
-    }
-    
-    func blendWihtBlurBackground(image:UIImage) -> CIImage? {
-        
-        let imageSize = image.size
-
-        guard let ciimage = CIImage(image: image) else{return nil}
-        
-        let clampFilter = CIFilter(name: "CIAffineClamp")
-        clampFilter?.setDefaults()
-        clampFilter?.setValue(ciimage, forKey: kCIInputImageKey)
-        let scaleTB = CGAffineTransform(scaleX: 0.6, y: 0.7)
-        
-        let gaussianBlurFilter = CIFilter(name:"CIGaussianBlur")
-        gaussianBlurFilter?.setValue(clampFilter?.outputImage?.transformed(by:scaleTB ), forKey: kCIInputImageKey)
-        gaussianBlurFilter?.setValue(10, forKey: kCIInputRadiusKey)
-        
-        let scaleTF = CGAffineTransform(scaleX: 0.6, y: 0.4)
-        let bgSize = __CGSizeApplyAffineTransform(imageSize, scaleTB)
-        let foreSize = __CGSizeApplyAffineTransform(imageSize, scaleTF)
-        
-        let blurOutput = gaussianBlurFilter?.outputImage?.cropped(to: CGRect(x: 0, y: 0, width: bgSize.width, height: bgSize.height))
-        
-        //let opacity = CGFloat(sinf(progress * 3.1416 * 3  + 4.7) * 0.5 + 0.5)
-
-        let blendFilter = CIFilter(name: "CISourceOverCompositing")
-        let scaledCiImage = ciimage.transformed(by:scaleTF ).transformed(by:CGAffineTransform(translationX:  bgSize.width/2 - foreSize.width/2, y: bgSize.height/2 - foreSize.height/2))
-
-        blendFilter?.setValue(scaledCiImage, forKey:kCIInputImageKey)
-        blendFilter?.setValue(blurOutput, forKey: kCIInputBackgroundImageKey)
-        
-        if let blendImage = blendFilter?.value(forKey: "outputImage") as? CIImage{
-            return blendImage
-        }
-        return nil
-    }
     
     func spiralAnimation(image:CIImage,progress:Float,canvasSize:CGSize) -> CIImage? {
         let size = image.extent.size
@@ -401,21 +241,4 @@ class SquareBoxPopTemplate{
         
     }
     
-    
-    func resizeImage(sourceImage:CIImage,targetSize:CGSize) -> CIImage? {
-        
-        let resizeFilter = CIFilter(name:"CILanczosScaleTransform")!
-
-        // Desired output size
-
-        // Compute scale and corrective aspect ratio
-        let scale = targetSize.height / sourceImage.extent.height
-        let aspectRatio = targetSize.width/(sourceImage.extent.width * scale)
-
-        // Apply resizing
-        resizeFilter.setValue(sourceImage, forKey: kCIInputImageKey)
-        resizeFilter.setValue(scale, forKey: kCIInputScaleKey)
-        resizeFilter.setValue(aspectRatio, forKey: kCIInputAspectRatioKey)
-        return resizeFilter.outputImage
-    }
 }

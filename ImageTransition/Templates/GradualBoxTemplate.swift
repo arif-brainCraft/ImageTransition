@@ -86,11 +86,6 @@ class GradualBoxTemplate:SlideShowTemplate{
         var animProgress:Float = 0
         var transitionAnimProgress:Float = 0
 
-        if progress == 0 {
-            //print("pause \(pause) animprogress \(animProgress) transitionProgress \(transitionAnimProgress)")
-
-        }
-        
         
         pause = Float(1.0 / duration)
         animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)

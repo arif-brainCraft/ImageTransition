@@ -143,11 +143,14 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TemplateCollectionViewCell", for: indexPath) as! TemplateCollectionViewCell
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
         cell.backgroundColor = .lightGray
-       // cell.localThread = DispatchQueue(label:"templateThread\(indexPath.section)\(indexPath.row)")
-        cell.slideShowTemplate = GradualBoxTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
-        cell.imageUrls = loadImageUrls(count: 5)
-        //cell.displayLink = self.displayLink
-        //cell.showSelectedTemplate()
+        
+        if self.templates[indexPath.section][indexPath.row].className == SquareBoxPopTemplate.self{
+            cell.slideShowTemplate = SquareBoxPopTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
+
+        }else{
+            cell.slideShowTemplate = GradualBoxTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
+        }
+        
         return cell
     }
     

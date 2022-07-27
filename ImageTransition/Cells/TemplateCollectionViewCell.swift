@@ -12,12 +12,11 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet var imageView:MTIImageView!
     @IBOutlet var nameLabel:UILabel!
-    var imageUrls = [URL]()
     
     var displayLink:CADisplayLink?
     var lastFrameTime:Float = 0
 
-    var slideShowTemplate:GradualBoxTemplate?{
+    var slideShowTemplate:SlideShowTemplate?{
         didSet{
             slideShowTemplate?.delegate = self
         }
@@ -28,7 +27,6 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageUrls = [URL]()
         slideShowTemplate?.stopCreatingVideo()
         slideShowTemplate?.delegate = nil
         slideShowTemplate = nil
