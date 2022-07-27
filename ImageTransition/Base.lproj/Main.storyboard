@@ -248,11 +248,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VGe-6z-6EA" customClass="MTIImageView">
-                                <rect key="frame" x="20" y="20" width="374" height="147.33333333333334"/>
-                                <color key="backgroundColor" systemColor="linkColor"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="276"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="VGe-6z-6EA" secondAttribute="height" multiplier="1.5:1" id="KHo-Xl-qx4"/>
+                                </constraints>
                             </view>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="nzU-de-VDV">
-                                <rect key="frame" x="20" y="182.33333333333331" width="374" height="533.66666666666674"/>
+                                <rect key="frame" x="20" y="311" width="374" height="405"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="EE3-qz-KJg">
                                     <size key="itemSize" width="128" height="128"/>
@@ -306,10 +309,9 @@
                         <viewLayoutGuide key="safeArea" id="bCP-u7-CbS"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="VGe-6z-6EA" firstAttribute="height" secondItem="PUA-mn-voU" secondAttribute="height" multiplier="0.2" id="36C-2V-Kpl"/>
                             <constraint firstItem="nzU-de-VDV" firstAttribute="top" secondItem="VGe-6z-6EA" secondAttribute="bottom" constant="15" id="7MS-zf-9t1"/>
-                            <constraint firstItem="VGe-6z-6EA" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" constant="20" id="Fp9-wN-E2v"/>
                             <constraint firstItem="nzU-de-VDV" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" constant="20" id="Hx0-HQ-rk2"/>
+                            <constraint firstItem="VGe-6z-6EA" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" id="YaZ-4T-u2W"/>
                             <constraint firstItem="nzU-de-VDV" firstAttribute="centerX" secondItem="bCP-u7-CbS" secondAttribute="centerX" id="Ys8-ad-0fM"/>
                             <constraint firstItem="VGe-6z-6EA" firstAttribute="top" secondItem="bCP-u7-CbS" secondAttribute="top" constant="20" id="g3d-77-Q5u"/>
                             <constraint firstItem="VGe-6z-6EA" firstAttribute="centerX" secondItem="bCP-u7-CbS" secondAttribute="centerX" id="r16-P3-GEd"/>
@@ -326,9 +328,6 @@
         </scene>
     </scenes>
     <resources>
-        <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -11,7 +11,6 @@ import MTTransitions
 import CoreMedia
 
 protocol SlideShowTemplateDelegate:NSObject {
-    //func update(progress:Float) -> Void
     func showImage(image:MTIImage) -> Void
 }
 
