@@ -18,7 +18,7 @@ class TemplateCollectionViewCell: UICollectionViewCell {
 
     var slideShowTemplate:SlideShowTemplate?{
         didSet{
-            slideShowTemplate?.delegate = self
+            self.slideShowTemplate?.delegate = self
         }
     }
     override class func awakeFromNib() {
@@ -26,34 +26,48 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        slideShowTemplate?.stopCreatingVideo()
-        slideShowTemplate?.delegate = nil
-        slideShowTemplate = nil
+        self.slideShowTemplate?.stopCreatingVideo()
+        self.slideShowTemplate?.delegate = nil
+        self.slideShowTemplate = nil
         imageView.image = nil
         lastFrameTime = 0
     }
     
     func addDisplayLink() -> Void {
-        NotificationCenter.default.addObserver(self, selector: #selector(displayLinkHandler(notification:)), name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
+        
+        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
+        displayLink?.add(to: .current, forMode: .common)
+        if #available(iOS 15.0, *) {
+            displayLink?.preferredFrameRateRange = CAFrameRateRange(minimum: 30, maximum: 40, __preferred: 30)
+        } else {
+            displayLink?.preferredFramesPerSecond = 40
+        }
+        
+       // NotificationCenter.default.addObserver(self, selector: #selector(displayLinkHandler(notification:)), name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
     }
     
     func removeDisplayLink() -> Void {
-        NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
+        self.displayLink?.invalidate()
+        self.displayLink = nil
+        //NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
     }
     
     
-    @objc func displayLinkHandler(notification:Notification){
-        guard let actualFramesPerSecond = notification.userInfo?["actualFramesPerSecond"] as? Double else {
-            return
-        }
+    @objc func displayLinkHandler(){
+//        guard let actualFramesPerSecond = notification.userInfo?["actualFramesPerSecond"] as? Double else {
+//            return
+//        }
+        guard displayLink != nil else{return}
         
-        slideShowTemplate?.increaseDisplayCount()
-        let progress = slideShowTemplate?.getProgress() ?? 0.0
-        if let frame = slideShowTemplate?.getFrame(progress:progress ){
+        let actualFramesPerSecond = 1 / (displayLink!.targetTimestamp - displayLink!.timestamp)
+
+        self.slideShowTemplate?.increaseDisplayCount()
+        let progress = self.slideShowTemplate?.getProgress() ?? 0.0
+        if let frame = self.slideShowTemplate?.getFrame(progress:progress ){
             self.showImage(image: frame)
         }
         if progress >= 1.0 {
-            slideShowTemplate?.reset()
+            self.slideShowTemplate?.reset()
         }
         
         lastFrameTime += Float(1.0 / actualFramesPerSecond);

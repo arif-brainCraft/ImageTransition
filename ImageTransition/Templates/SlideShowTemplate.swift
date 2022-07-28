@@ -25,7 +25,7 @@ class SlideShowTemplate{
     //let ciContext = CIContext(options: [CIContextOption.useSoftwareRenderer: true])
     weak var delegate:SlideShowTemplateDelegate?
     var allImageUrls = [URL]()
-    var displayCount = 0
+    private var displayCount = 0
     
     init(allImageUrls:[URL],forExport:Bool) {
         self.forExport = forExport
@@ -173,6 +173,6 @@ class SlideShowTemplate{
     }
     
     func getProgress() -> Float {
-        return Float(displayCount) / (Float(duration) * Float(framePerSecond))
+        return Float(self.displayCount) / (Float(self.duration) * Float(self.framePerSecond))
     }
 }

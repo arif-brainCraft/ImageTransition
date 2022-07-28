@@ -52,7 +52,7 @@ struct Templates {
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self)
 
     ]
     

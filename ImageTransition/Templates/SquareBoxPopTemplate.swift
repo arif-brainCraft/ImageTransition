@@ -13,13 +13,14 @@ import CoreMedia
 class SquareBoxPopTemplate:SlideShowTemplate{
     
 
-    var transitionFilter:BCLTransition?
+    fileprivate var transitionFilter:BCLTransition?
     
-    var currentFilter: BCLTransition?
-    var prevFilter:BCLTransition?
+    fileprivate var currentFilter: BCLTransition?
+    fileprivate var prevFilter:BCLTransition?
     
-    var currentBlendImage:CIImage?
-    var prevBlendImage:CIImage?
+    fileprivate var currentBlendImage:CIImage?
+    fileprivate var prevBlendImage:CIImage?
+    lazy var mtContext = try? MTIContext(device: MTLCreateSystemDefaultDevice()!)
 
     
     override init(allImageUrls: [URL], forExport: Bool) {
@@ -46,7 +47,6 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         currentFilter = WhiteMinimalBgFilter()
         currentFilter?.inputImage = mtiImage
         currentFilter?.destImage = mtiImage
-        
         if transitionFilter == nil {
             transitionFilter = DirectionalSlide()
         }
@@ -108,9 +108,9 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         let currentAnimProgress = simd_smoothstep(start, end, progress)
 
         let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
+        print("progress \(progress) tStart \(tStart) tEnd \(tEnd) cProgress \(currentAnimProgress) tprogress \(transitionProgress)")
 
         if progress >= tStart && progress <= tEnd {
-            print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
 
             //print("transition progress \(transitionProgress)")
             
@@ -146,7 +146,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
     
     func generateFinalFrame(bgFilter:BCLTransition,foregroundImage:CIImage,progress:Float,isSingle:Bool) -> CIImage? {
         bgFilter.progress = progress
-        let frame = try? BCLTransition.context?.makeCIImage(from:bgFilter.outputImage!.oriented(.downMirrored))
+        let frame = try? mtContext?.makeCIImage(from:bgFilter.outputImage!.oriented(.downMirrored))
 
         let animatedBlend : CIImage!
         

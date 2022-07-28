@@ -13,10 +13,10 @@ import MTTransitions
 
 class GradualBoxTemplate:SlideShowTemplate{
 
-    var transitionFilter:BCLTransition?
+    fileprivate var transitionFilter:BCLTransition?
     
-    var currentFilter: BCLTransition?
-    var prevFilter:BCLTransition?
+    fileprivate var currentFilter: BCLTransition?
+    fileprivate var prevFilter:BCLTransition?
 
     override init(allImageUrls: [URL], forExport: Bool) {
         super.init(allImageUrls: allImageUrls, forExport: forExport)

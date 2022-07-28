@@ -902,7 +902,7 @@ completion: @escaping MTMovieMakerCompletion)throws -> Void {
                     CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPool, &pixelBuffer)
                     
                     if let buffer = pixelBuffer,let frame = overlayBlendFilter.outputImage {
-                        try? BCLTransition.context?.render(frame, to: buffer)
+                        //try? BCLTransition.context?.render(frame, to: buffer)
                         
                         while pixelBufferAdaptor.assetWriterInput.isReadyForMoreMediaData == false {
                             print("Thread sleeping to get ready to append pixel buffer")

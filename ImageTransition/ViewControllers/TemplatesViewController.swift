@@ -15,7 +15,7 @@ class TemplatesViewController: UIViewController {
     
     var displayLink: CADisplayLink!
     var templates:[[Template]] = Templates.twoD(array: Templates.featured, by: 2)
-    var slideShowTemplate:SlideShowTemplate!
+    var slideShowTemplate:SlideShowTemplate?
     var lastFrameTime:Float = 0
     var mtiView:MTIImageView!
     
@@ -23,7 +23,7 @@ class TemplatesViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Slide Show Maker"
         slideShowTemplate = templates[0][0].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
-        slideShowTemplate.delegate = self
+        slideShowTemplate?.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -41,7 +41,7 @@ class TemplatesViewController: UIViewController {
     func showSelectedTemplate() -> Void {
         
         DispatchQueue.global().async {
-            self.slideShowTemplate.start( completion:{ result in
+            self.slideShowTemplate?.start( completion:{ result in
                 switch result {
                 case .success(let url):
                    // self.showSelectedTemplate()
@@ -57,24 +57,24 @@ class TemplatesViewController: UIViewController {
 
     }
     
-    @objc func displayLinkHandler(){
+    @objc func displayLinkHandler() -> Void{
         
         let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
         
         let userInfo = ["actualFramesPerSecond" : actualFramesPerSecond]
         //print("actualFramesPerSecond \(actualFramesPerSecond)")
         NotificationCenter.default.post(name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil, userInfo: userInfo)
-
-        slideShowTemplate.increaseDisplayCount()
-        let progress = slideShowTemplate.getProgress()
+ 
+        slideShowTemplate?.increaseDisplayCount()
+        let progress = slideShowTemplate?.getProgress() ?? 0.0
         autoreleasepool {
-            if let frame = slideShowTemplate.getFrame(progress:progress ){
+            if let frame = slideShowTemplate?.getFrame(progress:progress ){
                 self.showImage(image: frame)
             }
         }
 
         if progress >= 1.0 {
-            slideShowTemplate.reset()
+            slideShowTemplate?.reset()
         }
         
     }
@@ -152,7 +152,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        self.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
+        self.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 5), forExport: false)
     }
     
     
