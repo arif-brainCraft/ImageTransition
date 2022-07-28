@@ -39,7 +39,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         prevFilter = currentFilter
         prevBlendImage = currentBlendImage
         
-        currentBlendImage = self.blendWihtBlurBackground(image: loadImageFromUrl(url: url), bRatio: (x: 0.6, y: 0.7), fRatio: (x: 0.6, y: 0.4))
+        currentBlendImage = self.blendWihtBlurBackground(ciimage: resizeImage(sourceImage: CIImage(contentsOf: url)!, targetSize: outputSize)!, bRatio: (x: 0.63, y: 0.63), fRatio: (x: 0.63, y: 0.48))
 
         let mtiImage = MTIImage(contentsOf: url, size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
         
@@ -47,12 +47,16 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         currentFilter?.inputImage = mtiImage
         currentFilter?.destImage = mtiImage
         
+        if transitionFilter == nil {
+            transitionFilter = DirectionalSlide()
+        }
+        
+        
         if Int.random(in: 0...1) == 0 {
             transitionFilter?.parameters["direction"] = simd_float2(x: 0.0, y: 1.0)
         }else{
             transitionFilter?.parameters["direction"] = simd_float2(x: 0.0, y: -1.0)
         }
-        transitionFilter?.duration = 1.5
         transitionFilter?.progress = 0
     }
     
@@ -69,7 +73,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         pause = Float(1.0 / duration)
         animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
         animProgress = animProgress / Float(duration)
-        transitionAnimProgress = (animProgress * 20.0 / 100.0)
+        transitionAnimProgress = (animProgress * 50.0 / 100.0)
         
         var start:Float = 0, end = start + animProgress
         var tStart = end + pause, tEnd = tStart + transitionAnimProgress
@@ -94,6 +98,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
             
             if imageIndex < allImageUrls.count {
                 setFilterWithImage(url: allImageUrls[imageIndex])
+                transitionFilter?.duration = TimeInterval(transitionAnimProgress)
                 prevAnim = currentAnim
                 currentAnim = Int.random(in: 0..<2)
                 //presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
@@ -103,10 +108,10 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         let currentAnimProgress = simd_smoothstep(start, end, progress)
 
         let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
-        //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
 
         if progress >= tStart && progress <= tEnd {
-            
+            print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
+
             //print("transition progress \(transitionProgress)")
             
             autoreleasepool {
@@ -114,26 +119,23 @@ class SquareBoxPopTemplate:SlideShowTemplate{
                 
                 let prevFinalFrame = generateFinalFrame(bgFilter: prevFilter!, foregroundImage: prevBlendImage!, progress: 1 - currentAnimProgress, isSingle: prevAnim == 0 ? true:false)
                 
-                let inputImage = MTIImage(ciImage: prevFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
-                let destinationImage = MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+                let inputImage = MTIImage(ciImage: prevFinalFrame!).unpremultiplyingAlpha()
+                let destinationImage = MTIImage(ciImage: currentFinalFrame!).unpremultiplyingAlpha()
                 
                 transitionFilter?.inputImage = inputImage
                 transitionFilter?.destImage = destinationImage
-                //whiteMinimalBgFilter.outputImage!.oriented(.downMirrored)
-                
-
-                transitionFilter?.progress = progress
+                transitionFilter?.progress = transitionProgress
                 
             }
             
-            return transitionFilter?.outputImage
+            return transitionFilter?.outputImage?.oriented(.downMirrored)
 
             
         }else{
             
             let currentFinalFrame = generateFinalFrame(bgFilter: currentFilter!, foregroundImage: currentBlendImage!, progress: currentAnimProgress, isSingle: currentAnim == 0 ? true:false)
 
-            return MTIImage(ciImage: currentFinalFrame!).oriented(.downMirrored) .unpremultiplyingAlpha()
+            return MTIImage(ciImage: currentFinalFrame!)
 
         }
         
@@ -144,11 +146,11 @@ class SquareBoxPopTemplate:SlideShowTemplate{
     
     func generateFinalFrame(bgFilter:BCLTransition,foregroundImage:CIImage,progress:Float,isSingle:Bool) -> CIImage? {
         bgFilter.progress = progress
-        let frame = try? BCLTransition.context?.makeCIImage(from:bgFilter.outputImage!.resized(to: outputSize)!)
+        let frame = try? BCLTransition.context?.makeCIImage(from:bgFilter.outputImage!.oriented(.downMirrored))
 
         let animatedBlend : CIImage!
         
-        if true {
+        if isSingle {
 
             animatedBlend = applySingleAnimation(image:foregroundImage , progress: progress, canvasSize: outputSize)
 
@@ -210,21 +212,22 @@ class SquareBoxPopTemplate:SlideShowTemplate{
                 
         let center = CGPoint(x: canvasSize.width/2 - first.extent.size.width/2, y: canvasSize.height/2 - first.extent.size.height/2)
         
-        var translateF = CGAffineTransform(translationX: center.x  - 60 , y: center.y  - 70)
+        var translateF = CGAffineTransform(translationX: center.x  - 150 , y: center.y  - 150)
         
-        let initialScale = 0.8
-        let scaleF = CGFloat(initialScale + (Double(progress) * (1 - initialScale)))
+        let iScaleF = 0.8
+        let scaleF = CGFloat(iScaleF + (Double(progress) * (1 - iScaleF)))
         
         translateF = translateF.concatenating(CGAffineTransform(scaleX: scaleF, y: scaleF))
         
-        let scaleS = CGFloat(0.5 + (Double(sin( progress * 2.5)) * (0.8 - 0.5)))
+        let iScaleS = 0.6
+        let scaleS = CGFloat(iScaleS + (Double(sin( progress * 2.5)) * (0.8 - iScaleS)))
         
         var translateS = CGAffineTransform(scaleX: scaleS, y: scaleS)
         
-        let translation = (85.0 + (CGFloat(cos(progress * 3.1416 * 1.5 ) + 2.33) * 0.3) * 85.0)
-        print("scaleS \(scaleS) translation \(translation)")
+        let translation = (200.0 + (CGFloat(cos(progress * 3.1416 * 1.5 ) + 2.33) * 0.3) * 200.0)
+        //print("scaleS \(scaleS) translation \(translation)")
         
-        translateS = translateS.concatenating(CGAffineTransform(translationX: center.x + translation + 10, y: center.y + translation + 10 ))
+        translateS = translateS.concatenating(CGAffineTransform(translationX: center.x + translation , y: center.y + translation ))
         
         
         let blendFilter = CIFilter(name: "CISourceOverCompositing")

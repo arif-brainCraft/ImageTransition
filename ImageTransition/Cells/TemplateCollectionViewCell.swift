@@ -22,7 +22,6 @@ class TemplateCollectionViewCell: UICollectionViewCell {
         }
     }
     override class func awakeFromNib() {
-        
     }
     
     override func prepareForReuse() {
@@ -68,6 +67,7 @@ extension TemplateCollectionViewCell:SlideShowTemplateDelegate{
         DispatchQueue.main.async {
             autoreleasepool {
                 self.imageView.image = image
+                self.imageView.contentMode = .scaleAspectFit
             }
         }
     }

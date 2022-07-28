@@ -111,7 +111,7 @@ class GradualBoxTemplate:SlideShowTemplate{
         
         if imageIndex != currentImageIndex  {
             currentImageIndex = imageIndex
-            print("imageIndex \(imageIndex) progress \(progress)")
+            //print("imageIndex \(imageIndex) progress \(progress)")
             
             if imageIndex < allImageUrls.count {
                 setFilterWithImage(url: allImageUrls[imageIndex])

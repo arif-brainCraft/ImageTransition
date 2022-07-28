@@ -16,6 +16,7 @@ protocol SlideShowTemplateDelegate:NSObject {
 
 class SlideShowTemplate{
     
+    
     var outputSize:CGSize!
     let framePerSecond = 40.0
     var isStopped = false
@@ -119,11 +120,9 @@ class SlideShowTemplate{
         return resizeFilter.outputImage
     }
     
-    func blendWihtBlurBackground(image:UIImage,bRatio:(x:CGFloat, y: CGFloat), fRatio:(x:CGFloat, y: CGFloat)) -> CIImage? {
+    func blendWihtBlurBackground(ciimage:CIImage,bRatio:(x:CGFloat, y: CGFloat), fRatio:(x:CGFloat, y: CGFloat)) -> CIImage? {
         
-        let imageSize = image.size
-
-        guard let ciimage = CIImage(image: image) else{return nil}
+        let imageSize = ciimage.extent.size
         
         let clampFilter = CIFilter(name: "CIAffineClamp")
         clampFilter?.setDefaults()

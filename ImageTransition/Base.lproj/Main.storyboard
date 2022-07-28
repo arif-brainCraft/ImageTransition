@@ -255,9 +255,9 @@
                                 </constraints>
                             </view>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="nzU-de-VDV">
-                                <rect key="frame" x="20" y="355" width="374" height="361"/>
+                                <rect key="frame" x="10" y="355" width="394" height="361"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="EE3-qz-KJg">
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="0.0" id="EE3-qz-KJg">
                                     <size key="itemSize" width="128" height="128"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
@@ -290,7 +290,6 @@
                                                 <constraint firstItem="Nn7-IE-591" firstAttribute="bottom" secondItem="6cP-m2-WsO" secondAttribute="top" constant="5" id="ACS-mo-VTi"/>
                                                 <constraint firstAttribute="bottom" secondItem="6cP-m2-WsO" secondAttribute="bottom" id="Ncd-Re-0Lx"/>
                                                 <constraint firstItem="Nn7-IE-591" firstAttribute="leading" secondItem="lIi-U9-diS" secondAttribute="leading" constant="5" id="bmk-Fo-63P"/>
-                                                <constraint firstItem="6cP-m2-WsO" firstAttribute="width" secondItem="lIi-U9-diS" secondAttribute="width" multiplier="0.328125" id="dVz-oU-goJ"/>
                                                 <constraint firstItem="Nn7-IE-591" firstAttribute="centerX" secondItem="lIi-U9-diS" secondAttribute="centerX" id="pFw-wc-vTA"/>
                                                 <constraint firstItem="Nn7-IE-591" firstAttribute="top" secondItem="lIi-U9-diS" secondAttribute="top" constant="5" id="q74-4E-ZCF"/>
                                             </constraints>
@@ -311,7 +310,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="nzU-de-VDV" firstAttribute="top" secondItem="VGe-6z-6EA" secondAttribute="bottom" constant="15" id="7MS-zf-9t1"/>
-                            <constraint firstItem="nzU-de-VDV" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" constant="20" id="Hx0-HQ-rk2"/>
+                            <constraint firstItem="nzU-de-VDV" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" constant="10" id="Hx0-HQ-rk2"/>
                             <constraint firstItem="VGe-6z-6EA" firstAttribute="leading" secondItem="bCP-u7-CbS" secondAttribute="leading" id="YaZ-4T-u2W"/>
                             <constraint firstItem="nzU-de-VDV" firstAttribute="centerX" secondItem="bCP-u7-CbS" secondAttribute="centerX" id="Ys8-ad-0fM"/>
                             <constraint firstItem="VGe-6z-6EA" firstAttribute="top" secondItem="bCP-u7-CbS" secondAttribute="top" constant="20" id="g3d-77-Q5u"/>

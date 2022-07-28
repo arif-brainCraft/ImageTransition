@@ -15,14 +15,14 @@ class TemplatesViewController: UIViewController {
     
     var displayLink: CADisplayLink!
     var templates:[[Template]] = Templates.twoD(array: Templates.featured, by: 2)
-    var slideShowTemplate:GradualBoxTemplate!
+    var slideShowTemplate:SlideShowTemplate!
     var lastFrameTime:Float = 0
     var mtiView:MTIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Slide Show Maker"
-        slideShowTemplate = GradualBoxTemplate(allImageUrls: self.loadImageUrls(count: 5), forExport: false)
+        slideShowTemplate = templates[0][0].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
         slideShowTemplate.delegate = self
     }
     
@@ -62,7 +62,7 @@ class TemplatesViewController: UIViewController {
         let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
         
         let userInfo = ["actualFramesPerSecond" : actualFramesPerSecond]
-        print("actualFramesPerSecond \(actualFramesPerSecond)")
+        //print("actualFramesPerSecond \(actualFramesPerSecond)")
         NotificationCenter.default.post(name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil, userInfo: userInfo)
 
         slideShowTemplate.increaseDisplayCount()
@@ -114,7 +114,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let width = collectionView.frame.width / 2 - 5 * 2
+        let width = collectionView.frame.width / 2  - 5
         
         return CGSize(width: width, height: width + 20)
     }
@@ -122,6 +122,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return templates.count
     }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return templates[section].count
     }
@@ -144,18 +145,14 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
         cell.backgroundColor = .lightGray
         
-        if self.templates[indexPath.section][indexPath.row].className == SquareBoxPopTemplate.self{
-            cell.slideShowTemplate = SquareBoxPopTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
-
-        }else{
-            cell.slideShowTemplate = GradualBoxTemplate(allImageUrls: loadImageUrls(count: 3), forExport: false)
-        }
+        cell.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        self.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
     }
     
     
