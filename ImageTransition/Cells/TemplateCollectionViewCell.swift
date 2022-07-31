@@ -13,7 +13,6 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     @IBOutlet var imageView:MTIImageView!
     @IBOutlet var nameLabel:UILabel!
     
-    var displayLink:CADisplayLink?
     var lastFrameTime:Float = 0
 
     var slideShowTemplate:SlideShowTemplate?{
@@ -35,31 +34,19 @@ class TemplateCollectionViewCell: UICollectionViewCell {
     
     func addDisplayLink() -> Void {
         
-        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
-        displayLink?.add(to: .current, forMode: .common)
-        if #available(iOS 15.0, *) {
-            displayLink?.preferredFrameRateRange = CAFrameRateRange(minimum: 30, maximum: 40, __preferred: 30)
-        } else {
-            displayLink?.preferredFramesPerSecond = 40
-        }
-        
-       // NotificationCenter.default.addObserver(self, selector: #selector(displayLinkHandler(notification:)), name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(displayLinkHandler(notification:)), name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
     }
     
     func removeDisplayLink() -> Void {
-        self.displayLink?.invalidate()
-        self.displayLink = nil
-        //NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil)
     }
     
     
-    @objc func displayLinkHandler(){
-//        guard let actualFramesPerSecond = notification.userInfo?["actualFramesPerSecond"] as? Double else {
-//            return
-//        }
-        guard displayLink != nil else{return}
-        
-        let actualFramesPerSecond = 1 / (displayLink!.targetTimestamp - displayLink!.timestamp)
+    @objc func displayLinkHandler(notification:Notification){
+        guard let actualFramesPerSecond = notification.userInfo?["actualFramesPerSecond"] as? Double else {
+            return
+        }
+
 
         self.slideShowTemplate?.increaseDisplayCount()
         let progress = self.slideShowTemplate?.getProgress() ?? 0.0

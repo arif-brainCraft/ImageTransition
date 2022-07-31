@@ -49,7 +49,7 @@ class TemplatesViewController: UIViewController {
         DispatchQueue.global().async {
             self.slideShowTemplate?.start( forExport: false, completion:{ result in
                 switch result {
-                case .success(let url):
+                case .success(_):
                    // self.showSelectedTemplate()
                     break
                     
@@ -68,7 +68,7 @@ class TemplatesViewController: UIViewController {
         let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
         
         let userInfo = ["actualFramesPerSecond" : actualFramesPerSecond]
-        //print("actualFramesPerSecond \(actualFramesPerSecond)")
+        
         NotificationCenter.default.post(name: Notification.Name(rawValue: "DisplayLinkHandler"), object: nil, userInfo: userInfo)
  
         slideShowTemplate?.increaseDisplayCount()
@@ -82,7 +82,6 @@ class TemplatesViewController: UIViewController {
         if progress >= 1.0 {
             slideShowTemplate?.reset()
         }
-        
     }
     
     func loadImageUrls(count:Int) -> [URL] {
@@ -171,12 +170,17 @@ extension TemplatesViewController:SlideShowTemplateDelegate{
 extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
+
         let width = collectionView.frame.width / 2  - 5
-        
-        return CGSize(width: width, height: width + 20)
+
+        return CGSize(width: width, height: width + 20 )
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+    }
+
+
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return templates.count
     }

@@ -93,7 +93,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         
         if imageIndex != currentImageIndex  {
             currentImageIndex = imageIndex
-            print("imageIndex \(imageIndex) progress \(progress)")
+            //print("imageIndex \(imageIndex) progress \(progress)")
             
             if imageIndex < allImageUrls.count {
                 setFilterWithImage(url: allImageUrls[imageIndex])
@@ -107,7 +107,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         let currentAnimProgress = simd_smoothstep(start, end, progress)
 
         let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
-        print("progress \(progress) tStart \(tStart) tEnd \(tEnd) cProgress \(currentAnimProgress) tprogress \(transitionProgress)")
+        //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) cProgress \(currentAnimProgress) tprogress \(transitionProgress)")
 
         if progress >= tStart && progress <= tEnd {
 
