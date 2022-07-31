@@ -21,10 +21,9 @@ class SquareBoxPopTemplate:SlideShowTemplate{
     fileprivate var currentBlendImage:CIImage?
     fileprivate var prevBlendImage:CIImage?
     lazy var mtContext = try? MTIContext(device: MTLCreateSystemDefaultDevice()!)
-
     
-    override init(allImageUrls: [URL], forExport: Bool) {
-        super.init(allImageUrls: allImageUrls, forExport: forExport)
+    override init(allImageUrls: [URL]) {
+        super.init(allImageUrls: allImageUrls)
         outputSize = CGSize(width: 1080, height: 1080)
         setFilterWithImage(url: allImageUrls.first!)
 
@@ -40,7 +39,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         prevFilter = currentFilter
         prevBlendImage = currentBlendImage
         
-        currentBlendImage = self.blendWihtBlurBackground(ciimage: resizeImage(sourceImage: CIImage(contentsOf: url)!, targetSize: outputSize)!, bRatio: (x: 0.63, y: 0.63), fRatio: (x: 0.63, y: 0.48))
+        currentBlendImage = commonProcessor.blendWihtBlurBackground(ciimage: commonProcessor.resizeImage(sourceImage: CIImage(contentsOf: url)!, targetSize: outputSize)!, bRatio: (x: 0.63, y: 0.63), fRatio: (x: 0.63, y: 0.48))
 
         let mtiImage = MTIImage(contentsOf: url, size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
         

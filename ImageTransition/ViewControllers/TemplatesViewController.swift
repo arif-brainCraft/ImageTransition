@@ -8,6 +8,7 @@
 import UIKit
 import MetalPetal
 import CoreMedia
+import Photos
 
 class TemplatesViewController: UIViewController {
 
@@ -22,7 +23,12 @@ class TemplatesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Slide Show Maker"
-        slideShowTemplate = templates[0][0].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
+        
+        let exportButton = UIBarButtonItem(title: "Export", style: .done, target: self, action: #selector(exportTemplate(_:)))
+        
+        self.navigationItem.rightBarButtonItem = exportButton
+        
+        slideShowTemplate = templates[0][0].getInstance(allImageUrls: loadImageUrls(count: 3))
         slideShowTemplate?.delegate = self
     }
     
@@ -41,7 +47,7 @@ class TemplatesViewController: UIViewController {
     func showSelectedTemplate() -> Void {
         
         DispatchQueue.global().async {
-            self.slideShowTemplate?.start( completion:{ result in
+            self.slideShowTemplate?.start( forExport: false, completion:{ result in
                 switch result {
                 case .success(let url):
                    // self.showSelectedTemplate()
@@ -88,6 +94,58 @@ class TemplatesViewController: UIViewController {
             }
         }
         return images
+    }
+    
+    @objc func exportTemplate(_ sender:Any) -> Void {
+        self.slideShowTemplate?.start(forExport: true, completion: { result in
+            switch result {
+            case .success(let url):
+                if let outputUrl = url {
+                    self.exportToPhotoLibrary(url: outputUrl)
+                }
+                break
+                
+            case .failure(_): break
+
+            case .none:
+                break
+            }
+        })
+    }
+    
+    func exportToPhotoLibrary(url:URL) -> Void {
+        PHPhotoLibrary.requestAuthorization { auth in
+            switch auth {
+            case .authorized:
+                PHPhotoLibrary.shared().performChanges {
+                    let options = PHAssetResourceCreationOptions()
+                    options.shouldMoveFile = true
+                    let request = PHAssetCreationRequest.forAsset()
+                    request.addResource(with: .video, fileURL: url, options: options)
+                } completionHandler: { success, error in
+                    DispatchQueue.main.async {
+                        
+                        var msg = "Can't Save The Video."
+                        if success && error == nil {
+                            msg = "Video Saved To Camera Roll"
+                        }
+                        
+                        let alert = UIAlertController(title: msg, message: nil, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { _ in
+                            
+                        }))
+                        print("Video Saved To Camera Roll")
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
+                
+                break;
+            default:
+                print("PhotoLibrary not authorized")
+                
+                break;
+            }
+        }
     }
 }
 
@@ -145,14 +203,14 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
         cell.backgroundColor = .lightGray
         
-        cell.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 3), forExport: false)
+        cell.slideShowTemplate = templates[indexPath.section][indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 3))
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        self.slideShowTemplate = templates[indexPath.section][indexPath.row].initialize(allImageUrls: loadImageUrls(count: 5), forExport: false)
+        self.slideShowTemplate = templates[indexPath.section][indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 5))
     }
     
     

@@ -18,8 +18,8 @@ class GradualBoxTemplate:SlideShowTemplate{
     fileprivate var currentFilter: BCLTransition?
     fileprivate var prevFilter:BCLTransition?
 
-    override init(allImageUrls: [URL], forExport: Bool) {
-        super.init(allImageUrls: allImageUrls, forExport: forExport)
+    override init(allImageUrls: [URL]) {
+        super.init(allImageUrls: allImageUrls)
         outputSize = CGSize(width: 1080, height: 1080)
         setFilterWithImage(url: allImageUrls.first!)
 

@@ -18,14 +18,14 @@ class Template{
         self.type = type
     }
     
-    func initialize(allImageUrls: [URL], forExport: Bool) -> SlideShowTemplate {
+    func getInstance(allImageUrls: [URL]) -> SlideShowTemplate {
         
         if self.type == SquareBoxPopTemplate.self {
-            return SquareBoxPopTemplate(allImageUrls: allImageUrls, forExport: forExport)
+            return SquareBoxPopTemplate(allImageUrls: allImageUrls)
         } else if self.type == GradualBoxTemplate.self {
-            return GradualBoxTemplate(allImageUrls: allImageUrls, forExport: forExport)
+            return GradualBoxTemplate(allImageUrls: allImageUrls)
         }
-        return GradualBoxTemplate(allImageUrls: allImageUrls, forExport: forExport)
+        return GradualBoxTemplate(allImageUrls: allImageUrls)
     }
     
 }
