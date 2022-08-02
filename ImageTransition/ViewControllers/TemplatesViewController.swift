@@ -15,7 +15,7 @@ class TemplatesViewController: UIViewController {
     @IBOutlet var slideShowView:MTIImageView!
     
     var displayLink: CADisplayLink!
-    var templates:[[Template]] = Templates.twoD(array: Templates.featured, by: 2)
+    var templates:[Template] = Templates.featured
     var slideShowTemplate:SlideShowTemplate?
     var lastFrameTime:Float = 0
     var mtiView:MTIImageView!
@@ -28,7 +28,7 @@ class TemplatesViewController: UIViewController {
         
         self.navigationItem.rightBarButtonItem = exportButton
         
-        slideShowTemplate = templates[0][0].getInstance(allImageUrls: loadImageUrls(count: 3))
+        slideShowTemplate = templates.first?.getInstance(allImageUrls: loadImageUrls(count: 3))
         slideShowTemplate?.delegate = self
     }
     
@@ -176,17 +176,16 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
         return CGSize(width: width, height: width + 20 )
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return CGFloat(10)
     }
 
-
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return templates.count
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return templates[section].count
+        return templates.count
     }
     
     
@@ -204,17 +203,17 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TemplateCollectionViewCell", for: indexPath) as! TemplateCollectionViewCell
-        cell.nameLabel.text = self.templates[indexPath.section][indexPath.row].name
+        cell.nameLabel.text = self.templates[indexPath.row].name
         cell.backgroundColor = .lightGray
         
-        cell.slideShowTemplate = templates[indexPath.section][indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 3))
+        cell.slideShowTemplate = templates[indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 3))
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        self.slideShowTemplate = templates[indexPath.section][indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 5))
+        self.slideShowTemplate = templates[indexPath.row].getInstance(allImageUrls: loadImageUrls(count: 5))
     }
     
     

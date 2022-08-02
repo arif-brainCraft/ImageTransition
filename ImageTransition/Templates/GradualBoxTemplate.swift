@@ -82,51 +82,27 @@ class GradualBoxTemplate:SlideShowTemplate{
     
     override func getFrame(progress: Float) -> MTIImage? {
         
-        var pause:Float = 0
-        var animProgress:Float = 0
-        var transitionAnimProgress:Float = 0
-
         
-        pause = Float(1.0 / duration)
-        animProgress = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
-        animProgress = animProgress / Float(duration)
-        transitionAnimProgress = (animProgress * 20.0 / 100.0)
+        let schedule = super.getSchedule(progress: progress)
         
-        var start:Float = 0, end = start + animProgress
-        var tStart = end + pause, tEnd = tStart + transitionAnimProgress
-
-        let imageIndex = Int(progress / (end + pause))
-
-        start = (animProgress + pause) * Float(imageIndex)
-        end = start + animProgress
-        
-        if progress >= start && progress <= start + transitionAnimProgress && imageIndex > 0  {
-            tStart = start
-            tEnd = tStart + transitionAnimProgress
-        }else{
-            tStart = end + pause
-            tEnd = tStart + transitionAnimProgress
-        }
-        
-        
-        if imageIndex != currentImageIndex  {
-            currentImageIndex = imageIndex
+        if schedule.imageIndex != currentImageIndex  {
+            currentImageIndex = schedule.imageIndex
             //print("imageIndex \(imageIndex) progress \(progress)")
             
-            if imageIndex < allImageUrls.count {
-                setFilterWithImage(url: allImageUrls[imageIndex])
+            if schedule.imageIndex < allImageUrls.count {
+                setFilterWithImage(url: allImageUrls[schedule.imageIndex])
                 prevAnim = currentAnim
                 currentAnim = Int.random(in: 0..<2)
                 //presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
             }
         }
         
-        let currentAnimProgress = simd_smoothstep(start, end, progress)
+        let currentAnimProgress = simd_smoothstep(schedule.start, schedule.end, progress)
 
-        let transitionProgress = simd_smoothstep(tStart, tEnd, progress)
+        let transitionProgress = simd_smoothstep(schedule.tStart, schedule.tEnd, progress)
         //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
 
-        if progress >= tStart && progress <= tEnd {
+        if progress >= schedule.tStart && progress <= schedule.tEnd {
             
             //print("transition progress \(transitionProgress)")
             

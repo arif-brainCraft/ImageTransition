@@ -9,6 +9,18 @@ import Foundation
 import MetalPetal
 import MTTransitions
 
+struct Schedule {
+    var start:Float
+    var end:Float
+    var tStart:Float
+    var tEnd:Float
+    var imageIndex:Int
+    
+    var pauseDuration:Float
+    var animDuration:Float
+    var transitionAnimDuration:Float
+}
+
 protocol SlideShowTemplateDelegate:NSObject {
     func showImage(image:MTIImage) -> Void
 }
@@ -88,6 +100,36 @@ class SlideShowTemplate{
     func getFrame(progress:Float) -> MTIImage? {
         //must override this method and return appropriate frame
         return nil
+    }
+    
+    func getSchedule(progress:Float) -> Schedule {
+        var pauseDuration:Float = 0
+        var animDuration:Float = 0
+        var transitionAnimDuration:Float = 0
+
+        
+        pauseDuration = Float(1.0 / duration)
+        animDuration = (Float(duration) - Float(1 * allImageUrls.count)) / Float(allImageUrls.count)
+        animDuration = animDuration / Float(duration)
+        transitionAnimDuration = (animDuration * 20.0 / 100.0)
+        
+        var start:Float = 0, end = start + animDuration
+        var tStart = end + pauseDuration, tEnd = tStart + transitionAnimDuration
+
+        let imageIndex = Int(progress / (end + pauseDuration))
+
+        start = (animDuration + pauseDuration) * Float(imageIndex)
+        end = start + animDuration
+        
+        if progress >= start && progress <= start + transitionAnimDuration && imageIndex > 0  {
+            tStart = start
+            tEnd = tStart + transitionAnimDuration
+        }else{
+            tStart = end + pauseDuration
+            tEnd = tStart + transitionAnimDuration
+        }
+        
+        return Schedule(start: start, end: end, tStart: tStart, tEnd: tEnd, imageIndex: imageIndex, pauseDuration: pauseDuration, animDuration: animDuration,transitionAnimDuration: transitionAnimDuration)
     }
     
     func stopCreatingVideo() -> Void {
