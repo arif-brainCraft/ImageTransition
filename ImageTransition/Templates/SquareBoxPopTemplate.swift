@@ -12,12 +12,6 @@ import CoreMedia
 
 class SquareBoxPopTemplate:SlideShowTemplate{
     
-
-    fileprivate var transitionFilter:BCLTransition?
-    
-    fileprivate var currentFilter: BCLTransition?
-    fileprivate var prevFilter:BCLTransition?
-    
     fileprivate var currentBlendImage:CIImage?
     fileprivate var prevBlendImage:CIImage?
     lazy var mtContext = try? MTIContext(device: MTLCreateSystemDefaultDevice()!)
@@ -27,8 +21,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         outputSize = CGSize(width: 1080, height: 1080)
         setFilterWithImage(url: allImageUrls.first!)
 
-        self.duration = currentFilter!.duration * Double(allImageUrls.count) + 1.0 * Double(allImageUrls.count)
-
+        calculateDuration(pauseTime: 1.0, transitionOutTime: transitionFilter!.duration - 1.0)
     }
     
     
@@ -66,14 +59,13 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         
         let schedule = super.getSchedule(progress: progress)
 
-        
+
         if schedule.imageIndex != currentImageIndex  {
             currentImageIndex = schedule.imageIndex
-            //print("imageIndex \(imageIndex) progress \(progress)")
             
             if schedule.imageIndex < allImageUrls.count {
                 setFilterWithImage(url: allImageUrls[schedule.imageIndex])
-                transitionFilter?.duration = TimeInterval(schedule.transitionAnimDuration)
+                //transitionFilter?.duration = TimeInterval(schedule.transitionAnimDuration)
                 prevAnim = currentAnim
                 currentAnim = Int.random(in: 0..<2)
                 //presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
@@ -83,7 +75,7 @@ class SquareBoxPopTemplate:SlideShowTemplate{
         let currentAnimProgress = simd_smoothstep(schedule.start, schedule.end, progress)
 
         let transitionProgress = simd_smoothstep(schedule.tStart, schedule.tEnd, progress)
-        //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) cProgress \(currentAnimProgress) tprogress \(transitionProgress)")
+        print("progress \(progress) image \(schedule.imageIndex) tStart \(schedule.tStart) tEnd \(schedule.tEnd) cProgress \(currentAnimProgress) tprogress \(transitionProgress)")
 
         if progress >= schedule.tStart && progress <= schedule.tEnd {
 

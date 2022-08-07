@@ -13,18 +13,14 @@ import MTTransitions
 
 class GradualBoxTemplate:SlideShowTemplate{
 
-    fileprivate var transitionFilter:BCLTransition?
-    
-    fileprivate var currentFilter: BCLTransition?
-    fileprivate var prevFilter:BCLTransition?
+
 
     override init(allImageUrls: [URL]) {
         super.init(allImageUrls: allImageUrls)
+
         outputSize = CGSize(width: 1080, height: 1080)
         setFilterWithImage(url: allImageUrls.first!)
-
-        self.duration = currentFilter!.duration * Double(allImageUrls.count) + 1.0 * Double(allImageUrls.count)
-
+        calculateDuration(pauseTime: 1.0, transitionOutTime: transitionFilter!.duration)
     }
     
     func setFilterWithImage(url:URL) -> Void {
@@ -61,9 +57,10 @@ class GradualBoxTemplate:SlideShowTemplate{
             transitionFilter = BCLTransition.Effect.angular.transition
         }else{
             transitionFilter = BCLTransition.Effect.angular.transition
-            transitionFilter?.duration = 1.5
-            
         }
+        
+        transitionFilter?.duration = 1.5
+
         
         if transitionFilter!.isKind(of: DirectionalSlide.self) {
             if Int.random(in: 0...1) == 0 {
@@ -100,7 +97,7 @@ class GradualBoxTemplate:SlideShowTemplate{
         let currentAnimProgress = simd_smoothstep(schedule.start, schedule.end, progress)
 
         let transitionProgress = simd_smoothstep(schedule.tStart, schedule.tEnd, progress)
-        //print("progress \(progress) tStart \(tStart) tEnd \(tEnd) transitionprogress \(transitionProgress)")
+        print("progress \(progress) current tStart \(schedule.tStart) tEnd \(schedule.tEnd) transitionprogress \(transitionProgress)")
 
         if progress >= schedule.tStart && progress <= schedule.tEnd {
             
