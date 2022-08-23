@@ -185,7 +185,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0//templates.count
+        return templates.count
     }
     
     

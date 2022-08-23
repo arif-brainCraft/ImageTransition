@@ -40,6 +40,7 @@
 		130F1FCD284E130F0063F8BC /* sixthClip.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 130F1FCC284E130F0063F8BC /* sixthClip.MOV */; };
 		133D1E912861D09A0033AD55 /* DirectionalSlide.metal in Sources */ = {isa = PBXBuildFile; fileRef = 133D1E902861D09A0033AD55 /* DirectionalSlide.metal */; };
 		133D1E932861D1AD0033AD55 /* DirectionalSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */; };
+		135C46BE28B4A8180000F74E /* AdoreTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135C46BD28B4A8180000F74E /* AdoreTemplate.swift */; };
 		1376AB8E286B0FE400F1BF3E /* GradualBoxBrush.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */; };
 		1376AB90286B3D8700F1BF3E /* GradualBoxBrush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */; };
 		1376AB92287E990E00F1BF3E /* GradualBoxBrushStroke.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */; };
@@ -114,6 +115,7 @@
 		130F1FCC284E130F0063F8BC /* sixthClip.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = sixthClip.MOV; sourceTree = "<group>"; };
 		133D1E902861D09A0033AD55 /* DirectionalSlide.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = DirectionalSlide.metal; sourceTree = "<group>"; };
 		133D1E922861D1AD0033AD55 /* DirectionalSlide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionalSlide.swift; sourceTree = "<group>"; };
+		135C46BD28B4A8180000F74E /* AdoreTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdoreTemplate.swift; sourceTree = "<group>"; };
 		1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrush.metal; sourceTree = "<group>"; };
 		1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxBrush.swift; sourceTree = "<group>"; };
 		1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrushStroke.metal; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				139D18D62858A54600432E16 /* SquareBoxPopTemplate.swift */,
 				1376AB96287EA29F00F1BF3E /* GradualBoxTemplate.swift */,
 				13A0BA5428896F3900DD5B14 /* SlideShowTemplate.swift */,
+				135C46BD28B4A8180000F74E /* AdoreTemplate.swift */,
 			);
 			path = Templates;
 			sourceTree = "<group>";
@@ -514,6 +517,7 @@
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,
 				130F1FBF284634E50063F8BC /* UIImageExtension.swift in Sources */,
 				13A0BA572896561C00DD5B14 /* CommonImageProcessor.swift in Sources */,
+				135C46BE28B4A8180000F74E /* AdoreTemplate.swift in Sources */,
 				133D1E912861D09A0033AD55 /* DirectionalSlide.metal in Sources */,
 				13E6634D283BBAE90059802E /* BurnTransition.metal in Sources */,
 				139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */,
