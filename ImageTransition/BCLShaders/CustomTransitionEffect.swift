@@ -30,6 +30,8 @@ extension BCLTransition{
         case gradualBoxBrushStroke
         case gradualBoxZoom
         case gradualDoubleBoxZoom
+        case adoreTransition
+        case flareOverlay
         public var transition: BCLTransition {
             switch self {
             case .waterDrop: return WaterDropTransition()
@@ -46,6 +48,8 @@ extension BCLTransition{
             case .gradualBoxBrushStroke: return GradualBoxBrushStroke()
             case .gradualBoxZoom: return GradualBoxZoom()
             case .gradualDoubleBoxZoom: return GradualDoubleBoxZoom()
+            case .adoreTransition: return AdoreTransition()
+            case .flareOverlay: return FlareOverlay()
             }
         }
         
@@ -65,6 +69,8 @@ extension BCLTransition{
             case .gradualBoxBrushStroke: return "gradualBoxBrushStroke"
             case .gradualBoxZoom: return "gradualBoxZoom"
             case .gradualDoubleBoxZoom: return "GradualDoubleBoxZoom"
+            case .adoreTransition: return "AdoreTransition"
+            case .flareOverlay: return "flare overlay"
             }
         }
     }

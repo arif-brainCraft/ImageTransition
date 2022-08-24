@@ -24,6 +24,8 @@ class Template{
             return SquareBoxPopTemplate(allImageUrls: allImageUrls)
         } else if self.type == GradualBoxTemplate.self {
             return GradualBoxTemplate(allImageUrls: allImageUrls)
+        } else if self.type == AdoreTemplate.self {
+            return AdoreTemplate(allImageUrls: allImageUrls)
         }
         return GradualBoxTemplate(allImageUrls: allImageUrls)
     }
@@ -34,7 +36,7 @@ struct Templates {
 
     static var featured = [
         Template(name: "Over The Box", isPremium: false, type: SquareBoxPopTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+        Template(name: "AdoreTemplate", isPremium: false, type: AdoreTemplate.self),
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
         Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
