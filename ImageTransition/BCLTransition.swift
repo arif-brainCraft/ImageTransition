@@ -41,6 +41,7 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
     
     // Subclasses must provide fragmentName
     var fragmentName: String { return "" }
+    var vertexName: String { return "" }
     var parameters: [String: Any] = [String: Any]()
     var samplers: [String: String] { return [:] }
     
@@ -60,12 +61,21 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         params["ratio"] = Float(input.size.width / input.size.height)
         params["progress"] = progress
         
-        let output = kernel.apply(toInputImages: images, parameters: params, outputDescriptors: outputDescriptors).first
+        let output = kernel.apply(to: images, parameters: params, outputDescriptors: outputDescriptors).first
         return output
     }
     
     var kernel: MTIRenderPipelineKernel {
-        let vertexDescriptor = MTIFunctionDescriptor(name: MTIFilterPassthroughVertexFunctionName)
+        
+        var vertexDescriptor:MTIFunctionDescriptor!
+        
+        if vertexName.isEmpty {
+            vertexDescriptor = MTIFunctionDescriptor(name: MTIFilterPassthroughVertexFunctionName)
+        }else{
+            vertexDescriptor = MTIFunctionDescriptor(name: vertexName, libraryURL: MTIDefaultLibraryURLForBundle(Bundle(for: BCLTransition.self)))
+        }
+        
+        
         let fragmentDescriptor = MTIFunctionDescriptor(name: fragmentName, libraryURL: MTIDefaultLibraryURLForBundle(Bundle(for: BCLTransition.self)))
         let kernel = MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor)
         return kernel

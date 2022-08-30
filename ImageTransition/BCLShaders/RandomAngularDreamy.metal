@@ -19,12 +19,12 @@ constant float4 bgcolor = float4(0.0, 0.0, 0.0, 1.0);
 constant float randomness = 0.1;
 
 
-
  float2 offset_d(float progress, float x, float theta) {
    //float phase = progress*progress + progress + theta;
    float shifty = 0.03*progress*cos(10.0*(progress+x));
    return float2(0, shifty);
  }
+
  float getDelta(float2 p) {
    float2 rectanglePos = floor(float2(size) * p);
    float2 rectangleSize = float2(1.0 / float2(size).x, 1.0 / float2(size).y);

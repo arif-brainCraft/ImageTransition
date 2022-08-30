@@ -8,14 +8,27 @@
 import Foundation
 
 public class TextureOverlayWithTranslationFilter: BCLTransition {
-    let HEARTS_OVERLAY = 1
-    let DOTS_OVERLAY = 2
+    let HEARTS_OVERLAY = 0
+    let DOTS_OVERLAY = 1
 
     private var overlayTexName = "";
 
-    var opacityMul = 0.25
-    var overlayId = 1
-    private var frameRatio = 1.0;
+    var opacityMul = 0.25{
+        didSet{
+            setParams()
+        }
+    }
+    var overlayId = 1{
+        didSet{
+            setParams()
+        }
+    }
+    
+    var frameRatio = 1.0{
+        didSet{
+            setParams()
+        }
+    }
 
     func setParams() -> Void {
         self.parameters = ["opacityMul":opacityMul,
