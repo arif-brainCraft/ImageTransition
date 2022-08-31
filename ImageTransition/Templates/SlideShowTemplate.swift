@@ -166,7 +166,7 @@ class SlideShowTemplate{
         tEnd = tStart + transitionAnimDuration
 
         
-        print("progress \(progress) image \(imageIndex) start \(start) End \(end)")
+        //print("progress \(progress) image \(imageIndex) start \(start) End \(end)")
         //print("progress \(progress) tStart \(tStart) tEnd \(tEnd)")
         
         return Schedule(start: start, end: end, tStart: tStart, tEnd: tEnd, imageIndex: imageIndex, pauseDuration: pauseDuration, animDuration: animDuration,transitionAnimDuration: transitionAnimDuration)

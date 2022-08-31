@@ -65,6 +65,9 @@ public class AdoreTransition: BCLTransition {
         }
     }
     
+    public func changeRotation( val:Float,pos:(row:Int,col:Int)){
+        rotation[pos.col][pos.row] += val;
+    }
     
     public func setVideoRatio( value:Float){
         self.videoRatio = value;

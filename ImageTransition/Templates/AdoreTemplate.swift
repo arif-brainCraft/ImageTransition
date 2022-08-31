@@ -13,20 +13,52 @@ import simd
 class AdoreTemplate: SlideShowTemplate {
  
     let adoreTransitionFilter = AdoreTransition()
-    
-    
+    let heartOverlayFilter = TextureOverlayWithTranslationFilter()
+    let dotOverlayFilter = TextureOverlayWithTranslationFilter()
+    let shakyZoomFilter = ShakyZoom()
+    let prevShakyZoomFilter = ShakyZoom()
+
     override init(allImageUrls: [URL]) {
         super.init(allImageUrls: allImageUrls)
 
         outputSize = CGSize(width: 1080, height: 1080)
-        setFilterWithImage(url: allImageUrls.first!)
-        self.duration = Double(allImageUrls.count * 3)
+        setFilterWithImage(index: 0)
+        self.duration = Double(Double(allImageUrls.count) * adoreTransitionFilter.duration)
     }
     
-    func setFilterWithImage(url:URL) -> Void {
+    func setFilterWithImage(index:Int) -> Void {
         
         
+        let mtiImage = MTIImage(contentsOf: allImageUrls[index], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
         
+        shakyZoomFilter.inputImage = mtiImage
+        adoreTransitionFilter.inputImage = mtiImage
+        heartOverlayFilter.inputImage = mtiImage
+        dotOverlayFilter.inputImage = mtiImage
+        
+        if index + 1 < allImageUrls.count {
+            let destMtiImage = MTIImage(contentsOf: allImageUrls[index + 1], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
+            adoreTransitionFilter.destImage = destMtiImage
+            shakyZoomFilter.destImage = destMtiImage
+
+        }else{
+            adoreTransitionFilter.destImage = mtiImage
+            shakyZoomFilter.destImage = mtiImage
+
+        }
+        
+        
+        if heartOverlayFilter.destImage == nil, let url = Bundle.main.url(forResource: "love", withExtension: "png") {
+            let mtiStroke = MTIImage(contentsOf: url, size: CGSize(width: outputSize.width - 160, height: outputSize.height - 160), options: [.SRGB:false], alphaType: .nonPremultiplied)
+            heartOverlayFilter.destImage = mtiStroke
+        }
+        
+        if dotOverlayFilter.destImage == nil, let url = Bundle.main.url(forResource: "dots", withExtension: "png") {
+            let mtiStroke = MTIImage(contentsOf: url, size: CGSize(width: outputSize.width - 160, height: outputSize.height - 160), options: [.SRGB:false], alphaType: .nonPremultiplied)
+            dotOverlayFilter.destImage = mtiStroke
+        }
+        heartOverlayFilter.opacityMul = 0.15
+        dotOverlayFilter.opacityMul = 0.3
     }
     
     
@@ -34,26 +66,41 @@ class AdoreTemplate: SlideShowTemplate {
     
     override func getFrame(progress: Float) -> MTIImage? {
         
-        let schedule = super.getSchedule(progress: progress)
         
-        if schedule.imageIndex != currentImageIndex  {
-            currentImageIndex = schedule.imageIndex
-            //print("imageIndex \(imageIndex) progress \(progress)")
+        heartOverlayFilter.progress = 1.0 - progress
+        dotOverlayFilter.progress = (progress * 2.0 - floor(progress * 2.0))
+        adoreTransitionFilter.progress = sin(0.5 * Float.pi * progress)
+        shakyZoomFilter.progress = sin(0.5 * Float.pi * progress)
+
+        if adoreTransitionFilter.progress == 1.0  {
+            currentImageIndex += 1
             
-            if schedule.imageIndex < allImageUrls.count {
-                setFilterWithImage(url: allImageUrls[schedule.imageIndex])
-                prevAnim = currentAnim
-                currentAnim = Int.random(in: 0..<2)
-                //presentTime = CMTimeAdd(presentTime, CMTime(value: 100, timescale: 1000))
+            if currentImageIndex >= allImageUrls.count {
+                currentImageIndex = 0
             }
-        }
-        
-        if schedule.imageIndex < allImageUrls.count ,let ciimage = CIImage(contentsOf: allImageUrls[schedule.imageIndex]){
-            let image = applyRotationTransform(ciimage:ciimage , progress: progress)
-            return MTIImage(ciImage: image)
+            setFilterWithImage(index: currentImageIndex)
 
         }
-        return MTIImage(contentsOf: allImageUrls[0], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
+        
+
+        
+        //adoreTransitionFilter.progress = 1.0 - adoreTransitionFilter.progress
+
+        print("adore progress \(adoreTransitionFilter.progress) progress \(progress)")
+
+        let image = FilterGraph.makeImage(builder: { output in
+            heartOverlayFilter=>dotOverlayFilter=>adoreTransitionFilter=>output
+        })
+        
+        shakyZoomFilter.inputImage = image
+       
+        
+        return shakyZoomFilter.outputImage
+    }
+    
+    private func setLoveRotation() {
+        adoreTransitionFilter.changeRotation(value: 0.4 /*random.nextFloat()*/);
+        adoreTransitionFilter.changeRotation(val: 3, pos: (row: 2, col: 1));
     }
     
     func applyRotationTransform(ciimage:CIImage,progress:Float) -> CIImage {

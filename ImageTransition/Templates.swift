@@ -35,26 +35,26 @@ class Template{
 struct Templates {
 
     static var featured = [
-        Template(name: "Over The Box", isPremium: false, type: SquareBoxPopTemplate.self),
+        //Template(name: "Over The Box", isPremium: false, type: SquareBoxPopTemplate.self),
         Template(name: "AdoreTemplate", isPremium: false, type: AdoreTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self)
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
+//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self)
 
     ]
     

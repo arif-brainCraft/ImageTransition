@@ -15,7 +15,7 @@ struct vertexIn{
     float4 color[[attribute(1)]];
 };
 
-fragment float4 flareOverlay (VertexOut vertexIn [[ stage_in ]],
+fragment float4 transformFilterWithMirrorFragment (VertexOut vertexIn [[ stage_in ]],
                               texture2d<float, access::sample> sTexture [[ texture(0) ]],
                               constant matrix_float4x4 & transformMatrix [[ buffer(0) ]],
                               constant float & low [[ buffer(1) ]],
@@ -38,7 +38,7 @@ fragment float4 flareOverlay (VertexOut vertexIn [[ stage_in ]],
     return (uv.y > high || uv.y < low) ? float4(0.0) : color;
 }
 
-vertex float4 vertex_shader (const vertexIn vertexin [[stage_in]],
+vertex float4 transformFilterWithMirrorVertex (const vertexIn vertexin [[stage_in]],
                                 constant matrix_float4x4 & rot [[ buffer(0) ]],
                                 constant float4 &aPosition [[buffer(1)]],
                              constant float4x4 & orthographicMatrix [[buffer(2)]]){

@@ -78,6 +78,7 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         
         let fragmentDescriptor = MTIFunctionDescriptor(name: fragmentName, libraryURL: MTIDefaultLibraryURLForBundle(Bundle(for: BCLTransition.self)))
         let kernel = MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor)
+        
         return kernel
     }
     

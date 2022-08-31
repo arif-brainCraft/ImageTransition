@@ -51,6 +51,10 @@
 		135C46CE28B74FFF0000F74E /* TransformFilterWithMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135C46CD28B74FFF0000F74E /* TransformFilterWithMirror.swift */; };
 		135C46D228B782730000F74E /* loveIconPng.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 135C46D028B782730000F74E /* loveIconPng.jpeg */; };
 		135C46D328B782730000F74E /* red-heart-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 135C46D128B782730000F74E /* red-heart-icon.png */; };
+		135C46D728BE13810000F74E /* love.png in Resources */ = {isa = PBXBuildFile; fileRef = 135C46D628BE13800000F74E /* love.png */; };
+		135C46D928BE13870000F74E /* dots.png in Resources */ = {isa = PBXBuildFile; fileRef = 135C46D828BE13870000F74E /* dots.png */; };
+		135C46DB28BF709E0000F74E /* ShakyZoom.metal in Sources */ = {isa = PBXBuildFile; fileRef = 135C46DA28BF709D0000F74E /* ShakyZoom.metal */; };
+		135C46DD28BF72F90000F74E /* ShakyZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135C46DC28BF72F90000F74E /* ShakyZoom.swift */; };
 		1376AB8E286B0FE400F1BF3E /* GradualBoxBrush.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */; };
 		1376AB90286B3D8700F1BF3E /* GradualBoxBrush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */; };
 		1376AB92287E990E00F1BF3E /* GradualBoxBrushStroke.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */; };
@@ -136,6 +140,10 @@
 		135C46CD28B74FFF0000F74E /* TransformFilterWithMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformFilterWithMirror.swift; sourceTree = "<group>"; };
 		135C46D028B782730000F74E /* loveIconPng.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = loveIconPng.jpeg; sourceTree = "<group>"; };
 		135C46D128B782730000F74E /* red-heart-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "red-heart-icon.png"; sourceTree = "<group>"; };
+		135C46D628BE13800000F74E /* love.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = love.png; sourceTree = "<group>"; };
+		135C46D828BE13870000F74E /* dots.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dots.png; sourceTree = "<group>"; };
+		135C46DA28BF709D0000F74E /* ShakyZoom.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ShakyZoom.metal; sourceTree = "<group>"; };
+		135C46DC28BF72F90000F74E /* ShakyZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShakyZoom.swift; sourceTree = "<group>"; };
 		1376AB8D286B0FE400F1BF3E /* GradualBoxBrush.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrush.metal; sourceTree = "<group>"; };
 		1376AB8F286B3D8700F1BF3E /* GradualBoxBrush.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxBrush.swift; sourceTree = "<group>"; };
 		1376AB91287E990E00F1BF3E /* GradualBoxBrushStroke.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GradualBoxBrushStroke.metal; sourceTree = "<group>"; };
@@ -272,6 +280,8 @@
 		135C46CF28B781D30000F74E /* HeartIcons */ = {
 			isa = PBXGroup;
 			children = (
+				135C46D828BE13870000F74E /* dots.png */,
+				135C46D628BE13800000F74E /* love.png */,
 				135C46D028B782730000F74E /* loveIconPng.jpeg */,
 				135C46D128B782730000F74E /* red-heart-icon.png */,
 			);
@@ -330,6 +340,7 @@
 			children = (
 				135C46CF28B781D30000F74E /* HeartIcons */,
 				1376AB98287EDAEF00F1BF3E /* BrushStrokes */,
+				135C46DA28BF709D0000F74E /* ShakyZoom.metal */,
 				13E66332283A7C050059802E /* CustomTransitionEffect.swift */,
 				1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */,
 				1376AB93287EA0E000F1BF3E /* GradualBoxBrushStroke.swift */,
@@ -366,6 +377,7 @@
 				135C46C928B64CD90000F74E /* TextureOverlayWithTranslationFilter.swift */,
 				135C46CB28B662DF0000F74E /* TransformFilterWithMirror.metal */,
 				135C46CD28B74FFF0000F74E /* TransformFilterWithMirror.swift */,
+				135C46DC28BF72F90000F74E /* ShakyZoom.swift */,
 			);
 			path = BCLShaders;
 			sourceTree = "<group>";
@@ -458,6 +470,7 @@
 				130A86E52817F7F000943CCA /* 2.jpg in Resources */,
 				130F1FC3284CB5A60063F8BC /* moshow2.mp4 in Resources */,
 				130A86CE2817F42500943CCA /* LaunchScreen.storyboard in Resources */,
+				135C46D928BE13870000F74E /* dots.png in Resources */,
 				135C46D228B782730000F74E /* loveIconPng.jpeg in Resources */,
 				130F1FC9284CDFC80063F8BC /* fourthClip.mp4 in Resources */,
 				130F1FC1284CB3C80063F8BC /* moshow.MOV in Resources */,
@@ -470,6 +483,7 @@
 				130F1FCD284E130F0063F8BC /* sixthClip.MOV in Resources */,
 				130A86CB2817F42500943CCA /* Assets.xcassets in Resources */,
 				130A86E02817F7F000943CCA /* 7.jpg in Resources */,
+				135C46D728BE13810000F74E /* love.png in Resources */,
 				1376AB9E287EDB1700F1BF3E /* b5.png in Resources */,
 				130A86DF2817F7F000943CCA /* 6.jpg in Resources */,
 				130A86C92817F42300943CCA /* Main.storyboard in Resources */,
@@ -533,6 +547,7 @@
 				1376AB8E286B0FE400F1BF3E /* GradualBoxBrush.metal in Sources */,
 				13E6633E283B83410059802E /* DreamyWindowSlice.metal in Sources */,
 				13BCF20A2886AB2E001DBA9F /* TemplateCollectionViewCell.swift in Sources */,
+				135C46DB28BF709E0000F74E /* ShakyZoom.metal in Sources */,
 				13E66354283BCFE90059802E /* RandomAngularDreamy.swift in Sources */,
 				139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */,
 				13E66333283A7C050059802E /* CustomTransitionEffect.swift in Sources */,
@@ -557,6 +572,7 @@
 				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
+				135C46DD28BF72F90000F74E /* ShakyZoom.swift in Sources */,
 				1376ABA0287EF27B00F1BF3E /* GradualBoxZoom.swift in Sources */,
 				130A86E92819168800943CCA /* ImgesToVideoViewController.swift in Sources */,
 				13E66348283BBA110059802E /* AngularTransition.metal in Sources */,

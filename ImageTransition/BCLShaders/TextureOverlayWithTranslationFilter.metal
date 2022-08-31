@@ -40,7 +40,7 @@ fragment float4 textureOvelayWithTransition(VertexOut vertexIn [[ stage_in ]],
     
     float4 sColor = getFromColor(uv, sTexture, ratio, _fromR);
     uv.y /= frameRatio;
-    float4 oColor = getToColor(uv, overlayTexture, ratio,_toR );
+    float4 oColor = getToColor(getOverlayPoint(uv, progress), overlayTexture, ratio,_toR );
     return mix(sColor,getBlendedColor(sColor,oColor),opacityMul);
 }
 
