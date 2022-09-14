@@ -10,9 +10,12 @@
 
 using namespace metalpetal;
 
-struct vertexIn{
+struct VIn{
     float4 position[[attribute(0)]];
-    float4 color[[attribute(1)]];
+    float4 col0[[attribute(1)]];
+    float4 col1[[attribute(2)]];
+    float4 col2[[attribute(3)]];
+    float4 col3[[attribute(4)]];
 };
 
 fragment float4 transformFilterWithMirrorFragment (VertexOut vertexIn [[ stage_in ]],
@@ -38,22 +41,23 @@ fragment float4 transformFilterWithMirrorFragment (VertexOut vertexIn [[ stage_i
     return (uv.y > high || uv.y < low) ? float4(0.0) : color;
 }
 
-vertex float4 transformFilterWithMirrorVertex (const vertexIn vertexin [[stage_in]],
-                                constant matrix_float4x4 & rot [[ buffer(0) ]],
-                                constant float4 &aPosition [[buffer(1)]],
-                             constant float4x4 & orthographicMatrix [[buffer(2)]]){
 
-    float4 color = float4(aPosition.xyz, 1.0) * orthographicMatrix;
-    return color;
-}
-/*
-
-precision highp float;
-varying highp float2 vTextureCoord;
-uniform lowp sampler2D sTexture;
-uniform mat4 transformMatrix;
-uniform float low;
-uniform float high;
+vertex VertexOut transformFilterWithMirrorVertex (const VIn  vertices [[ stage_in ]]){
     
-    */
+    float4 aPosition = vertices.position;
+
+    float4x4 orthographicMatrix = float4x4();
+    orthographicMatrix.columns[0] = vertices.col0;
+    orthographicMatrix.columns[1] = vertices.col1;
+    orthographicMatrix.columns[2] = vertices.col2;
+    orthographicMatrix.columns[3] = vertices.col3;
+
+    VertexOut out;
+
+    out.position = float4(aPosition.xyz, 1.0) * orthographicMatrix;
+    out.textureCoordinate = aPosition.xy;
+
+    return out;
+}
+
 

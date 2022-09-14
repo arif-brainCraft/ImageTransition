@@ -51,9 +51,11 @@ fragment float4 shakyZoom (VertexOut vertexIn [[ stage_in ]],
     p = sZ_zoom(p,smoothstep(0.0, nQuick, progress + 0.3));
     
         
-    return mix(
-               getFromColor(p,fromTexture,ratio,_fromR),
-               getToColor(vertexIn.textureCoordinate,toTexture,ratio,_toR),
-               smoothstep(nQuick-0.2, 1.0, progress)
-               );
+    return getFromColor(p,fromTexture,ratio,_fromR);
+
+//    return mix(
+//               getFromColor(p,fromTexture,ratio,_fromR),
+//               getToColor(vertexIn.textureCoordinate,toTexture,ratio,_toR),
+//               smoothstep(nQuick-0.2, 1.0, progress)
+//               );
 }

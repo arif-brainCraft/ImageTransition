@@ -144,8 +144,8 @@ float4 getHeartColor(float2 uv,float theta,int pos,float ps){
 }
 
 fragment float4 adoreTransition (VertexOut vertexIn [[ stage_in ]],
-                          texture2d<float, access::sample> sTexture [[ texture(0) ]],
-                          texture2d<float, access::sample> prevTexture [[ texture(1) ]],
+                          texture2d<float, access::sample> fromTexture [[ texture(0) ]],
+                          texture2d<float, access::sample> toTexture [[ texture(1) ]],
                           constant float & vRatio [[ buffer(0) ]],
                           constant matrix_float4x4 & rot [[ buffer(1) ]],
 
@@ -154,23 +154,23 @@ fragment float4 adoreTransition (VertexOut vertexIn [[ stage_in ]],
     
     float2 uv = vertexIn.textureCoordinate;
     uv.y = 1.0 - uv.y;
-    float _fromR = float(prevTexture.get_width())/float(prevTexture.get_height());
-    float _toR = float(sTexture.get_width())/float(sTexture.get_height());
+    float _fromR = float(fromTexture.get_width())/float(fromTexture.get_height());
+    float _toR = float(toTexture.get_width())/float(toTexture.get_height());
     
     float ps = getSine(getSine(progress));
     
-    float4 c = getFromColor(uv,prevTexture,ratio,_fromR);
+    float4 c = getFromColor(uv,fromTexture,ratio,_fromR);
     float4 h,to;
     
     for(int i = 0; i<9; i++){
-        to = getBiasedColor(getToColor(uv,sTexture,ratio,_toR),int(i > 3),ps);
+        to = getBiasedColor(getToColor(uv,toTexture,ratio,_toR),int(i > 3),ps);
         h = getHeartColor(float2(uv.x,uv.y/vRatio),rot[i/4][(i - (i/4)*4)],i+10,ps);
         c = mix(mix(c,h,h.a),to,h.a);
     }
     
     if(ps > 0.8){
         float pro = (ps - 0.8) / 0.2;
-        c = mix(c,getToColor(uv,sTexture,ratio,_toR),pro);
+        c = mix(c,getToColor(uv,toTexture,ratio,_toR),pro);
     }
     return c;
 }

@@ -12,41 +12,36 @@ import simd
 
 class AdoreTemplate: SlideShowTemplate {
  
-    let adoreTransitionFilter = AdoreTransition()
+    let heartTransitionFilter = AdoreTransition()
+
     let heartOverlayFilter = TextureOverlayWithTranslationFilter()
     let dotOverlayFilter = TextureOverlayWithTranslationFilter()
-    let shakyZoomFilter = ShakyZoom()
-    let prevShakyZoomFilter = ShakyZoom()
+    let transformFilter = TransformFilterWithMirror()
+    let prevTransformFilter = TransformFilterWithMirror()
 
     override init(allImageUrls: [URL]) {
         super.init(allImageUrls: allImageUrls)
 
         outputSize = CGSize(width: 1080, height: 1080)
         setFilterWithImage(index: 0)
-        self.duration = Double(Double(allImageUrls.count) * adoreTransitionFilter.duration)
+        self.duration = Double(Double(allImageUrls.count) * 5.0)
     }
     
     func setFilterWithImage(index:Int) -> Void {
         
         
         let mtiImage = MTIImage(contentsOf: allImageUrls[index], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
-        
-        shakyZoomFilter.inputImage = mtiImage
-        adoreTransitionFilter.inputImage = mtiImage
-        heartOverlayFilter.inputImage = mtiImage
-        dotOverlayFilter.inputImage = mtiImage
-        
-        if index + 1 < allImageUrls.count {
-            let destMtiImage = MTIImage(contentsOf: allImageUrls[index + 1], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
-            adoreTransitionFilter.destImage = destMtiImage
-            shakyZoomFilter.destImage = destMtiImage
 
-        }else{
-            adoreTransitionFilter.destImage = mtiImage
-            shakyZoomFilter.destImage = mtiImage
+        heartTransitionFilter.inputImage = mtiImage
 
+        var destIndex = index + 1
+        if destIndex >= allImageUrls.count {
+            destIndex = 0
         }
         
+        let destMtiImage = MTIImage(contentsOf: allImageUrls[destIndex], size: outputSize, options: [.SRGB:false], alphaType: .nonPremultiplied)
+        heartTransitionFilter.destImage = destMtiImage
+
         
         if heartOverlayFilter.destImage == nil, let url = Bundle.main.url(forResource: "love", withExtension: "png") {
             let mtiStroke = MTIImage(contentsOf: url, size: CGSize(width: outputSize.width - 160, height: outputSize.height - 160), options: [.SRGB:false], alphaType: .nonPremultiplied)
@@ -66,41 +61,77 @@ class AdoreTemplate: SlideShowTemplate {
     
     override func getFrame(progress: Float) -> MTIImage? {
         
+        let singleProgress:Float = 1.0 / Float(allImageUrls.count)
+        var start:Float = 0.0, end:Float = 0.0
         
-        heartOverlayFilter.progress = 1.0 - progress
-        dotOverlayFilter.progress = (progress * 2.0 - floor(progress * 2.0))
-        adoreTransitionFilter.progress = sin(0.5 * Float.pi * progress)
-        shakyZoomFilter.progress = sin(0.5 * Float.pi * progress)
+        for i in 0..<allImageUrls.count {
+            start = singleProgress * Float(i)
+            end = start + singleProgress
+            if end >= progress {
+                print("image index \(i)")
+                break
+            }
+        }
+        
+        let currentProgress = smoothStep(edge0: start, edge1: end, x: progress)
+        
+        heartOverlayFilter.progress = 1.0 - currentProgress
+        dotOverlayFilter.progress = (currentProgress * 2.0 - floor(currentProgress * 2.0))
+        heartTransitionFilter.progress = sin(0.5 * Float.pi * currentProgress)
 
-        if adoreTransitionFilter.progress == 1.0  {
+        
+        transformFilter.resetTransformation()
+        let rotateTime = 1.0 - currentProgress
+        transformFilter.setScaleUnit(scaleX: 1.0 - 0.25 * rotateTime, scaleY: 1.0 - 0.25 * rotateTime)
+        transformFilter.setRotateInAngle(angleInDegree: 5 * rotateTime)
+
+        
+        prevTransformFilter.resetTransformation()
+        let prevRotateTime = currentProgress
+        prevTransformFilter.setScaleUnit(scaleX: 1.0 + 0.25 * prevRotateTime, scaleY: 1.0 + 0.25 * prevRotateTime)
+        prevTransformFilter.setRotateInAngle(angleInDegree: -5 * prevRotateTime)
+        
+        
+       // print("adore progress \(progress) currentProgress \(currentProgress) progress \(progress)")
+       
+       
+        let image = FilterGraph.makeImage(builder: { output in
+            heartTransitionFilter => transformFilter => heartOverlayFilter => dotOverlayFilter =>  output
+        })
+        
+        //transformFilter.destImage = transformFilter.inputImage
+        
+        if currentProgress == 1.0  {
             currentImageIndex += 1
             
             if currentImageIndex >= allImageUrls.count {
                 currentImageIndex = 0
             }
             setFilterWithImage(index: currentImageIndex)
-
         }
         
-
+        return image
         
-        //adoreTransitionFilter.progress = 1.0 - adoreTransitionFilter.progress
-
-        print("adore progress \(adoreTransitionFilter.progress) progress \(progress)")
-
-        let image = FilterGraph.makeImage(builder: { output in
-            heartOverlayFilter=>dotOverlayFilter=>adoreTransitionFilter=>output
-        })
-        
-        shakyZoomFilter.inputImage = image
+        //shakyZoomFilter.inputImage = image
        
-        
-        return shakyZoomFilter.outputImage
+    }
+    
+    func smoothStep(edge0:Float,edge1:Float,x:Float) -> Float {
+        if x < edge0 {
+            return edge0
+        }
+        if x > edge1 {
+            return edge1
+        }
+        if edge1 <= edge0 {
+            return x
+        }
+        return (x - edge0)/(edge1 - edge0)
     }
     
     private func setLoveRotation() {
-        adoreTransitionFilter.changeRotation(value: 0.4 /*random.nextFloat()*/);
-        adoreTransitionFilter.changeRotation(val: 3, pos: (row: 2, col: 1));
+        heartTransitionFilter.changeRotation(value: 0.4 /*random.nextFloat()*/);
+        heartTransitionFilter.changeRotation(val: 3, pos: (row: 2, col: 1));
     }
     
     func applyRotationTransform(ciimage:CIImage,progress:Float) -> CIImage {

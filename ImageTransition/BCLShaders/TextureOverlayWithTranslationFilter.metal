@@ -35,7 +35,7 @@ fragment float4 textureOvelayWithTransition(VertexOut vertexIn [[ stage_in ]],
     float2 uv = vertexIn.textureCoordinate;
     uv.y = 1.0 - uv.y;
     float _fromR = float(sTexture.get_width())/float(sTexture.get_height());
-    float _toR = float(sTexture.get_width())/float(sTexture.get_height());
+    float _toR = float(overlayTexture.get_width())/float(overlayTexture.get_height());
 
     
     float4 sColor = getFromColor(uv, sTexture, ratio, _fromR);

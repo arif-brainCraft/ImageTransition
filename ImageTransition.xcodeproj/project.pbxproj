@@ -65,6 +65,7 @@
 		1376AB9E287EDB1700F1BF3E /* b5.png in Resources */ = {isa = PBXBuildFile; fileRef = 1376AB9B287EDB1700F1BF3E /* b5.png */; };
 		1376ABA0287EF27B00F1BF3E /* GradualBoxZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376AB9F287EF27B00F1BF3E /* GradualBoxZoom.swift */; };
 		1376ABA4287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */; };
+		138F944328D0A6030006A6BF /* CustomVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 138F944228D0A6030006A6BF /* CustomVertex.swift */; };
 		139D18D1285880AF00432E16 /* VideoCompositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D0285880AF00432E16 /* VideoCompositionManager.swift */; };
 		139D18D32858845C00432E16 /* WhiteMinimalBgFilter.metal in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */; };
 		139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */; };
@@ -154,6 +155,7 @@
 		1376AB9B287EDB1700F1BF3E /* b5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = b5.png; sourceTree = "<group>"; };
 		1376AB9F287EF27B00F1BF3E /* GradualBoxZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradualBoxZoom.swift; sourceTree = "<group>"; };
 		1376ABA3287EFE2100F1BF3E /* GradualDoubleBoxZoom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradualDoubleBoxZoom.swift; sourceTree = "<group>"; };
+		138F944228D0A6030006A6BF /* CustomVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomVertex.swift; sourceTree = "<group>"; };
 		139D18D0285880AF00432E16 /* VideoCompositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCompositionManager.swift; sourceTree = "<group>"; };
 		139D18D22858845C00432E16 /* WhiteMinimalBgFilter.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = WhiteMinimalBgFilter.metal; sourceTree = "<group>"; };
 		139D18D42858914900432E16 /* WhiteMinimalBgFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteMinimalBgFilter.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 				13E66359283D13920059802E /* AspectRatioCollectionCell.swift */,
 				139D18D0285880AF00432E16 /* VideoCompositionManager.swift */,
 				13BCF20B2886AE57001DBA9F /* Templates.swift */,
+				138F944228D0A6030006A6BF /* CustomVertex.swift */,
 			);
 			path = ImageTransition;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				139D18D52858914900432E16 /* WhiteMinimalBgFilter.swift in Sources */,
 				130F1FB0283E3AD60063F8BC /* RandomAngularDreamy.metal in Sources */,
 				130A86C22817F42300943CCA /* AppDelegate.swift in Sources */,
+				138F944328D0A6030006A6BF /* CustomVertex.swift in Sources */,
 				130A86EF281A7EB200943CCA /* CombineTransitionMovieMaker.swift in Sources */,
 				135C46DD28BF72F90000F74E /* ShakyZoom.swift in Sources */,
 				1376ABA0287EF27B00F1BF3E /* GradualBoxZoom.swift in Sources */,

@@ -42,14 +42,22 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
     // Subclasses must provide fragmentName
     var fragmentName: String { return "" }
     var vertexName: String { return "" }
+    var vertexParameters: [simd_float4] = [simd_float4]()
+
     var parameters: [String: Any] = [String: Any]()
     var samplers: [String: String] { return [:] }
     
     public var outputImage: MTIImage? {
-        guard let input = inputImage, let dest = destImage else {
+        guard let input = inputImage else {
             return inputImage
         }
-        var images: [MTIImage] = [input, dest]
+        
+        var images: [MTIImage] = [input]
+        
+        if let dest = destImage {
+            images.append(dest)
+        }
+        
         let outputDescriptors = [ MTIRenderPassOutputDescriptor(dimensions: MTITextureDimensions(cgSize: input.size), pixelFormat: outputPixelFormat)]
         for key in samplers.keys {
             if let name = samplers[key], let samplerImage = samplerImage(name: name) {
@@ -61,8 +69,26 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         params["ratio"] = Float(input.size.width / input.size.height)
         params["progress"] = progress
         
-        let output = kernel.apply(to: images, parameters: params, outputDescriptors: outputDescriptors).first
-        return output
+        
+        if vertexParameters.count > 0 {
+            
+            let geometry = MTIVertices(__vertices: [
+                MTIVertex(position: vertexParameters[0], textureCoordinate: simd_float2.zero),
+                MTIVertex(position: vertexParameters[1], textureCoordinate: simd_float2.zero),
+                MTIVertex(position: vertexParameters[2], textureCoordinate: simd_float2.zero),
+                MTIVertex(position: vertexParameters[3], textureCoordinate: simd_float2.zero),
+                MTIVertex(position: vertexParameters[4], textureCoordinate: simd_float2.zero),
+
+            ],count:1, primitiveType: .triangleStrip)
+            
+            let renderCommand = MTIRenderCommand(kernel: kernel, geometry: geometry, images: images, parameters: params)
+            
+            let output = MTIRenderCommand.images(byPerforming: [renderCommand], outputDescriptors: outputDescriptors).first
+            return output
+        }else{
+            let output = kernel.apply(to: images, parameters: params, outputDescriptors: outputDescriptors).first
+            return output
+        }
     }
     
     var kernel: MTIRenderPipelineKernel {
@@ -77,9 +103,40 @@ public class BCLTransition: NSObject, MTIUnaryFilter {
         
         
         let fragmentDescriptor = MTIFunctionDescriptor(name: fragmentName, libraryURL: MTIDefaultLibraryURLForBundle(Bundle(for: BCLTransition.self)))
-        let kernel = MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor)
+    
+        if vertexParameters.count > 0 {
+            
+            let descriptor = MTLVertexDescriptor()
+            
+            descriptor.attributes[0].format = .float4
+            descriptor.attributes[0].bufferIndex = 0
+            descriptor.attributes[0].offset = 0
+            
+            descriptor.attributes[1].format = .float4
+            descriptor.attributes[1].bufferIndex = 0
+            descriptor.attributes[1].offset = MemoryLayout<Float>.stride * 4
+
+            descriptor.attributes[2].format = .float4
+            descriptor.attributes[2].bufferIndex = 0
+            descriptor.attributes[2].offset = MemoryLayout<Float>.stride * 8
+            
+            descriptor.attributes[3].format = .float4
+            descriptor.attributes[3].bufferIndex = 0
+            descriptor.attributes[3].offset = MemoryLayout<Float>.stride * 12
+            
+            descriptor.attributes[4].format = .float4
+            descriptor.attributes[4].bufferIndex = 0
+            descriptor.attributes[4].offset = MemoryLayout<Float>.stride * 16
+            
+            descriptor.layouts[0].stride = MemoryLayout<Float>.stride * 20
+
+            return MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor, vertexDescriptor: descriptor, colorAttachmentCount: 1, alphaTypeHandlingRule: MTIAlphaTypeHandlingRule.passthrough)
+            
+        }else{
+            return  MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor)
+
+        }
         
-        return kernel
     }
     
     public func samplerImage(name: String) -> MTIImage? {

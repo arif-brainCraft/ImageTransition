@@ -81,6 +81,7 @@ class TemplatesViewController: UIViewController {
 
         if progress >= 1.0 {
             slideShowTemplate?.reset()
+            print("Slide show restarted")
         }
     }
     
@@ -185,7 +186,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0;//templates.count
+        return 0//templates.count
     }
     
     

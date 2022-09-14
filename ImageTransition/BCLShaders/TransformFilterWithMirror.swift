@@ -9,11 +9,21 @@ import Foundation
 import simd
 import SceneKit
 import Accelerate
+import MetalPetal
+
 
 class TransformFilterWithMirror:BCLTransition {
 
-    private var orthographicM = matrix_identity_float4x4
-    private var transform3D = matrix_identity_float4x4
+    private var orthographicM = matrix_identity_float4x4{
+        didSet{
+            //setVertexParams()
+        }
+    }
+    private var transform3D = matrix_identity_float4x4{
+        didSet{
+            setParams()
+        }
+    }
 
     private var rotationM = matrix_identity_float4x4
     private var scaleM = matrix_identity_float4x4
@@ -23,19 +33,34 @@ class TransformFilterWithMirror:BCLTransition {
     private var width:Int = 0;
     private var height:Int = 0;
 
-    private var lowLimit:Float = -15.0;
-    private var highLimit:Float = 15.0;
+    private var lowLimit:Float = -15.0{
+        didSet{
+            setParams()
+        }
+    }
+    private var highLimit:Float = 15.0{
+        didSet{
+            setParams()
+        }
+    }
 
 
 
 
     override init() {
         super.init()
-        
         orthographicM = makeOrthographicMatrix(left: -1.0, right: 1.0, bottom: -1.0, top: 1.0, near: -1.0, far: 1.0)
+        //setVertexParams()
         aspectRatio = 1080 / 1920;
         transform3D = matrix_identity_float4x4
     }
+    
+    override var fragmentName: String{
+        return "transformFilterWithMirrorFragment"
+    }
+//    override var vertexName: String{
+//        return "transformFilterWithMirrorVertex"
+//    }
     
     func makeOrthographicMatrix(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) -> float4x4 {
       
@@ -56,9 +81,11 @@ class TransformFilterWithMirror:BCLTransition {
     }
     
     func setVertexParams() -> Void {
-        self.parameters = ["rot":rotationM,
-                           //"aPosition":position,
-                           "orthographicM":orthographicM
+        self.vertexParameters = [simd_float4.init(0.1, 0.1, 0.1, 0.1),
+                                 orthographicM.columns.0,
+                                 orthographicM.columns.1,
+                                 orthographicM.columns.2,
+                                 orthographicM.columns.3,
         ]
     }
     
