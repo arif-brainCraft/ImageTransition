@@ -28,7 +28,7 @@ class TemplatesViewController: UIViewController {
         
         self.navigationItem.rightBarButtonItem = exportButton
         
-        slideShowTemplate = templates.first?.getInstance(allImageUrls: loadImageUrls(count: 3))
+        slideShowTemplate = templates.first?.getInstance(allImageUrls: loadImageUrls(count: 5))
         slideShowTemplate?.delegate = self
     }
     
@@ -54,9 +54,6 @@ class TemplatesViewController: UIViewController {
                     break
                     
                 case .failure(_): break
-
-                case .none:
-                    break
                 }
             })
         }
@@ -107,8 +104,6 @@ class TemplatesViewController: UIViewController {
                 
             case .failure(_): break
 
-            case .none:
-                break
             }
         })
     }
@@ -186,7 +181,7 @@ extension TemplatesViewController:UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 0//templates.count
+        return templates.count
     }
     
     

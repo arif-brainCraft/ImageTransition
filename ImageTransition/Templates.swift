@@ -20,14 +20,10 @@ class Template{
     
     func getInstance(allImageUrls: [URL]) -> SlideShowTemplate {
         
-        if self.type == SquareBoxPopTemplate.self {
-            return SquareBoxPopTemplate(allImageUrls: allImageUrls)
-        } else if self.type == GradualBoxTemplate.self {
-            return GradualBoxTemplate(allImageUrls: allImageUrls)
-        } else if self.type == AdoreTemplate.self {
+        if self.type == AdoreTemplate.self {
             return AdoreTemplate(allImageUrls: allImageUrls)
         }
-        return GradualBoxTemplate(allImageUrls: allImageUrls)
+        return AdoreTemplate(allImageUrls: allImageUrls)
     }
     
 }
@@ -38,24 +34,6 @@ struct Templates {
         //Template(name: "Over The Box", isPremium: false, type: SquareBoxPopTemplate.self),
         Template(name: "AdoreTemplate", isPremium: false, type: AdoreTemplate.self),
         //Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self),
-//        Template(name: "Box motion", isPremium: false, type: GradualBoxTemplate.self)
-
     ]
     
     static func twoD(array:[Template],by:Int) -> [[Template]] {

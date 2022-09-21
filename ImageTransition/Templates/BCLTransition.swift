@@ -15,6 +15,7 @@ public typealias MTTransitionUpdater = (_ image: MTIImage) -> Void
 
 /// The callback when transition completed
 public typealias MTTransitionCompletion = (_ finished: Bool) -> Void
+public typealias MTMovieMakerCompletion = (Result<URL?, Error>) -> Void
 
 public class BCLTransition: NSObject, MTIUnaryFilter {
     

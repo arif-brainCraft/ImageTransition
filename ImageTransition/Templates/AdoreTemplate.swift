@@ -99,7 +99,6 @@ class AdoreTemplate: SlideShowTemplate {
             heartTransitionFilter => transformFilter => heartOverlayFilter => dotOverlayFilter =>  output
         })
         
-        //transformFilter.destImage = transformFilter.inputImage
         
         if currentProgress == 1.0  {
             currentImageIndex += 1
@@ -111,9 +110,7 @@ class AdoreTemplate: SlideShowTemplate {
         }
         
         return image
-        
-        //shakyZoomFilter.inputImage = image
-       
+               
     }
     
     func smoothStep(edge0:Float,edge1:Float,x:Float) -> Float {
